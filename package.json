@@ -12,12 +12,12 @@
     "react-dom": "^16.13.1"
   },
   "devDependencies": {
-    "babel-preset-nano-react-app": "^0.1.0",
+    "@babel/preset-react": "^7.10.1",
     "parcel": "^2.0.0-alpha.3.2"
   },
   "babel": {
     "presets": [
-      "nano-react-app"
+      "@babel/preset-react"
     ]
   }
 }
