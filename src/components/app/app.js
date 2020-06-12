@@ -6,7 +6,7 @@ class App extends React.Component {
     return (
       <div>
         <h1>SynBIM Fluid Simulation</h1>
-        <WebGL id="webgl"/>
+        <WebGL id="webgl" program="lbm"/>
       </div>
     );
   }

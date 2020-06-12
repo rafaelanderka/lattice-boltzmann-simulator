@@ -24,15 +24,15 @@
 class WebGLInterface {
   constructor(id) {
     this.id = id;
-    this.initWebGLContext();
-    this.initHalfFloatRendering();
-    this.initVertexBuffer();
-    this.initEventListeners();
+    this._initWebGLContext();
+    this._initHalfFloatRendering();
+    this._initVertexBuffer();
+    this._initEventListeners();
   }
 
   // Note: Originally taken from Pavel Dobryakov's WebGL Fluid Simulation
   // https://github.com/PavelDoGreat/WebGL-Fluid-Simulation
-  initWebGLContext() {
+  _initWebGLContext() {
     // Get canvas
     this.canvas = document.querySelector(`#${this.id}`);
 
@@ -50,7 +50,7 @@ class WebGLInterface {
 
   // Note: Originally taken from Pavel Dobryakov's WebGL Fluid Simulation
   // https://github.com/PavelDoGreat/WebGL-Fluid-Simulation
-  initHalfFloatRendering() {
+  _initHalfFloatRendering() {
     // Enable WebGL extensions
     let halfFloat;
     if (this.isWebGL2) {
@@ -118,7 +118,7 @@ class WebGLInterface {
   // Initializes a vertex buffer for drawing full screen quads
   // Note: Originally taken from Pavel Dobryakov's WebGL Fluid Simulation
   // https://github.com/PavelDoGreat/WebGL-Fluid-Simulation
-  initVertexBuffer() {
+  _initVertexBuffer() {
     this.vertexBuffer = this.gl.createBuffer();
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
     const vertices = [1.0, 1.0, 0.0, 1.0, 1.0, -1.0, 1.0, 0.0, 0.0, 1.0, 1.0, -1.0, 0.0, 1.0, 0.0, -1.0, -1.0, 0.0, 0.0, 0.0];
@@ -128,11 +128,11 @@ class WebGLInterface {
   }
 
   // Inintializes event listeners for mouse and touch input
-  initEventListeners() {
+  _initEventListeners() {
       // Initialize input state variables
-      this.setCanvasPos();
+      this._setCanvasPos();
       this.isActive = false;
-      this.mousePos = {
+      this.cursorPos = {
         x: 0.0,
         y: 0.0
       };
@@ -140,13 +140,13 @@ class WebGLInterface {
         x: 0.0,
         y: 0.0
       };
-      this.mouseVel = {
+      this.cursorVel = {
         x: 0.0,
         y: 0.0
       };
       
       // Handle mouse input
-      this.canvas.addEventListener("mousemove", e => this.setMousePos(e), false);
+      this.canvas.addEventListener("mousemove", e => this._setCursorPos(e), false);
       this.canvas.addEventListener("mousedown", e => {this.isActive = true;});
       this.canvas.addEventListener("mouseup", e => {this.isActive = false;});
   
@@ -154,33 +154,41 @@ class WebGLInterface {
       this.canvas.addEventListener("touchstart", e => { 
         e.preventDefault();
         this.isActive = true;
-        this.setMousePos(e.targetTouches[0]);
+        this._setCursorPos(e.targetTouches[0]);
       });
       this.canvas.addEventListener("touchend", e => {this.isActive = false;});
       this.canvas.addEventListener("touchmove", e => { 
         e.preventDefault();
-        this.setMousePos(e.targetTouches[0]);
+        this._setCursorPos(e.targetTouches[0]);
       }, false);
   }
 
-  setMousePos(e) {
-    this.lastMousePos = this.mousePos;
-    this.mousePos = {
+  _setCursorPos(e) {
+    this.lastCursorPos = this.cursorPos;
+    this.cursorPos = {
         x: (e.clientX - this.canvasPos.x) / this.canvas.width,
         y: 1.0 - ((e.clientY - this.canvasPos.y)) / this.canvas.height
     };
-    this.mouseVel = {
-        x: this.mousePos.x - this.lastMousePos.x,
-        y: this.mousePos.y - this.lastMousePos.y
+    this.cursorVel = {
+        x: this.cursorPos.x - this.lastCursorPos.x,
+        y: this.cursorPos.y - this.lastCursorPos.y
     };
   }
 
-  setCanvasPos() {
-    this.canvasPos = this.getPosition(this.canvas);
+  getCursorState() {
+    return {
+      cursorPos: this.cursorPos,
+      cursorVel: this.cursorVel,
+      isActive: this.isActive
+    }
+  }
+
+  _setCanvasPos() {
+    this.canvasPos = this._getPosition(this.canvas);
   }
 
   // Helper function to get an element's exact position
-  getPosition(el) {
+  _getPosition(el) {
     let xPos = 0;
     let yPos = 0;
     
@@ -205,30 +213,16 @@ class WebGLInterface {
   }
 
   // Clears the viewport
-  clear() {
+  clear(r, g, b, a) {
+    this.gl.clearColor(r, g, b, a);
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
   }
 
-  // Main update loop
+  // Update WebGL state
   update() {
-    window.requestAnimFrame(() => this.update());
-    this.setCanvasPos();
-    this.gl.clearColor(this.mousePos.x, this.mousePos.y, this.isActive ? 1.0 : 0.0, 1.0);
-    this.clear();
+    this._setCanvasPos();
   }
 }
-
-// Provides requestAnimationFrame for cross browser support
-window.requestAnimFrame = (function() {
-  return window.requestAnimationFrame ||
-         window.webkitRequestAnimationFrame ||
-         window.mozRequestAnimationFrame ||
-         window.oRequestAnimationFrame ||
-         window.msRequestAnimationFrame ||
-         function(callback, element) {
-           window.setTimeout(callback, 1000/60);
-         };
-})();
 
 export default WebGLInterface;
