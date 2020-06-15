@@ -2,6 +2,7 @@ import React from 'react';
 import WebGLInterface from './helpers/webgl-interface'
 import DefaultProgram from './programs/default-program';
 import LBMProgram from './programs/lbm-program';
+import CursorFollowProgram from './programs/cursor-follow-program';
 
 export default class WebGL extends React.Component {
   constructor(props) {
@@ -16,6 +17,9 @@ export default class WebGL extends React.Component {
     switch (this.props.program) {
       case "lbm":
         this.program = new LBMProgram(this.wgli);
+        break;
+      case "cursorFollow":
+        this.program = new CursorFollowProgram(this.wgli);
         break;
       default:
         this.program = new DefaultProgram(this.wgli);
