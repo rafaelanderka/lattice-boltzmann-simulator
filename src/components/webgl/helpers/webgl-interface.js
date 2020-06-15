@@ -21,12 +21,15 @@
 * SOFTWARE.
 */
 
+import vsBaseSource from '../shaders/vertex/vs-base';
+
 class WebGLInterface {
   constructor(id) {
     this.id = id;
     this._initWebGLContext();
     this._initHalfFloatRendering();
     this._initVertexBuffer();
+    this._initVertexShader();
     this._initEventListeners();
   }
 
@@ -127,6 +130,10 @@ class WebGLInterface {
     this.vertexBuffer.numItems = 4;
   }
 
+  _initVertexShader() {
+    this.vertexShader = this._createShader(vsBaseSource, 'vertex');
+  }
+
   // Inintializes event listeners for mouse and touch input
   _initEventListeners() {
       // Initialize input state variables
@@ -212,6 +219,65 @@ class WebGLInterface {
     };
   }
 
+  // Creates and compiles a fragment shader
+  createFragmentShader(shaderSource) {
+    return this._createShader(shaderSource, 'fragment');
+  }
+
+  // Creates and compiles vertex and fragment shaders for private use
+  _createShader(shaderSource, shaderType) {
+    if (!shaderSource) {
+        return null;
+    }
+
+    let shader;
+    if (shaderType === 'fragment') {
+        shader = this.gl.createShader(this.gl.FRAGMENT_SHADER);
+    } else if (shaderType === 'vertex') {
+        shader = this.gl.createShader(this.gl.VERTEX_SHADER);
+    } else {
+        return null;
+    }
+
+    this.gl.shaderSource(shader, shaderSource);
+    this.gl.compileShader(shader);
+    if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
+        console.log(this.gl.getShaderInfoLog(shader));
+        this.gl.deleteShader(shader);
+        return null;
+    }
+
+    return shader;
+  }
+
+  // Creates and links a pixel shader program
+  createProgram(fragmentShader) {
+    const program = this.gl.createProgram();
+    this.gl.attachShader(program, this.vertexShader);
+    this.gl.attachShader(program, fragmentShader);
+    this.gl.linkProgram(program);
+    if (!this.gl.getProgramParameter(program, this.gl.LINK_STATUS)) {
+        console.log(this.gl.getProgramInfoLog(program));
+        this.gl.deleteProgram(program);    
+        return null;
+    }
+    return program;
+  }
+
+  // Sets active program
+  useProgram(program) {
+    this.gl.useProgram(program);
+  }
+
+  // Get uniform location
+  getUniformLocation(program, uniform) {
+    return this.gl.getUniformLocation(program, uniform);
+  }
+
+  uniform2f(uniform, x1, x2) {
+    return this.gl.uniform2f(uniform, x1, x2);
+  }
+
   // Clears the viewport
   clear(r, g, b, a) {
     this.gl.clearColor(r, g, b, a);
@@ -219,9 +285,21 @@ class WebGLInterface {
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
   }
 
+  // Draw to destination frame buffer
+  blit(destination) {
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
+    this.gl.enableVertexAttribArray(0);
+    this.gl.enableVertexAttribArray(1);
+    this.gl.vertexAttribPointer(0, 3, this.gl.FLOAT, false, 20, 0);
+    this.gl.vertexAttribPointer(1, 2, this.gl.FLOAT, false, 20, 12);
+    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, destination);
+    this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, this.vertexBuffer.numItems);
+  }
+
   // Update WebGL state
   update() {
     this._setCanvasPos();
+    this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
   }
 }
 
