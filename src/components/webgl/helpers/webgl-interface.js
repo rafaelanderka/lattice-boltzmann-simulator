@@ -222,7 +222,7 @@ class WebGLInterface {
   // Creates a framebuffer to use as a render target
   // Note: Originally taken from Pavel Dobryakov's WebGL Fluid Simulation
   // https://github.com/PavelDoGreat/WebGL-Fluid-Simulation
-  createFBO (formatParam, filteringParam) {
+  createFBO(formatParam, filteringParam) {
     // Parse input
     let internalFormat;
     let format;
@@ -280,12 +280,44 @@ class WebGLInterface {
         height: this.canvas.height,
         texelSizeX,
         texelSizeY,
-        attach (id) {
+        attach(id) {
             gl.activeTexture(gl.TEXTURE0 + id);
             gl.bindTexture(gl.TEXTURE_2D, texture);
             return id;
         }
     };
+  }
+
+  // Creates a "double" framebuffer with separate read and write targets
+  // Note: Originally taken from Pavel Dobryakov's WebGL Fluid Simulation
+  // https://github.com/PavelDoGreat/WebGL-Fluid-Simulation
+  createDoubleFBO(formatParam, filteringParam) {
+    let fbo1 = this.createFBO(formatParam, filteringParam);
+    let fbo2 = this.createFBO(formatParam, filteringParam);
+
+    return {
+        width: this.canvas.width,
+        height: this.canvas.height,
+        texelSizeX: fbo1.texelSizeX,
+        texelSizeY: fbo1.texelSizeY,
+        get read() {
+            return fbo1;
+        },
+        set read(v) {
+            fbo1 = v;
+        },
+        get write() {
+            return fbo2;
+        },
+        set write(v) {
+            fbo2 = v;
+        },
+        swap() {
+            const temp = fbo1;
+            fbo1 = fbo2;
+            fbo2 = temp;
+        }
+    }
   }
 
   // Creates and compiles a fragment shader
