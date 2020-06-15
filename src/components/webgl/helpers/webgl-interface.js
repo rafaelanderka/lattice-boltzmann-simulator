@@ -40,11 +40,17 @@ class WebGLInterface {
     this.canvas = document.querySelector(`#${this.id}`);
 
     // Initialize WebGL context
-    const params = { alpha: true, depth: false, stencil: false, antialias: false, preserveDrawingBuffer: false };
+    const params = {
+      alpha: true,
+      depth: false,
+      stencil: false,
+      antialias: false,
+      preserveDrawingBuffer: false
+    };
     this.gl = this.canvas.getContext('webgl2', params);
     this.isWebGL2 = !!this.gl;
     if (!this.isWebGL2) {
-        this.gl = this.canvas.getContext('webgl', params) || canvas.getContext('experimental-webgl', params);
+      this.gl = this.canvas.getContext('webgl', params) || canvas.getContext('experimental-webgl', params);
     }
 
     // Set default clear color to black
@@ -57,23 +63,23 @@ class WebGLInterface {
     // Enable WebGL extensions
     let halfFloat;
     if (this.isWebGL2) {
-        this.gl.getExtension('EXT_color_buffer_float');
-        this.supportsLinearFiltering = this.gl.getExtension('OES_texture_float_linear');
+      this.gl.getExtension('EXT_color_buffer_float');
+      this.supportsLinearFiltering = this.gl.getExtension('OES_texture_float_linear');
     } else {
-        halfFloat = this.gl.getExtension('OES_texture_half_float');
-        this.supportsLinearFiltering = this.gl.getExtension('OES_texture_half_float_linear');
+      halfFloat = this.gl.getExtension('OES_texture_half_float');
+      this.supportsLinearFiltering = this.gl.getExtension('OES_texture_half_float_linear');
     }
 
     // Set supported texture formats
     this.halfFloatTexType = this.isWebGL2 ? this.gl.HALF_FLOAT : halfFloat.HALF_FLOAT_OES;
     if (this.isWebGL2) {
-        this.formatRGBA = this.getSupportedFormat(this.gl.RGBA16F, this.gl.RGBA, this.halfFloatTexType);
-        this.formatRG = this.getSupportedFormat(this.gl.RG16F, this.gl.RG, this.halfFloatTexType);
-        this.formatR = this.getSupportedFormat(this.gl.R16F, this.gl.RED, this.halfFloatTexType);
+      this.formatRGBA = this.getSupportedFormat(this.gl.RGBA16F, this.gl.RGBA, this.halfFloatTexType);
+      this.formatRG = this.getSupportedFormat(this.gl.RG16F, this.gl.RG, this.halfFloatTexType);
+      this.formatR = this.getSupportedFormat(this.gl.R16F, this.gl.RED, this.halfFloatTexType);
     } else {
-        this.formatRGBA = this.getSupportedFormat(this.gl.RGBA, this.gl.RGBA, this.halfFloatTexType);
-        this.formatRG = this.getSupportedFormat(this.gl.RGBA, this.gl.RGBA, this.halfFloatTexType);
-        this.formatR = this.getSupportedFormat(this.gl.RGBA, this.gl.RGBA, this.halfFloatTexType);
+      this.formatRGBA = this.getSupportedFormat(this.gl.RGBA, this.gl.RGBA, this.halfFloatTexType);
+      this.formatRG = this.getSupportedFormat(this.gl.RGBA, this.gl.RGBA, this.halfFloatTexType);
+      this.formatR = this.getSupportedFormat(this.gl.RGBA, this.gl.RGBA, this.halfFloatTexType);
     }
   }
 
@@ -82,19 +88,19 @@ class WebGLInterface {
   // https://github.com/PavelDoGreat/WebGL-Fluid-Simulation
   getSupportedFormat (internalFormat, format, type) {
     if (!this.supportsRenderTextureFormat(internalFormat, format, type)) {
-        switch (internalFormat) {
-            case this.gl.R16F:
-                return this.getSupportedFormat(this.gl.RG16F, this.gl.RG, type);
-            case this.gl.RG16F:
-                return this.getSupportedFormat(this.gl.RGBA16F, this.gl.RGBA, type);
-            default:
-                return null;
-        }
+      switch (internalFormat) {
+        case this.gl.R16F:
+          return this.getSupportedFormat(this.gl.RG16F, this.gl.RG, type);
+        case this.gl.RG16F:
+          return this.getSupportedFormat(this.gl.RGBA16F, this.gl.RGBA, type);
+        default:
+          return null;
+      }
     }
 
     return {
-        internalFormat,
-        format
+      internalFormat,
+      format
     }
   }
 
@@ -136,49 +142,49 @@ class WebGLInterface {
 
   // Inintializes event listeners for mouse and touch input
   _initEventListeners() {
-      // Initialize input state variables
-      this._setCanvasPos();
-      this.isActive = false;
-      this.cursorPos = {
-        x: 0.0,
-        y: 0.0
-      };
-      this.prevMousePos = {
-        x: 0.0,
-        y: 0.0
-      };
-      this.cursorVel = {
-        x: 0.0,
-        y: 0.0
-      };
-      
-      // Handle mouse input
-      this.canvas.addEventListener("mousemove", e => this._setCursorPos(e), false);
-      this.canvas.addEventListener("mousedown", e => {this.isActive = true;});
-      this.canvas.addEventListener("mouseup", e => {this.isActive = false;});
-  
-      // Handle touch input
-      this.canvas.addEventListener("touchstart", e => { 
-        e.preventDefault();
-        this.isActive = true;
-        this._setCursorPos(e.targetTouches[0]);
-      });
-      this.canvas.addEventListener("touchend", e => {this.isActive = false;});
-      this.canvas.addEventListener("touchmove", e => { 
-        e.preventDefault();
-        this._setCursorPos(e.targetTouches[0]);
-      }, false);
+    // Initialize input state variables
+    this._setCanvasPos();
+    this.isActive = false;
+    this.cursorPos = {
+      x: 0.0,
+      y: 0.0
+    };
+    this.prevMousePos = {
+      x: 0.0,
+      y: 0.0
+    };
+    this.cursorVel = {
+      x: 0.0,
+      y: 0.0
+    };
+    
+    // Handle mouse input
+    this.canvas.addEventListener("mousemove", e => this._setCursorPos(e), false);
+    this.canvas.addEventListener("mousedown", e => {this.isActive = true;});
+    this.canvas.addEventListener("mouseup", e => {this.isActive = false;});
+
+    // Handle touch input
+    this.canvas.addEventListener("touchstart", e => { 
+      e.preventDefault();
+      this.isActive = true;
+      this._setCursorPos(e.targetTouches[0]);
+    });
+    this.canvas.addEventListener("touchend", e => {this.isActive = false;});
+    this.canvas.addEventListener("touchmove", e => { 
+      e.preventDefault();
+      this._setCursorPos(e.targetTouches[0]);
+    }, false);
   }
 
   _setCursorPos(e) {
     this.lastCursorPos = this.cursorPos;
     this.cursorPos = {
-        x: (e.clientX - this.canvasPos.x) / this.canvas.width,
-        y: 1.0 - ((e.clientY - this.canvasPos.y)) / this.canvas.height
+      x: (e.clientX - this.canvasPos.x) / this.canvas.width,
+      y: 1.0 - ((e.clientY - this.canvasPos.y)) / this.canvas.height
     };
     this.cursorVel = {
-        x: this.cursorPos.x - this.lastCursorPos.x,
-        y: this.cursorPos.y - this.lastCursorPos.y
+      x: this.cursorPos.x - this.lastCursorPos.x,
+      y: this.cursorPos.y - this.lastCursorPos.y
     };
   }
 
@@ -200,22 +206,22 @@ class WebGLInterface {
     let yPos = 0;
     
     while (el) {
-        if (el.tagName == "BODY") {
-            // Deal with browser quirks with body/window/document and page scroll
-            let xScroll = el.scrollLeft || document.documentElement.scrollLeft;
-            let yScroll = el.scrollTop || document.documentElement.scrollTop;
-            xPos += (el.offsetLeft - xScroll + el.clientLeft);
-            yPos += (el.offsetTop - yScroll + el.clientTop);
-        } else {
-            // For all other non-BODY elements  
-            xPos += (el.offsetLeft - el.scrollLeft + el.clientLeft);
-            yPos += (el.offsetTop - el.scrollTop + el.clientTop);
-        }
-        el = el.offsetParent;
+      if (el.tagName == "BODY") {
+        // Deal with browser quirks with body/window/document and page scroll
+        let xScroll = el.scrollLeft || document.documentElement.scrollLeft;
+        let yScroll = el.scrollTop || document.documentElement.scrollTop;
+        xPos += (el.offsetLeft - xScroll + el.clientLeft);
+        yPos += (el.offsetTop - yScroll + el.clientTop);
+      } else {
+        // For all other non-BODY elements  
+        xPos += (el.offsetLeft - el.scrollLeft + el.clientLeft);
+        yPos += (el.offsetTop - el.scrollTop + el.clientTop);
+      }
+      el = el.offsetParent;
     }
     return {
-        x: xPos,
-        y: yPos
+      x: xPos,
+      y: yPos
     };
   }
 
@@ -274,17 +280,17 @@ class WebGLInterface {
     const texelSizeY = 1.0 / this.canvas.height;
     const gl = this.gl;
     return {
-        texture,
-        fbo,
-        width: this.canvas.width,
-        height: this.canvas.height,
-        texelSizeX,
-        texelSizeY,
-        attach(id) {
-            gl.activeTexture(gl.TEXTURE0 + id);
-            gl.bindTexture(gl.TEXTURE_2D, texture);
-            return id;
-        }
+      texture,
+      fbo,
+      width: this.canvas.width,
+      height: this.canvas.height,
+      texelSizeX,
+      texelSizeY,
+      attach(id) {
+        gl.activeTexture(gl.TEXTURE0 + id);
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        return id;
+      }
     };
   }
 
@@ -296,27 +302,27 @@ class WebGLInterface {
     let fbo2 = this.createFBO(formatParam, filteringParam);
 
     return {
-        width: this.canvas.width,
-        height: this.canvas.height,
-        texelSizeX: fbo1.texelSizeX,
-        texelSizeY: fbo1.texelSizeY,
-        get read() {
-            return fbo1;
-        },
-        set read(v) {
-            fbo1 = v;
-        },
-        get write() {
-            return fbo2;
-        },
-        set write(v) {
-            fbo2 = v;
-        },
-        swap() {
-            const temp = fbo1;
-            fbo1 = fbo2;
-            fbo2 = temp;
-        }
+      width: this.canvas.width,
+      height: this.canvas.height,
+      texelSizeX: fbo1.texelSizeX,
+      texelSizeY: fbo1.texelSizeY,
+      get read() {
+        return fbo1;
+      },
+      set read(v) {
+        fbo1 = v;
+      },
+      get write() {
+        return fbo2;
+      },
+      set write(v) {
+        fbo2 = v;
+      },
+      swap() {
+        const temp = fbo1;
+        fbo1 = fbo2;
+        fbo2 = temp;
+      }
     }
   }
 
@@ -328,24 +334,24 @@ class WebGLInterface {
   // Creates and compiles vertex and fragment shaders for private use
   _createShader(shaderSource, shaderType) {
     if (!shaderSource) {
-        return null;
+      return null;
     }
 
     let shader;
     if (shaderType === 'fragment') {
-        shader = this.gl.createShader(this.gl.FRAGMENT_SHADER);
+      shader = this.gl.createShader(this.gl.FRAGMENT_SHADER);
     } else if (shaderType === 'vertex') {
-        shader = this.gl.createShader(this.gl.VERTEX_SHADER);
+      shader = this.gl.createShader(this.gl.VERTEX_SHADER);
     } else {
-        return null;
+      return null;
     }
 
     this.gl.shaderSource(shader, shaderSource);
     this.gl.compileShader(shader);
     if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
-        console.log(this.gl.getShaderInfoLog(shader));
-        this.gl.deleteShader(shader);
-        return null;
+      console.log(this.gl.getShaderInfoLog(shader));
+      this.gl.deleteShader(shader);
+      return null;
     }
 
     return shader;
@@ -358,9 +364,9 @@ class WebGLInterface {
     this.gl.attachShader(program, fragmentShader);
     this.gl.linkProgram(program);
     if (!this.gl.getProgramParameter(program, this.gl.LINK_STATUS)) {
-        console.log(this.gl.getProgramInfoLog(program));
-        this.gl.deleteProgram(program);    
-        return null;
+      console.log(this.gl.getProgramInfoLog(program));
+      this.gl.deleteProgram(program);
+      return null;
     }
     return program;
   }
