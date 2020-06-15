@@ -219,6 +219,75 @@ class WebGLInterface {
     };
   }
 
+  // Creates a framebuffer to use as a render target
+  // Note: Originally taken from Pavel Dobryakov's WebGL Fluid Simulation
+  // https://github.com/PavelDoGreat/WebGL-Fluid-Simulation
+  createFBO (formatParam, filteringParam) {
+    // Parse input
+    let internalFormat;
+    let format;
+    switch (formatParam) {
+      case "RGBA":
+        internalFormat = this.formatRGBA.internalFormat;
+        format = this.formatRGBA.format;
+        break;
+      case "RG":
+        internalFormat = this.formatRG.internalFormat;
+        format = this.formatRG.format;
+        break;
+      case "R":
+        internalFormat = this.formatR.internalFormat;
+        format = this.formatR.format;
+        break;
+      default:
+        internalFormat = this.formatRGBA.internalFormat;
+        format = this.formatRGBA.format;
+        break;
+    }
+
+    let filtering;
+    switch (filteringParam) {
+      case "LINEAR":
+        filtering = this.supportsLinearFiltering ? this.gl.LINEAR : this.gl.NEAREST;
+        break;
+      default:
+        filtering = this.gl.NEAREST;
+    }
+
+    // Create FBO
+    this.gl.activeTexture(this.gl.TEXTURE0);
+    const texture = this.gl.createTexture();
+    this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, filtering);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, filtering);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
+    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, internalFormat, this.canvas.width, this.canvas.height, 0, format, this.halfFloatTexType, null);
+
+    const fbo = this.gl.createFramebuffer();
+    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, fbo);
+    this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.COLOR_ATTACHMENT0, this.gl.TEXTURE_2D, texture, 0);
+    this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+
+    const texelSizeX = 1.0 / this.canvas.width;
+    const texelSizeY = 1.0 / this.canvas.height;
+    const gl = this.gl;
+    return {
+        texture,
+        fbo,
+        width: this.canvas.width,
+        height: this.canvas.height,
+        texelSizeX,
+        texelSizeY,
+        attach (id) {
+            gl.activeTexture(gl.TEXTURE0 + id);
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            return id;
+        }
+    };
+  }
+
   // Creates and compiles a fragment shader
   createFragmentShader(shaderSource) {
     return this._createShader(shaderSource, 'fragment');
@@ -274,8 +343,12 @@ class WebGLInterface {
     return this.gl.getUniformLocation(program, uniform);
   }
 
-  uniform2f(uniform, x1, x2) {
-    return this.gl.uniform2f(uniform, x1, x2);
+  uniform2f(location, v0, v1) {
+    this.gl.uniform2f(location, v0, v1);
+  }
+
+  uniform1i(location, v0) {
+    this.gl.uniform1f(location, v0);
   }
 
   // Clears the viewport
