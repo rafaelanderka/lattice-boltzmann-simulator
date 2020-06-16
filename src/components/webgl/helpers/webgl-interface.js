@@ -386,7 +386,7 @@ class WebGLInterface {
   }
 
   uniform1i(location, v0) {
-    this.gl.uniform1f(location, v0);
+    this.gl.uniform1i(location, v0);
   }
 
   // Clears the viewport
