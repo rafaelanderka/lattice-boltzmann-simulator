@@ -4,6 +4,7 @@ import fsInitVelocitySource from '../shaders/fragment/fs-init-velocity';
 import fsInitDensitySource from '../shaders/fragment/fs-init-density';
 import fsInitEqSource from '../shaders/fragment/fs-init-eq';
 import fsForceDensitySource from '../shaders/fragment/fs-force-density';
+import fsWallSource from '../shaders/fragment/fs-wall';
 import fsTRTSource from '../shaders/fragment/fs-trt';
 import fsStreamingSource from '../shaders/fragment/fs-streaming';
 import fsDensitySource from '../shaders/fragment/fs-density';
@@ -12,7 +13,7 @@ import fsOutputSource from '../shaders/fragment/fs-output';
 import fsCircleSource from '../shaders/fragment/fs-circle';
 
 class LBMProgram {
-  constructor(wgli) {
+  constructor(wgli, props) {
     this.params = {};
     this.params.tau = 1.0;
     this.params.TRTmagic = 1.0 / 12.0;
@@ -23,6 +24,7 @@ class LBMProgram {
     this.params.speedOfSound = 0.3;
 
     this.wgli = wgli;
+    this.props = props;
     
     this._initFBOs();
     this._initShaderPrograms();
@@ -80,6 +82,13 @@ class LBMProgram {
     this.forceProgram.cursorVelUniform = this.wgli.getUniformLocation(this.forceProgram, "uCursorVel");
     this.forceProgram.nodeIdUniform = this.wgli.getUniformLocation(this.forceProgram, "uNodeId");
 
+    const wallShader = this.wgli.createFragmentShader(fsWallSource);
+    this.wallProgram = this.wgli.createProgram(wallShader);
+    this.wallProgram.isAddingUniform = this.wgli.getUniformLocation(this.wallProgram, "uIsAdding");
+    this.wallProgram.isRemovingUniform = this.wgli.getUniformLocation(this.wallProgram, "uIsRemoving");
+    this.wallProgram.cursorPosUniform = this.wgli.getUniformLocation(this.wallProgram, "uCursorPos");
+    this.wallProgram.nodeIdUniform = this.wgli.getUniformLocation(this.wallProgram, "uNodeId");
+
     this.TRTProgramF0 = this._createTRTShaderProgram("#define F0 \n");
     this.TRTProgramF1_4 = this._createTRTShaderProgram("#define F1_4 \n");
     this.TRTProgramF5_8 = this._createTRTShaderProgram("#define F5_8 \n");
@@ -98,7 +107,8 @@ class LBMProgram {
 
     const outputShader = this.wgli.createFragmentShader(fsOutputSource);
     this.outputProgram = this.wgli.createProgram(outputShader);
-    this.outputProgram.xUniform = this.wgli.getUniformLocation(this.outputProgram, "uX");
+    this.outputProgram.velocityUniform = this.wgli.getUniformLocation(this.outputProgram, "uVelocity");
+    this.outputProgram.nodeIdUniform = this.wgli.getUniformLocation(this.outputProgram, "uNodeId");
 
     const circleShader = this.wgli.createFragmentShader(fsCircleSource);
     this.circleProgram = this.wgli.createProgram(circleShader);
@@ -143,6 +153,7 @@ class LBMProgram {
     program.densityUniform = this.wgli.getUniformLocation(program, "uDensity");
     program.velocityUniform = this.wgli.getUniformLocation(program, "uVelocity");
     program.distFuncUniform = this.wgli.getUniformLocation(program, "uDistFunc");
+    program.nodeIdUniform = this.wgli.getUniformLocation(program, "uNodeId");
     return program;
   }
 
@@ -300,6 +311,7 @@ class LBMProgram {
     this.wgli.uniform1i(this.velocityProgramF1_4.densityUniform, this.density.read.attach(0));
     this.wgli.uniform1i(this.velocityProgramF1_4.velocityUniform, this.velocity.read.attach(1));
     this.wgli.uniform1i(this.velocityProgramF1_4.distFuncUniform, this.distFuncF1_4.read.attach(2));
+    this.wgli.uniform1i(this.velocityProgramF1_4.nodeIdUniform, this.nodeId.read.attach(3));
     this.wgli.blit(this.velocity.write.fbo);
     this.velocity.swap();
 
@@ -309,6 +321,7 @@ class LBMProgram {
     this.wgli.uniform1i(this.velocityProgramF5_8.densityUniform, this.density.read.attach(0));
     this.wgli.uniform1i(this.velocityProgramF5_8.velocityUniform, this.velocity.read.attach(1));
     this.wgli.uniform1i(this.velocityProgramF5_8.distFuncUniform, this.distFuncF5_8.read.attach(2));
+    this.wgli.uniform1i(this.velocityProgramF5_8.nodeIdUniform, this.nodeId.read.attach(3));
     this.wgli.blit(this.velocity.write.fbo);
     this.velocity.swap();
   }
@@ -344,6 +357,11 @@ class LBMProgram {
     requestAnimFrame(() => this._update());
   }
 
+  // Update props
+  setProps(props) {
+    this.props = props;
+  }
+
   // Main update loop
   _update() {
     // Callback
@@ -352,10 +370,24 @@ class LBMProgram {
     // Pre-update: ensure WebGL interface state is up to date
     this.wgli.update();
 
-    // Get imposed forces
+    // Get cursor state
     const cursorState = this.wgli.getCursorState();
+    
+    // Update walls
+    const isAddingWalls = cursorState.isActive && this.props.tool == 1;
+    const isRemovingWalls = cursorState.isActive && this.props.tool == 2;
+    this.wgli.useProgram(this.wallProgram);
+    this.wgli.uniform1i(this.wallProgram.isAddingUniform, isAddingWalls);
+    this.wgli.uniform1i(this.wallProgram.isRemovingUniform, isRemovingWalls);
+    this.wgli.uniform2f(this.wallProgram.cursorPosUniform, cursorState.cursorPos.x, cursorState.cursorPos.y);
+    this.wgli.uniform1i(this.wallProgram.nodeIdUniform, this.nodeId.read.attach(0));
+    this.wgli.blit(this.nodeId.write.fbo);
+    this.nodeId.swap();
+
+    // Get imposed forces
+    const isAddingForce = cursorState.isActive && this.props.tool == 0;
     this.wgli.useProgram(this.forceProgram);
-    this.wgli.uniform1i(this.forceProgram.isActiveUniform, cursorState.isActive);
+    this.wgli.uniform1i(this.forceProgram.isActiveUniform, isAddingForce);
     this.wgli.uniform2f(this.forceProgram.cursorPosUniform, cursorState.cursorPos.x, cursorState.cursorPos.y);
     this.wgli.uniform2f(this.forceProgram.cursorVelUniform, cursorState.cursorVel.x, cursorState.cursorVel.y);
     this.wgli.uniform1i(this.forceProgram.nodeIdUniform, this.nodeId.read.attach(0));
@@ -375,15 +407,9 @@ class LBMProgram {
 
     // Draw velocity
     this.wgli.useProgram(this.outputProgram);
-    this.wgli.uniform1i(this.outputProgram.xUniform, this.velocity.read.attach(0));
+    this.wgli.uniform1i(this.outputProgram.velocityUniform, this.velocity.read.attach(0));
+    this.wgli.uniform1i(this.outputProgram.nodeIdUniform, this.nodeId.read.attach(1));
     this.wgli.blit(null);
-
-    /*
-    // Draw nodeId
-    this.wgli.useProgram(this.passthroughProgram);
-    this.wgli.uniform1i(this.passthroughProgram.xUniform, this.nodeId.read.attach(0));
-    this.wgli.blit(null);
-    */
   }
 }
 

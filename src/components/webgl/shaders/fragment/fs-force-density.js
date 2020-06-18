@@ -17,7 +17,7 @@ export default `
     int nodeId = int(texture2D(uNodeId, vUV).x + 0.5);
     float dist = length(uCursorPos - vUV);
     float threshold = 0.1;
-    if (uIsActive && dist < threshold && nodeId != 1) {
+    if (uIsActive && dist <= threshold && nodeId != 1) {
       float coeff = 2.0 * (1.0 - dist / threshold);
       gl_FragColor = vec4(coeff * uCursorVel.x, coeff * uCursorVel.y, 0.0, 1.0);
     } else {

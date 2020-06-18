@@ -16,18 +16,22 @@ export default class WebGL extends React.Component {
     // Get corresponding program
     switch (this.props.program) {
       case "lbm":
-        this.program = new LBMProgram(this.wgli);
+        this.program = new LBMProgram(this.wgli, this.props);
         break;
       case "cursorFollow":
-        this.program = new CursorFollowProgram(this.wgli);
+        this.program = new CursorFollowProgram(this.wgli, this.props);
         break;
       default:
-        this.program = new DefaultProgram(this.wgli);
+        this.program = new DefaultProgram(this.wgli, this.props);
         break;
     }
 
     // Start program
     this.program.run();
+  }
+
+  componentDidUpdate() {
+    this.program.setProps(this.props);
   }
 
   render() {
