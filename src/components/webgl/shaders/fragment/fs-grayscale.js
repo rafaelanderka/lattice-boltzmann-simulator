@@ -5,7 +5,6 @@ export default `
   precision highp sampler2D;
 
   uniform sampler2D uX;
-  uniform vec2 uCursorPos;
   varying vec2 vUV; 
   
   void main(void) {
