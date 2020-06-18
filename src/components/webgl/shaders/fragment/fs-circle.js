@@ -10,7 +10,7 @@ export default `
   void main(void) {
     vec2 center = vec2(0.5, 0.5);
     float dist = length(vUV - center);
-    if (dist < 0.1 && dist > 0.09) {
+    if (dist < 0.1) {
       gl_FragColor = vec4(1.0);
     } else {
       gl_FragColor = vec4(0.0);
