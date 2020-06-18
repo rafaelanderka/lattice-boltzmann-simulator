@@ -27,12 +27,13 @@ class WebGLInterface {
   constructor(id) {
     this.id = id;
     this._initWebGLContext();
-    this._initHalfFloatRendering();
+    this._initFloatRendering();
     this._initVertexBuffer();
-    this._initVertexShader();
+    this._initBaseVertexShader();
     this._initEventListeners();
   }
 
+  // Initialises the canvas and WebGL 1 or 2 context
   // Note: Originally taken from Pavel Dobryakov's WebGL Fluid Simulation
   // https://github.com/PavelDoGreat/WebGL-Fluid-Simulation
   _initWebGLContext() {
@@ -57,29 +58,28 @@ class WebGLInterface {
     this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
   }
 
+  // Initialises float rendering (textures and framebuffers)
   // Note: Originally taken from Pavel Dobryakov's WebGL Fluid Simulation
   // https://github.com/PavelDoGreat/WebGL-Fluid-Simulation
-  _initHalfFloatRendering() {
+  _initFloatRendering() {
     // Enable WebGL extensions
-    let halfFloat;
     if (this.isWebGL2) {
       this.gl.getExtension('EXT_color_buffer_float');
-      this.supportsLinearFiltering = this.gl.getExtension('OES_texture_float_linear');
     } else {
-      halfFloat = this.gl.getExtension('OES_texture_half_float');
-      this.supportsLinearFiltering = this.gl.getExtension('OES_texture_half_float_linear');
+      this.gl.getExtension('OES_texture_float');
     }
+    this.supportsLinearFiltering = this.gl.getExtension('OES_texture_float_linear');
 
     // Set supported texture formats
-    this.halfFloatTexType = this.isWebGL2 ? this.gl.HALF_FLOAT : halfFloat.HALF_FLOAT_OES;
-    if (this.isWebGL2) {
-      this.formatRGBA = this.getSupportedFormat(this.gl.RGBA16F, this.gl.RGBA, this.halfFloatTexType);
-      this.formatRG = this.getSupportedFormat(this.gl.RG16F, this.gl.RG, this.halfFloatTexType);
-      this.formatR = this.getSupportedFormat(this.gl.R16F, this.gl.RED, this.halfFloatTexType);
+    this.floatTexType = this.gl.FLOAT;
+    if (this.isWebGL2) {  
+      this.formatRGBA = this.getSupportedFormat(this.gl.RGBA32F, this.gl.RGBA, this.floatTexType);
+      this.formatRG = this.getSupportedFormat(this.gl.RG32F, this.gl.RG, this.floatTexType);
+      this.formatR = this.getSupportedFormat(this.gl.R32F, this.gl.RED, this.floatTexType);
     } else {
-      this.formatRGBA = this.getSupportedFormat(this.gl.RGBA, this.gl.RGBA, this.halfFloatTexType);
-      this.formatRG = this.getSupportedFormat(this.gl.RGBA, this.gl.RGBA, this.halfFloatTexType);
-      this.formatR = this.getSupportedFormat(this.gl.RGBA, this.gl.RGBA, this.halfFloatTexType);
+      this.formatRGBA = this.getSupportedFormat(this.gl.RGBA, this.gl.RGBA, this.floatTexType);
+      this.formatRG = this.getSupportedFormat(this.gl.RGBA, this.gl.RGBA, this.floatTexType);
+      this.formatR = this.getSupportedFormat(this.gl.RGBA, this.gl.RGBA, this.floatTexType);
     }
   }
 
@@ -112,8 +112,8 @@ class WebGLInterface {
     this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
     this.gl.texImage2D(this.gl.TEXTURE_2D, 0, internalFormat, 4, 4, 0, format, type, null);
 
     const fbo = this.gl.createFramebuffer();
@@ -136,7 +136,7 @@ class WebGLInterface {
     this.vertexBuffer.numItems = 4;
   }
 
-  _initVertexShader() {
+  _initBaseVertexShader() {
     this.vertexShader = this._createShader(vsBaseSource, 'vertex');
   }
 
@@ -146,12 +146,12 @@ class WebGLInterface {
     this._setCanvasPos();
     this.isActive = false;
     this.cursorPos = {
-      x: 0.0,
-      y: 0.0
+      x: 0.5,
+      y: 0.5
     };
     this.prevMousePos = {
-      x: 0.0,
-      y: 0.0
+      x: 0.5,
+      y: 0.5
     };
     this.cursorVel = {
       x: 0.0,
@@ -188,6 +188,7 @@ class WebGLInterface {
     };
   }
 
+  // Returns the current cursor state
   getCursorState() {
     return {
       cursorPos: this.cursorPos,
@@ -266,9 +267,9 @@ class WebGLInterface {
     this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, filtering);
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, filtering);
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
-    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, internalFormat, this.canvas.width, this.canvas.height, 0, format, this.halfFloatTexType, null);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
+    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, internalFormat, this.canvas.width, this.canvas.height, 0, format, this.floatTexType, null);
 
     const fbo = this.gl.createFramebuffer();
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, fbo);
@@ -331,7 +332,7 @@ class WebGLInterface {
     return this._createShader(shaderSource, 'fragment');
   }
 
-  // Creates and compiles vertex and fragment shaders for private use
+  // Creates and compiles vertex and fragment shaders
   _createShader(shaderSource, shaderType) {
     if (!shaderSource) {
       return null;
@@ -376,9 +377,13 @@ class WebGLInterface {
     this.gl.useProgram(program);
   }
 
-  // Get uniform location
+  // Gets uniform location
   getUniformLocation(program, uniform) {
     return this.gl.getUniformLocation(program, uniform);
+  }
+
+  uniform1f(location, v0) {
+    this.gl.uniform1f(location, v0);
   }
 
   uniform2f(location, v0, v1) {
@@ -390,14 +395,16 @@ class WebGLInterface {
   }
 
   // Clears the viewport
-  clear(r, g, b, a) {
+  clear(destination, r, g, b, a) {
     this.gl.clearColor(r, g, b, a);
-    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, destination);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+    this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
   }
 
   // Draw to destination frame buffer
   blit(destination) {
+    this.gl.viewport(0, 0, this.canvas.width, this.canvas.height)
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
     this.gl.enableVertexAttribArray(0);
     this.gl.enableVertexAttribArray(1);
