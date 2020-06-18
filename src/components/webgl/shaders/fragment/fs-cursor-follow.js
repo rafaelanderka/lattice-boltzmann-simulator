@@ -10,7 +10,7 @@ export default `
     if (length(uCursorPos - vUV) < 0.1) {
       gl_FragColor = vec4(1.0 - uCursorPos, 0.0, 1.0);
     } else {
-      gl_FragColor = vec4(uCursorPos, 0.0, 1.0);
+      gl_FragColor = vec4(vUV, 0.0, 1.0);
     }
   }
 `;
