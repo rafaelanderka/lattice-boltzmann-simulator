@@ -4,10 +4,10 @@ import fsCursorFollowSource from '../shaders/fragment/fs-cursor-follow';
 class CursorFollowProgram {
   constructor(wgli) {
     this.wgli = wgli;
-    this.initShaderPrograms();
+    this._initShaderPrograms();
   }
 
-  initShaderPrograms() {
+  _initShaderPrograms() {
     const cursorFollowShader = this.wgli.createFragmentShader(fsCursorFollowSource);
     this.cursorFollowProgram = this.wgli.createProgram(cursorFollowShader);
     this.cursorFollowProgram.cursorPosUniform = this.wgli.getUniformLocation(this.cursorFollowProgram, "uCursorPos");
