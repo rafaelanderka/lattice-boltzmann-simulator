@@ -20,7 +20,7 @@ class DefaultProgram {
 
     // Clear screen based on current mouse position
     const cursorState = this.wgli.getCursorState();
-    this.wgli.clear(cursorState.cursorPos.x, cursorState.cursorPos.y, cursorState.isActive ? 1.0 : 0.0, 1.0);
+    this.wgli.clear(null, cursorState.cursorPos.x, cursorState.cursorPos.y, cursorState.isActive ? 1.0 : 0.0, 1.0);
   }
 }
 
