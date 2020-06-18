@@ -4,6 +4,7 @@ export default `
   precision highp float;
 
   uniform vec2 uCursorPos;
+  
   varying vec2 vUV; 
   
   void main(void) {

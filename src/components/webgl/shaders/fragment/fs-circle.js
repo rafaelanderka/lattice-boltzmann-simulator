@@ -4,7 +4,6 @@ export default `
   // Draws a circle for testing purposes
 
   precision highp float;
-  precision highp sampler2D;
 
   varying vec2 vUV; 
   

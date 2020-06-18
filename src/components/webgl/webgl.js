@@ -31,6 +31,6 @@ export default class WebGL extends React.Component {
   }
 
   render() {
-    return (<canvas id={this.props.id} width="256px" height="256px"></canvas>);
+    return (<canvas id={this.props.id} width="512px" height="512px" style={{width: "512px", height: "512px"}}></canvas>);
   }
 }
