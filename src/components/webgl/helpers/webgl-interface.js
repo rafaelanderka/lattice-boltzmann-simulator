@@ -39,6 +39,7 @@ class WebGLInterface {
   _initWebGLContext() {
     // Get canvas
     this.canvas = document.querySelector(`#${this.id}`);
+    this.aspect = this.canvas.width / this.canvas.height;
 
     // Initialize WebGL context
     const params = {
@@ -112,8 +113,8 @@ class WebGLInterface {
     this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
     this.gl.texImage2D(this.gl.TEXTURE_2D, 0, internalFormat, 4, 4, 0, format, type, null);
 
     const fbo = this.gl.createFramebuffer();
@@ -267,8 +268,8 @@ class WebGLInterface {
     this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, filtering);
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, filtering);
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
     this.gl.texImage2D(this.gl.TEXTURE_2D, 0, internalFormat, this.canvas.width, this.canvas.height, 0, format, this.floatTexType, null);
 
     const fbo = this.gl.createFramebuffer();
@@ -414,9 +415,18 @@ class WebGLInterface {
     this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, this.vertexBuffer.numItems);
   }
 
+  // Gets canvas aspect ratio
+  getAspect() {
+    return {
+      xAspect: this.aspect > 1.0 ? this.aspect : 1.0,
+      yAspect: this.aspect < 1.0 ? 1 / this.aspect : 1.0
+    };
+  }
+
   // Update WebGL state
   update() {
     this._setCanvasPos();
+    this.aspect = this.canvas.width / this.canvas.height;
     this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
   }
 }

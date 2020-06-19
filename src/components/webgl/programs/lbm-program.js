@@ -78,6 +78,8 @@ class LBMProgram {
     const forceShader = this.wgli.createFragmentShader(fsForceDensitySource);
     this.forceProgram = this.wgli.createProgram(forceShader);
     this.forceProgram.isActiveUniform = this.wgli.getUniformLocation(this.forceProgram, "uIsActive");
+    this.forceProgram.xAspectUniform = this.wgli.getUniformLocation(this.forceProgram, "uXAspect");
+    this.forceProgram.yAspectUniform = this.wgli.getUniformLocation(this.forceProgram, "uYAspect");
     this.forceProgram.cursorPosUniform = this.wgli.getUniformLocation(this.forceProgram, "uCursorPos");
     this.forceProgram.cursorVelUniform = this.wgli.getUniformLocation(this.forceProgram, "uCursorVel");
     this.forceProgram.nodeIdUniform = this.wgli.getUniformLocation(this.forceProgram, "uNodeId");
@@ -86,6 +88,8 @@ class LBMProgram {
     this.wallProgram = this.wgli.createProgram(wallShader);
     this.wallProgram.isAddingUniform = this.wgli.getUniformLocation(this.wallProgram, "uIsAdding");
     this.wallProgram.isRemovingUniform = this.wgli.getUniformLocation(this.wallProgram, "uIsRemoving");
+    this.wallProgram.xAspectUniform = this.wgli.getUniformLocation(this.wallProgram, "uXAspect");
+    this.wallProgram.yAspectUniform = this.wgli.getUniformLocation(this.wallProgram, "uYAspect");
     this.wallProgram.cursorPosUniform = this.wgli.getUniformLocation(this.wallProgram, "uCursorPos");
     this.wallProgram.nodeIdUniform = this.wgli.getUniformLocation(this.wallProgram, "uNodeId");
 
@@ -112,6 +116,8 @@ class LBMProgram {
 
     const circleShader = this.wgli.createFragmentShader(fsCircleSource);
     this.circleProgram = this.wgli.createProgram(circleShader);
+    this.circleProgram.xAspectUniform = this.wgli.getUniformLocation(this.circleProgram, "uXAspect");
+    this.circleProgram.yAspectUniform = this.wgli.getUniformLocation(this.circleProgram, "uYAspect");
   }
 
   // Creates and returns a init-eq shader program based on the specified define
@@ -189,7 +195,10 @@ class LBMProgram {
 
   // Set initial node Ids
   _setInitNodeId() {
+    const aspect = this.wgli.getAspect();
     this.wgli.useProgram(this.circleProgram);
+    this.wgli.uniform1f(this.circleProgram.xAspectUniform, aspect.xAspect);
+    this.wgli.uniform1f(this.circleProgram.yAspectUniform, aspect.yAspect);
     this.wgli.blit(this.nodeId.write.fbo);
     this.nodeId.swap();
   }
@@ -370,8 +379,9 @@ class LBMProgram {
     // Pre-update: ensure WebGL interface state is up to date
     this.wgli.update();
 
-    // Get cursor state
+    // Get WebGl state
     const cursorState = this.wgli.getCursorState();
+    const aspect = this.wgli.getAspect();
     
     // Update walls
     const isAddingWalls = cursorState.isActive && this.props.tool == 1;
@@ -379,6 +389,8 @@ class LBMProgram {
     this.wgli.useProgram(this.wallProgram);
     this.wgli.uniform1i(this.wallProgram.isAddingUniform, isAddingWalls);
     this.wgli.uniform1i(this.wallProgram.isRemovingUniform, isRemovingWalls);
+    this.wgli.uniform1f(this.wallProgram.xAspectUniform, aspect.xAspect);
+    this.wgli.uniform1f(this.wallProgram.yAspectUniform, aspect.yAspect);
     this.wgli.uniform2f(this.wallProgram.cursorPosUniform, cursorState.cursorPos.x, cursorState.cursorPos.y);
     this.wgli.uniform1i(this.wallProgram.nodeIdUniform, this.nodeId.read.attach(0));
     this.wgli.blit(this.nodeId.write.fbo);
@@ -388,6 +400,8 @@ class LBMProgram {
     const isAddingForce = cursorState.isActive && this.props.tool == 0;
     this.wgli.useProgram(this.forceProgram);
     this.wgli.uniform1i(this.forceProgram.isActiveUniform, isAddingForce);
+    this.wgli.uniform1f(this.forceProgram.xAspectUniform, aspect.xAspect);
+    this.wgli.uniform1f(this.forceProgram.yAspectUniform, aspect.yAspect);
     this.wgli.uniform2f(this.forceProgram.cursorPosUniform, cursorState.cursorPos.x, cursorState.cursorPos.y);
     this.wgli.uniform2f(this.forceProgram.cursorVelUniform, cursorState.cursorVel.x, cursorState.cursorVel.y);
     this.wgli.uniform1i(this.forceProgram.nodeIdUniform, this.nodeId.read.attach(0));
