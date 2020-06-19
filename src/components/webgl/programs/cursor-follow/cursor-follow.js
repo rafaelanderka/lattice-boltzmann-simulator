@@ -1,5 +1,5 @@
-import requestAnimFrame from '../helpers/request-anim-frame';
-import fsCursorFollowSource from '../shaders/fragment/fs-cursor-follow';
+import requestAnimFrame from '../../helpers/request-anim-frame';
+import fsCursorFollowSource from '../../shaders/fragment/fs-cursor-follow';
 
 class CursorFollowProgram {
   constructor(wgli, props) {

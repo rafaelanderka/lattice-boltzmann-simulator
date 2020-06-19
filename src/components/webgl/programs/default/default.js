@@ -1,4 +1,4 @@
-import requestAnimFrame from '../helpers/request-anim-frame';
+import requestAnimFrame from '../../helpers/request-anim-frame';
 
 class DefaultProgram {
   constructor(wgli, props) {

@@ -1,8 +1,8 @@
 import React from 'react';
 import WebGLInterface from './helpers/webgl-interface'
-import DefaultProgram from './programs/default-program';
-import LBMProgram from './programs/lbm-program';
-import CursorFollowProgram from './programs/cursor-follow-program';
+import DefaultProgram from './programs/default/default';
+import LBMProgram from './programs/lbm/lbm';
+import CursorFollowProgram from './programs/cursor-follow/cursor-follow';
 
 export default class WebGL extends React.Component {
   constructor(props) {
