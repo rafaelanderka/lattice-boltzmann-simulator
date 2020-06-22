@@ -146,6 +146,8 @@ class LBMProgram {
     const program = this.wgli.createProgram(shader);
     program.summandUniform = this.wgli.getUniformLocation(program, "uSummand");
     program.distFuncUniform = this.wgli.getUniformLocation(program, "uDistFunc");
+    program.nodeIdUniform = this.wgli.getUniformLocation(program, "uNodeId");
+    program.defaultValUniform = this.wgli.getUniformLocation(program, "uDefaultVal");
     return program;
   }
 
@@ -415,6 +417,8 @@ class LBMProgram {
     this.wgli.useProgram(this.sumDistFuncProgram);
     this.wgli.uniform1i(this.sumDistFuncProgram.summandUniform, this.fluid.density.read.attach(0));
     this.wgli.uniform1i(this.sumDistFuncProgram.distFuncUniform, this.fluid.distFunc0.read.attach(1));
+    this.wgli.uniform1i(this.sumDistFuncProgram.nodeIdUniform, this.nodeId.read.attach(2));
+    this.wgli.uniform1f(this.sumDistFuncProgram.defaultValUniform, this.params.initDensity);
     this.wgli.blit(this.fluid.density.write.fbo);
     this.fluid.density.swap();
 
@@ -422,6 +426,8 @@ class LBMProgram {
     this.wgli.useProgram(this.sumDistFuncProgram);
     this.wgli.uniform1i(this.sumDistFuncProgram.summandUniform, this.fluid.density.read.attach(0));
     this.wgli.uniform1i(this.sumDistFuncProgram.distFuncUniform, this.fluid.distFunc1_4.read.attach(1));
+    this.wgli.uniform1i(this.sumDistFuncProgram.nodeIdUniform, this.nodeId.read.attach(2));
+    this.wgli.uniform1f(this.sumDistFuncProgram.defaultValUniform, this.params.initDensity);
     this.wgli.blit(this.fluid.density.write.fbo);
     this.fluid.density.swap();
 
@@ -429,6 +435,8 @@ class LBMProgram {
     this.wgli.useProgram(this.sumDistFuncProgram);
     this.wgli.uniform1i(this.sumDistFuncProgram.summandUniform, this.fluid.density.read.attach(0));
     this.wgli.uniform1i(this.sumDistFuncProgram.distFuncUniform, this.fluid.distFunc5_8.read.attach(1));
+    this.wgli.uniform1i(this.sumDistFuncProgram.nodeIdUniform, this.nodeId.read.attach(2));
+    this.wgli.uniform1f(this.sumDistFuncProgram.defaultValUniform, this.params.initDensity);
     this.wgli.blit(this.fluid.density.write.fbo);
     this.fluid.density.swap();
   }
@@ -441,6 +449,8 @@ class LBMProgram {
     this.wgli.useProgram(this.sumDistFuncProgram);
     this.wgli.uniform1i(this.sumDistFuncProgram.summandUniform, tracer.concentration.read.attach(0));
     this.wgli.uniform1i(this.sumDistFuncProgram.distFuncUniform, tracer.distFunc0.read.attach(1));
+    this.wgli.uniform1i(this.sumDistFuncProgram.nodeIdUniform, this.nodeId.read.attach(2));
+    this.wgli.uniform1f(this.sumDistFuncProgram.defaultValUniform, 0.0);
     this.wgli.blit(tracer.concentration.write.fbo);
     tracer.concentration.swap();
 
@@ -448,6 +458,8 @@ class LBMProgram {
     this.wgli.useProgram(this.sumDistFuncProgram);
     this.wgli.uniform1i(this.sumDistFuncProgram.summandUniform, tracer.concentration.read.attach(0));
     this.wgli.uniform1i(this.sumDistFuncProgram.distFuncUniform, tracer.distFunc1_4.read.attach(1));
+    this.wgli.uniform1i(this.sumDistFuncProgram.nodeIdUniform, this.nodeId.read.attach(2));
+    this.wgli.uniform1f(this.sumDistFuncProgram.defaultValUniform, 0.0);
     this.wgli.blit(tracer.concentration.write.fbo);
     tracer.concentration.swap();
 
@@ -455,6 +467,8 @@ class LBMProgram {
     this.wgli.useProgram(this.sumDistFuncProgram);
     this.wgli.uniform1i(this.sumDistFuncProgram.summandUniform, tracer.concentration.read.attach(0));
     this.wgli.uniform1i(this.sumDistFuncProgram.distFuncUniform, tracer.distFunc5_8.read.attach(1));
+    this.wgli.uniform1i(this.sumDistFuncProgram.nodeIdUniform, this.nodeId.read.attach(2));
+    this.wgli.uniform1f(this.sumDistFuncProgram.defaultValUniform, 0.0);
     this.wgli.blit(tracer.concentration.write.fbo);
     tracer.concentration.swap();
   }
