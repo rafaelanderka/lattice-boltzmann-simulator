@@ -5,6 +5,7 @@ import fsInitDensitySource from '../../shaders/fragment/fs-init-density';
 import fsInitEqSource from '../../shaders/fragment/fs-init-eq';
 import fsForceDensitySource from '../../shaders/fragment/fs-force-density';
 import fsWallSource from '../../shaders/fragment/fs-wall';
+import fsConcentrationSource from '../../shaders/fragment/fs-concentration';
 import fsTRTSource from '../../shaders/fragment/fs-trt';
 import fsStreamingSource from '../../shaders/fragment/fs-streaming';
 import fsSumDistFuncSource from '../../shaders/fragment/fs-sum-dist-func';
@@ -48,6 +49,7 @@ class LBMProgram {
     this.initEqProgramF5_8 = this._createInitEqShaderProgram("#define F5_8 \n");
     this.forceProgram = this._createForceShaderProgram();
     this.wallProgram = this._createWallShaderProgram();
+    this.concentrationProgram = this._createConcentrationShaderProgram();
     this.TRTProgramF0 = this._createTRTShaderProgram("#define F0 \n");
     this.TRTProgramF1_4 = this._createTRTShaderProgram("#define F1_4 \n");
     this.TRTProgramF5_8 = this._createTRTShaderProgram("#define F5_8 \n");
@@ -115,6 +117,19 @@ class LBMProgram {
     program.xAspectUniform = this.wgli.getUniformLocation(program, "uXAspect");
     program.yAspectUniform = this.wgli.getUniformLocation(program, "uYAspect");
     program.cursorPosUniform = this.wgli.getUniformLocation(program, "uCursorPos");
+    program.nodeIdUniform = this.wgli.getUniformLocation(program, "uNodeId");
+    return program;
+  }
+
+  _createConcentrationShaderProgram() {
+    const shader = this.wgli.createFragmentShader(fsConcentrationSource);
+    const program = this.wgli.createProgram(shader);
+    program.isAddingUniform = this.wgli.getUniformLocation(program, "uIsAdding");
+    program.isRemovingUniform = this.wgli.getUniformLocation(program, "uIsRemoving");
+    program.xAspectUniform = this.wgli.getUniformLocation(program, "uXAspect");
+    program.yAspectUniform = this.wgli.getUniformLocation(program, "uYAspect");
+    program.cursorPosUniform = this.wgli.getUniformLocation(program, "uCursorPos");
+    program.concentrationUniform = this.wgli.getUniformLocation(program, "uConcentration");
     program.nodeIdUniform = this.wgli.getUniformLocation(program, "uNodeId");
     return program;
   }
@@ -546,6 +561,20 @@ class LBMProgram {
     this.wgli.uniform1i(this.wallProgram.nodeIdUniform, this.nodeId.read.attach(0));
     this.wgli.blit(this.nodeId.write.fbo);
     this.nodeId.swap();
+
+    // Update concentration
+    const isAddingConcentration = cursorState.isActive && this.props.tool == 3;
+    const isRemovingConcentration = cursorState.isActive && this.props.tool == 4;
+    this.wgli.useProgram(this.concentrationProgram);
+    this.wgli.uniform1i(this.concentrationProgram.isAddingUniform, isAddingConcentration);
+    this.wgli.uniform1i(this.concentrationProgram.isRemovingUniform, isRemovingConcentration);
+    this.wgli.uniform1f(this.concentrationProgram.xAspectUniform, aspect.xAspect);
+    this.wgli.uniform1f(this.concentrationProgram.yAspectUniform, aspect.yAspect);
+    this.wgli.uniform2f(this.concentrationProgram.cursorPosUniform, cursorState.cursorPos.x, cursorState.cursorPos.y);
+    this.wgli.uniform1i(this.concentrationProgram.concentrationUniform, this.tracers[0].concentration.read.attach(0));
+    this.wgli.uniform1i(this.concentrationProgram.nodeIdUniform, this.nodeId.read.attach(1));
+    this.wgli.blit(this.tracers[0].concentration.write.fbo);
+    this.tracers[0].concentration.swap();
 
     // Get imposed forces
     const isAddingForce = cursorState.isActive && this.props.tool == 0;

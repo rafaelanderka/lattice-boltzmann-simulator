@@ -1,7 +1,7 @@
 export default `
   // FRAGMENT SHADER
 
-  // Draws or erases walls
+  // Adds or removes walls based on the cursor position
 
   precision highp float;
   precision highp sampler2D;
@@ -22,7 +22,7 @@ export default `
     bool isAdding = uIsAdding && isActiveNode;
     bool isRemoving = uIsRemoving && isActiveNode;
     if (isAdding) {
-      gl_FragColor = vec4(1.0);
+      gl_FragColor = vec4(1.0, 0.0, 0.0, 0.0);
     } else if (isRemoving) {
       gl_FragColor = vec4(0.0);
     } else {

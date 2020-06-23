@@ -18,12 +18,12 @@ export default `
   void main(void) {
     int nodeId = int(texture2D(uNodeId, vUV).x + 0.5);
     float dist = length(vec2(uXAspect * uCursorPos.x, uYAspect * uCursorPos.y) - vec2(uXAspect * vUV.x, uYAspect * vUV.y));
-    float threshold = 0.1;
+    float threshold = 0.2;
     if (uIsActive && dist <= threshold && nodeId != 1) {
       float coeff = 5.0 * (1.0 - dist / threshold);
-      gl_FragColor = vec4(coeff * uCursorVel.x, coeff * uCursorVel.y, 0.0, 1.0);
+      gl_FragColor = vec4(coeff * uCursorVel.x, coeff * uCursorVel.y, 0.0, 0.0);
     } else {
-      gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+      gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
     }
   }
 `;
