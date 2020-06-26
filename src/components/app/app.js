@@ -1,5 +1,14 @@
 import React from "react";
 import WebGL from "../webgl/webgl";
+import Toolbar from "../toolbar/toolbar";
+import Button from "../button/button";
+import ContainerDimensions from 'react-container-dimensions';
+import SynBIMLogo from 'url:~/src/public/synbim-logo.jpg';
+import IconFluidSettingsGrey from 'url:~/src/public/icon-fluid-settings-grey.png';
+import IconFluidSettingsWhite from 'url:~/src/public/icon-fluid-settings-white.png';
+import IconTracerSettingsGrey from 'url:~/src/public/icon-tracer-settings-grey.png';
+import IconTracerSettingsWhite from 'url:~/src/public/icon-tracer-settings-white.png';
+import './app.css';
 
 class App extends React.Component {
   constructor(props) {
@@ -7,45 +16,29 @@ class App extends React.Component {
     this.state = {
       tool: 0,
     }
-
-    this.useForceTool = this.useForceTool.bind(this);
-    this.useWallTool = this.useWallTool.bind(this);
-    this.useWallEraserTool = this.useWallEraserTool.bind(this);
-    this.useConcentrationTool = this.useConcentrationTool.bind(this);
-    this.useConcentrationEraserTool = this.useConcentrationEraserTool.bind(this);
+    this.setTool = this.setTool.bind(this);
   }
 
-  useForceTool() {
-    this.setState({tool: 0});
-  }
-
-  useWallTool() {
-    this.setState({tool: 1});
-  }
-
-  useWallEraserTool() {
-    this.setState({tool: 2});
-  }
-
-  useConcentrationTool() {
-    this.setState({tool: 3});
-  }
-
-  useConcentrationEraserTool() {
-    this.setState({tool: 4});
+  setTool(id) {
+    this.setState({tool: id});
   }
 
   render() {
     return (
-      <div>
-        <h1>SynBIM Fluid Simulation</h1>
-        <button onClick={this.useForceTool}>Force Tool</button>
-        <button onClick={this.useWallTool}>Wall Tool</button>
-        <button onClick={this.useWallEraserTool}>Wall Eraser Tool</button>
-        <button onClick={this.useConcentrationTool}>Concentration Tool</button>
-        <button onClick={this.useConcentrationEraserTool}>Concentration Eraser Tool</button>
-        <br/>
-        <WebGL id="webgl" program="lbm" tool={this.state.tool}/>
+      <div className="app">
+        <div className="header">
+          <img className="logo" src={SynBIMLogo} alt="SynBIM"/>
+          <Toolbar tool={this.state.tool} setTool={this.setTool}/>
+          <div className="settings-container">
+            <Button image={IconFluidSettingsGrey} activeImage={IconFluidSettingsWhite} altText="Fluid Settings"/>
+            <Button image={IconTracerSettingsGrey} activeImage={IconTracerSettingsWhite} altText="Tracer Settings"/>
+          </div>
+        </div>
+        <div id="webgl-container">
+          <ContainerDimensions>
+            <WebGL id="webgl" program="lbm" tool={this.state.tool}/>
+          </ContainerDimensions>
+        </div>
       </div>
     );
   }

@@ -8,7 +8,9 @@
   },
   "license": "MIT",
   "dependencies": {
+    "normalize.css": "^8.0.1",
     "react": "^16.13.1",
+    "react-container-dimensions": "^1.4.1",
     "react-dom": "^16.13.1"
   },
   "devDependencies": {
