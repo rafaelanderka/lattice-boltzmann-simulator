@@ -36,7 +36,7 @@ class App extends React.Component {
         </div>
         <div id="webgl-container">
           <ContainerDimensions>
-            <WebGL id="webgl" program="lbm" tool={this.state.tool}/>
+            <WebGL id="webgl" program="lbm" tool={this.state.tool} resolution={256}/>
           </ContainerDimensions>
         </div>
       </div>

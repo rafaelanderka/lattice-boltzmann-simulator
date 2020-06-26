@@ -24,8 +24,9 @@
 import vsBaseSource from '../shaders/vertex/vs-base';
 
 class WebGLInterface {
-  constructor(id) {
+  constructor(id, scale) {
     this.id = id;
+    this.scale = scale;
     this._initWebGLContext();
     this._initFloatRendering();
     this._initVertexBuffer();
@@ -113,8 +114,8 @@ class WebGLInterface {
     this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
     this.gl.texImage2D(this.gl.TEXTURE_2D, 0, internalFormat, 4, 4, 0, format, type, null);
 
     const fbo = this.gl.createFramebuffer();
@@ -180,8 +181,8 @@ class WebGLInterface {
   _setCursorPos(e) {
     this.lastCursorPos = this.cursorPos;
     this.cursorPos = {
-      x: (e.clientX - this.canvasPos.x) / this.canvas.width,
-      y: 1.0 - ((e.clientY - this.canvasPos.y)) / this.canvas.height
+      x: (e.clientX - this.canvasPos.x) / this.canvas.width * this.scale,
+      y: 1.0 - ((e.clientY - this.canvasPos.y)) / this.canvas.height * this.scale
     };
     this.cursorVel = {
       x: this.cursorPos.x - this.lastCursorPos.x,
@@ -268,8 +269,8 @@ class WebGLInterface {
     this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, filtering);
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, filtering);
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
     this.gl.texImage2D(this.gl.TEXTURE_2D, 0, internalFormat, this.canvas.width, this.canvas.height, 0, format, this.floatTexType, null);
 
     const fbo = this.gl.createFramebuffer();

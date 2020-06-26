@@ -11,6 +11,8 @@ import fsStreamingSource from '../../shaders/fragment/fs-streaming';
 import fsSumDistFuncSource from '../../shaders/fragment/fs-sum-dist-func';
 import fsVelocitySource from '../../shaders/fragment/fs-velocity';
 import fsOutputSource from '../../shaders/fragment/fs-output';
+import fsAverageRowsSource from '../../shaders/fragment/fs-average-rows';
+import fsAverageColumnsSource from '../../shaders/fragment/fs-average-columns';
 import fsCircleSource from '../../shaders/fragment/fs-circle';
 import Fluid from './fluid';
 import Tracer from './tracer';
@@ -60,6 +62,8 @@ class LBMProgram {
     this.velocityProgramF1_4 = this._createVelocityShaderProgram("#define F1_4 \n");
     this.velocityProgramF5_8 = this._createVelocityShaderProgram("#define F5_8 \n");
     this.outputProgram = this._createOutputShaderProgram();
+    this.averageRowsProgram = this._createAverageRowsShaderProgram();
+    this.averageColumnsProgram = this._createAverageColumnsShaderProgram();
     this.circleProgram = this._createCircleShaderProgram();
   }
 
@@ -186,6 +190,24 @@ class LBMProgram {
     return program;
   }
 
+  _createAverageRowsShaderProgram() {
+    const shader = this.wgli.createFragmentShader(fsAverageRowsSource);
+    const program = this.wgli.createProgram(shader);
+    program.texelSizeUniform = this.wgli.getUniformLocation(program, "uTexelSize");
+    program.canvasSizeUniform = this.wgli.getUniformLocation(program, "uCanvasSize");
+    program.targetUniform = this.wgli.getUniformLocation(program, "uTarget");
+    return program;
+  }
+
+  _createAverageColumnsShaderProgram() {
+    const shader = this.wgli.createFragmentShader(fsAverageColumnsSource);
+    const program = this.wgli.createProgram(shader);
+    program.texelSizeUniform = this.wgli.getUniformLocation(program, "uTexelSize");
+    program.canvasSizeUniform = this.wgli.getUniformLocation(program, "uCanvasSize");
+    program.targetUniform = this.wgli.getUniformLocation(program, "uTarget");
+    return program;
+  }
+
   _createCircleShaderProgram() {
     const shader = this.wgli.createFragmentShader(fsCircleSource);
     const program = this.wgli.createProgram(shader);
@@ -298,7 +320,7 @@ class LBMProgram {
     this.wgli.blit(tracer.distFunc0.write.fbo);
     tracer.distFunc0.swap();
 
-    // Rest component
+    // Main cartesian components
     this.wgli.useProgram(this.initEqProgramF1_4);
     this.wgli.uniform1f(this.initEqProgramF1_4.tauUniform, tracer.params.tau);
     this.wgli.uniform1i(this.initEqProgramF1_4.velocityUniform, this.fluid.velocity.read.attach(0));
@@ -308,7 +330,7 @@ class LBMProgram {
     this.wgli.blit(tracer.distFunc1_4.write.fbo);
     tracer.distFunc1_4.swap();
     
-    // Rest component
+    // Diagonal components
     this.wgli.useProgram(this.initEqProgramF5_8);
     this.wgli.uniform1f(this.initEqProgramF5_8.tauUniform, tracer.params.tau);
     this.wgli.uniform1i(this.initEqProgramF5_8.velocityUniform, this.fluid.velocity.read.attach(0));
@@ -513,6 +535,24 @@ class LBMProgram {
     this.fluid.velocity.swap();
   }
 
+  _computeAverageDensity() {
+    // Average rows
+    this.wgli.useProgram(this.averageRowsProgram);
+    this.wgli.uniform2f(this.averageRowsProgram.texelSizeUniform, this.fluid.density.read.texelSizeX, this.fluid.density.read.texelSizeY);
+    this.wgli.uniform2f(this.averageRowsProgram.canvasSizeUniform, this.props.width, this.props.height);
+    this.wgli.uniform1i(this.averageRowsProgram.targetUniform, this.fluid.density.read.attach(0));
+    this.wgli.blit(this.fluid.averageDensity.write.fbo);
+    this.fluid.averageDensity.swap();
+
+    // Average columns
+    this.wgli.useProgram(this.averageColumnsProgram);
+    this.wgli.uniform2f(this.averageColumnsProgram.texelSizeUniform, this.fluid.density.read.texelSizeX, this.fluid.density.read.texelSizeY);
+    this.wgli.uniform2f(this.averageColumnsProgram.canvasSizeUniform, this.props.width, this.props.height);
+    this.wgli.uniform1i(this.averageColumnsProgram.targetUniform, this.fluid.averageDensity.read.attach(0));
+    this.wgli.blit(this.fluid.averageDensity.write.fbo);
+    this.fluid.averageDensity.swap();
+  }
+
   // Copies one FBO to another
   _copy(source, destination) {
     this.wgli.useProgram(this.passthroughProgram);
@@ -602,6 +642,9 @@ class LBMProgram {
     for (let tracer of this.tracers) {
       this._performStreaming(tracer);
     }
+
+    // Compute previous average density
+    //this._computeAverageDensity();
 
     // Compute macroscopic fluid density
     this._computeDensity();

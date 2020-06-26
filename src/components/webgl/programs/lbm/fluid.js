@@ -18,6 +18,9 @@ class Fluid {
     // Stores density
     this.density = this.wgli.createDoubleFBO("RGBA", "NEAREST");
 
+    // Stores average density
+    this.averageDensity = this.wgli.createDoubleFBO("RGBA", "NEAREST");
+
     // Stores imposed force density
     this.forceDensity = this.wgli.createFBO("RGBA", "NEAREST");
 

@@ -16,7 +16,7 @@ export default `
   const vec3 velocityCol = vec3(0.8); 
   const vec3 tracer1Col = vec3(0.6352941176, 1.0, 0.0);
   const vec3 tracer2Col = vec3(1.0, 0.73333333334, 0.5764705882);
-  const vec3 wallCol = vec3(0.0);
+  const vec3 wallCol = vec3(0.2);
   const vec3 yellow = vec3(247.0 / 255.0, 216.0 / 255.0, 84.0 / 255.0);
 
   vec3 hsv2rgb(vec3 hsv) {
@@ -34,8 +34,6 @@ export default `
       // Fluid node
       vec2 velocity = texture2D(uVelocity, vUV).xy;
       float concentration = texture2D(uTracer, vUV).x;
-      //float val = 0.97 - 1.0 * length(velocity);
-      //gl_FragColor = vec4(val - concentration, 0.97 - concentration, 0.97 - concentration, 1.0);
       gl_FragColor = vec4(baseBrightness - concentration * (baseBrightness - tracer2Col) - 3.33333333334 * length(velocity) * (baseBrightness - velocityCol), 1.0);
     }
   }

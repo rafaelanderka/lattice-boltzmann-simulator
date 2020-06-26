@@ -22,7 +22,7 @@ export default `
       // Fluid node
       vec4 nodalDistFunc = texture2D(uDistFunc, vUV);
       float sum = texture2D(uSummand, vUV).x + nodalDistFunc.x + nodalDistFunc.y + nodalDistFunc.z + nodalDistFunc.w;
-      gl_FragColor = vec4(sum, 0.0, 0.0, 0.0);
+      gl_FragColor = vec4(max(sum, 0.0), 0.0, 0.0, 0.0);
     }
   }
 `;

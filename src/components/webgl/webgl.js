@@ -11,7 +11,8 @@ export default class WebGL extends React.Component {
 
   componentDidMount() {
     // Initialize WebGL interface
-    this.wgli = new WebGLInterface(this.props.id);
+    const scale = this.props.resolution / this.props.width;
+    this.wgli = new WebGLInterface(this.props.id, scale);
     
     // Get corresponding program
     switch (this.props.program) {
@@ -37,11 +38,12 @@ export default class WebGL extends React.Component {
   render() {
     return (<canvas 
       id={this.props.id} 
-      width={this.props.width} 
-      height={this.props.height} 
+      width={this.props.width * this.props.resolution / this.props.width} 
+      height={this.props.height * this.props.resolution / this.props.height} 
       style={{
         width: this.props.width, 
-        height: this.props.height
+        height: this.props.height,
+        borderRadius: "10px",
       }}
     />);
   }

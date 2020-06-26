@@ -37,8 +37,8 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  height: 500px;
+  width: 1200px;
+  height: 1200px;
 }
 
 .settings-container {

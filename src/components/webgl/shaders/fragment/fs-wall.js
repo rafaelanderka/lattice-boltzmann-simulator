@@ -17,7 +17,7 @@ export default `
   
   void main(void) {
     float dist = length(vec2(uXAspect * uCursorPos.x, uYAspect * uCursorPos.y) - vec2(uXAspect * vUV.x, uYAspect * vUV.y));
-    float threshold = 0.05;
+    float threshold = 0.02;
     bool isActiveNode = dist <= threshold;
     bool isAdding = uIsAdding && isActiveNode;
     bool isRemoving = uIsRemoving && isActiveNode;
