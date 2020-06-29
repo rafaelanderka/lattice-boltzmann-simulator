@@ -126,16 +126,16 @@ class WebGLInterface {
     return status == this.gl.FRAMEBUFFER_COMPLETE;
   }
 
-  // Initializes a vertex buffer for drawing full screen quads
+  // Initializes a vertex and element buffer for drawing full screen quads
   // Note: Originally taken from Pavel Dobryakov's WebGL Fluid Simulation
   // https://github.com/PavelDoGreat/WebGL-Fluid-Simulation
   _initVertexBuffer() {
     this.vertexBuffer = this.gl.createBuffer();
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
-    const vertices = [1.0, 1.0, 0.0, 1.0, 1.0, -1.0, 1.0, 0.0, 0.0, 1.0, 1.0, -1.0, 0.0, 1.0, 0.0, -1.0, -1.0, 0.0, 0.0, 0.0];
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertices), this.gl.STATIC_DRAW);
-    this.vertexBuffer.itemSize = 5;
-    this.vertexBuffer.numItems = 4;
+    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array([-1, -1, -1, 1, 1, 1, 1, -1]), this.gl.STATIC_DRAW);
+    this.elementBuffer = this.gl.createBuffer();
+    this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.elementBuffer);
+    this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array([0, 1, 2, 0, 2, 3]), this.gl.STATIC_DRAW);
   }
 
   _initBaseVertexShader() {
@@ -408,12 +408,11 @@ class WebGLInterface {
   blit(destination) {
     this.gl.viewport(0, 0, this.canvas.width, this.canvas.height)
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
+    this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.elementBuffer);
     this.gl.enableVertexAttribArray(0);
-    this.gl.enableVertexAttribArray(1);
-    this.gl.vertexAttribPointer(0, 3, this.gl.FLOAT, false, 20, 0);
-    this.gl.vertexAttribPointer(1, 2, this.gl.FLOAT, false, 20, 12);
+    this.gl.vertexAttribPointer(0, 2, this.gl.FLOAT, false, 0, 0);
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, destination);
-    this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, this.vertexBuffer.numItems);
+    this.gl.drawElements(this.gl.TRIANGLES, 6, this.gl.UNSIGNED_SHORT, 0);
   }
 
   // Gets canvas aspect ratio
