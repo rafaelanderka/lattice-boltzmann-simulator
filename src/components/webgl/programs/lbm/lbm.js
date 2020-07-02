@@ -122,9 +122,12 @@ class LBMProgram {
     const program = this.wgli.createProgram(shader);
     program.isAddingUniform = this.wgli.getUniformLocation(program, "uIsAdding");
     program.isRemovingUniform = this.wgli.getUniformLocation(program, "uIsRemoving");
+    program.leftRightWallUniform = this.wgli.getUniformLocation(program, "uLeftRightWall");
+    program.topBottomWallUniform = this.wgli.getUniformLocation(program, "uTopBottomWall");
     program.xAspectUniform = this.wgli.getUniformLocation(program, "uXAspect");
     program.yAspectUniform = this.wgli.getUniformLocation(program, "uYAspect");
     program.cursorPosUniform = this.wgli.getUniformLocation(program, "uCursorPos");
+    program.texelSizeUniform = this.wgli.getUniformLocation(program, "uTexelSize");
     program.nodeIdUniform = this.wgli.getUniformLocation(program, "uNodeId");
     return program;
   }
@@ -604,9 +607,12 @@ class LBMProgram {
     this.wgli.useProgram(this.wallProgram);
     this.wgli.uniform1i(this.wallProgram.isAddingUniform, isAddingWalls);
     this.wgli.uniform1i(this.wallProgram.isRemovingUniform, isRemovingWalls);
+    this.wgli.uniform1i(this.wallProgram.leftRightWallUniform, this.props.leftRightWall);
+    this.wgli.uniform1i(this.wallProgram.topBottomWallUniform, this.props.topBottomWall);
     this.wgli.uniform1f(this.wallProgram.xAspectUniform, aspect.xAspect);
     this.wgli.uniform1f(this.wallProgram.yAspectUniform, aspect.yAspect);
     this.wgli.uniform2f(this.wallProgram.cursorPosUniform, cursorState.cursorPos.x, cursorState.cursorPos.y);
+    this.wgli.uniform2f(this.wallProgram.texelSizeUniform, this.nodeId.write.texelSizeX, this.nodeId.write.texelSizeY);
     this.wgli.uniform1i(this.wallProgram.nodeIdUniform, this.nodeId.read.attach(0));
     this.wgli.blit(this.nodeId.write.fbo);
     this.nodeId.swap();

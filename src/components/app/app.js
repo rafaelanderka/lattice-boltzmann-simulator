@@ -2,6 +2,7 @@ import React from "react";
 import WebGL from "../webgl/webgl";
 import Toolbar from "../toolbar/toolbar";
 import Button from "../button/button";
+import Selector from "../selector/selector";
 import TracerSelector from "../tracer-selector/tracer-selector";
 import Slider from "../slider/slider";
 import ContainerDimensions from 'react-container-dimensions';
@@ -19,12 +20,14 @@ class App extends React.Component {
       tool: 0,
       tracer: 0,
       viscosity: 0.1,
+      boundaryWalls: 0,
       diffusivities: [0.1, 0.65, 0.4],
       colors: [{r: 162, g: 255, b: 0}, {r: 255, g: 100, b: 100}, {r: 70, g: 200, b: 255}]
     }
     this.setTool = this.setTool.bind(this);
     this.setTracer = this.setTracer.bind(this);
     this.setViscosity = this.setViscosity.bind(this);
+    this.setBoundaryWalls = this.setBoundaryWalls.bind(this);
     this.setActiveTracerDiffusivity = this.setActiveTracerDiffusivity.bind(this);
     this.setActiveTracerColorR = this.setActiveTracerColorR.bind(this);
     this.setActiveTracerColorG = this.setActiveTracerColorG.bind(this);
@@ -41,6 +44,10 @@ class App extends React.Component {
 
   setViscosity(value) {
     this.setState({viscosity: value});
+  }
+
+  setBoundaryWalls(id) {
+    this.setState({boundaryWalls: id});
   }
 
   setDiffusivity(index, value) {
@@ -82,6 +89,8 @@ class App extends React.Component {
   }
 
   render() {
+    const leftRightWall = (this.state.boundaryWalls == 1 || this.state.boundaryWalls == 3) ? true : false;
+    const topBottomWall = (this.state.boundaryWalls == 2 || this.state.boundaryWalls == 3) ? true : false;
     return (
       <div id="app">
         <div id="header">
@@ -107,6 +116,8 @@ class App extends React.Component {
                 viscosity={this.state.viscosity}
                 diffusivities={this.state.diffusivities}
                 colors={this.state.colors}
+                leftRightWall={leftRightWall}
+                topBottomWall={topBottomWall}
               />
             </ContainerDimensions>
           </div>
@@ -129,7 +140,14 @@ class App extends React.Component {
                 />
               </div>
             </div>
-            <br/>
+            <div className="settings-subcontainer">
+              <div className="settings-subtitle">BOUNDARY WALLS</div>
+              <Selector
+                values={["OFF", "HORIZONTAL", "VERTICAL", "ALL"]}
+                selection={this.state.boundaryWalls}
+                setSelection={this.setBoundaryWalls}
+              />
+            </div>
             <div className="settings-title">
               <img src={IconTracerSettingsBlack} alt=""/>
               TRACER SETTINGS
