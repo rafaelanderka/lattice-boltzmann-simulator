@@ -24,13 +24,15 @@ export default `
     bool isActiveNode = dist <= threshold;
     bool isAdding = uIsAdding && isActiveNode;
     bool isRemoving = uIsRemoving && isActiveNode;
-    bool leftRightWall = uLeftRightWall && vUV.x >= 1.0 - uTexelSize.x;
-    bool topBottomWall = uTopBottomWall && vUV.y <= 0.0 + uTexelSize.y;
-    bool leftWall = false;
-    bool bottomWall = false;
-    if (isAdding || leftRightWall || topBottomWall) {
+    bool liesOnRightWall = vUV.x >= 1.0 - uTexelSize.x;
+    bool liesOnBottomWall = vUV.y <= 0.0 + uTexelSize.y;
+    bool leftRightWallEnabled = uLeftRightWall && liesOnRightWall;
+    bool topBottomWallEnabled = uTopBottomWall && liesOnBottomWall;
+    bool leftRightWallDisabled = !uLeftRightWall && liesOnRightWall;
+    bool topBottomWallDisabled = !uTopBottomWall && liesOnBottomWall;
+    if (isAdding || leftRightWallEnabled || topBottomWallEnabled) {
       gl_FragColor = vec4(1.0, 0.0, 0.0, 0.0);
-    } else if (isRemoving || !leftRightWall || !topBottomWall) {
+    } else if (isRemoving || leftRightWallDisabled || topBottomWallDisabled) {
       gl_FragColor = vec4(0.0);
     } else {
       gl_FragColor = texture2D(uNodeId, vUV);
