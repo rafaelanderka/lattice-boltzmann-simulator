@@ -1,10 +1,10 @@
 import React from 'react';
 import './toolbar.css';
-import IconForceToolGrey from 'url:~/src/public/icon-force-tool-grey.png';
-import IconWallToolGrey from 'url:~/src/public/icon-wall-tool-grey.png';
-import IconWallEraserToolGrey from 'url:~/src/public/icon-wall-eraser-tool-grey.png';
-import IconConcentrationToolGrey from 'url:~/src/public/icon-concentration-tool-grey.png';
-import IconConcentrationEraserToolGrey from 'url:~/src/public/icon-concentration-eraser-tool-grey.png';
+import IconForceToolBlack from 'url:~/src/public/icon-force-tool-black.png';
+import IconWallToolBlack from 'url:~/src/public/icon-wall-tool-black.png';
+import IconWallEraserToolBlack from 'url:~/src/public/icon-wall-eraser-tool-black.png';
+import IconConcentrationToolBlack from 'url:~/src/public/icon-concentration-tool-black.png';
+import IconConcentrationEraserToolBlack from 'url:~/src/public/icon-concentration-eraser-tool-black.png';
 import IconForceToolWhite from 'url:~/src/public/icon-force-tool-white.png';
 import IconWallToolWhite from 'url:~/src/public/icon-wall-tool-white.png';
 import IconWallEraserToolWhite from 'url:~/src/public/icon-wall-eraser-tool-white.png';
@@ -43,16 +43,16 @@ export default class Toolbar extends React.Component {
 
 
   render() {
-    const tool0ClassName = "toolbar-button" + (this.props.tool == 0 ? " active" : "");
-    const tool0Img = this.props.tool == 0 ? IconForceToolWhite : IconForceToolGrey;
-    const tool1ClassName = "toolbar-button" + (this.props.tool == 1 ? " active" : "");
-    const tool1Img = this.props.tool == 1 ? IconWallToolWhite : IconWallToolGrey;
-    const tool2ClassName = "toolbar-button" + (this.props.tool == 2 ? " active" : "");
-    const tool2Img = this.props.tool == 2 ? IconWallEraserToolWhite : IconWallEraserToolGrey;
-    const tool3ClassName = "toolbar-button" + (this.props.tool == 3 ? " active" : "");
-    const tool3Img = this.props.tool == 3 ? IconConcentrationToolWhite : IconConcentrationToolGrey;
-    const tool4ClassName = "toolbar-button" + (this.props.tool == 4 ? " active" : "");
-    const tool4Img = this.props.tool == 4 ? IconConcentrationEraserToolWhite : IconConcentrationEraserToolGrey;
+    const tool0ClassName = "toolbar-button" + (this.props.tool == 0 ? " toolbar-button-active" : "");
+    const tool0Img = this.props.tool == 0 ? IconForceToolWhite : IconForceToolBlack;
+    const tool1ClassName = "toolbar-button" + (this.props.tool == 1 ? " toolbar-button-active" : "");
+    const tool1Img = this.props.tool == 1 ? IconWallToolWhite : IconWallToolBlack;
+    const tool2ClassName = "toolbar-button" + (this.props.tool == 2 ? " toolbar-button-active" : "");
+    const tool2Img = this.props.tool == 2 ? IconWallEraserToolWhite : IconWallEraserToolBlack;
+    const tool3ClassName = "toolbar-button" + (this.props.tool == 3 ? " toolbar-button-active" : "");
+    const tool3Img = this.props.tool == 3 ? IconConcentrationToolWhite : IconConcentrationToolBlack;
+    const tool4ClassName = "toolbar-button" + (this.props.tool == 4 ? " toolbar-button-active" : "");
+    const tool4Img = this.props.tool == 4 ? IconConcentrationEraserToolWhite : IconConcentrationEraserToolBlack;
     return (
       <div className="toolbar">
         <button className={tool0ClassName} onClick={this.useForceTool}><img src={tool0Img} alt="Force Tool"/></button>

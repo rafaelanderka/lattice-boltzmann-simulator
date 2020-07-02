@@ -43,7 +43,6 @@ export default class WebGL extends React.Component {
       style={{
         width: this.props.width, 
         height: this.props.height,
-        borderRadius: "10px",
       }}
     />);
   }

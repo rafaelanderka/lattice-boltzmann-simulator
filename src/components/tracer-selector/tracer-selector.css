@@ -1,0 +1,22 @@
+.tracer-selector {
+  position: relative;
+  left: 2.5px;
+  top: 2.5px;
+  width: 25px;
+  height: 25px;
+  border: none;
+  border-radius: 25px;
+}
+
+.tracer-selector-border {
+  width: 30px;
+  height: 30px;
+  border-radius: 30px;
+  transition: all 0.2s ease;
+  border: 2px solid white;
+  margin-right: 6px;
+}
+
+.tracer-selector-border-active {
+  border: 2px solid black;
+}

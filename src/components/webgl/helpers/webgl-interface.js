@@ -392,6 +392,10 @@ class WebGLInterface {
     this.gl.uniform2f(location, v0, v1);
   }
 
+  uniform3f(location, v0, v1, v2) {
+    this.gl.uniform3f(location, v0, v1, v2);
+  }
+
   uniform1i(location, v0) {
     this.gl.uniform1i(location, v0);
   }

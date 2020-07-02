@@ -3,12 +3,12 @@
   width: 55px;
   height: 55px;
   border: none;
-  background-color: #F3F3F3;
-  transition: all 0.3s ease;
+  background-color: #FFF;
+  transition: all 0.2s ease;
   padding: 0px;
   margin: 0px;
+  border: 2px solid black;
   border-radius: 10px;
-  box-shadow: 0px 0px 20px #CCCCCC;
 }
 
 .button:hover {
@@ -23,10 +23,12 @@
   height: 60%;
 }
 
-.active {
-  background-color: #9df800;
+.button-active {
+  background-color: #000;
 }
 
-.active:hover {
-  background-color: #92e700;
+.button-active:hover {
+  background-color: #222;
+  border: 2px solid #222;
+
 }

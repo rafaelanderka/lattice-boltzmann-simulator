@@ -21,6 +21,7 @@ class LBMProgram {
   constructor(wgli, props) {
     this.wgli = wgli;
     this.props = props;
+    this.setNormalizedColors();
 
     this.params = {};
     this.params.initVelocity = [0.0, 0.0];
@@ -30,9 +31,12 @@ class LBMProgram {
     this._initFBOs();
     this._initShaderPrograms();
 
-    this.fluid = new Fluid(this.wgli);
-    this.tracers = [];
-    this.tracers.push(new Tracer(wgli));
+    this.fluid = new Fluid(this.wgli, this.props.viscosity);
+    this.tracers = [
+      new Tracer(wgli, this.props.diffusivities[0]), 
+      new Tracer(wgli, this.props.diffusivities[1]),
+      new Tracer(wgli, this.props.diffusivities[2])
+    ];
   }
 
   _initFBOs() {
@@ -185,7 +189,12 @@ class LBMProgram {
     const shader = this.wgli.createFragmentShader(fsOutputSource);
     const program = this.wgli.createProgram(shader);
     program.velocityUniform = this.wgli.getUniformLocation(program, "uVelocity");
-    program.tracerUniform = this.wgli.getUniformLocation(program, "uTracer");
+    program.tracer0ColUniform = this.wgli.getUniformLocation(program, "uTracer0Col");
+    program.tracer1ColUniform = this.wgli.getUniformLocation(program, "uTracer1Col");
+    program.tracer2ColUniform = this.wgli.getUniformLocation(program, "uTracer2Col");
+    program.tracer0Uniform = this.wgli.getUniformLocation(program, "uTracer0");
+    program.tracer1Uniform = this.wgli.getUniformLocation(program, "uTracer1");
+    program.tracer2Uniform = this.wgli.getUniformLocation(program, "uTracer2");
     program.nodeIdUniform = this.wgli.getUniformLocation(program, "uNodeId");
     return program;
   }
@@ -605,16 +614,17 @@ class LBMProgram {
     // Update concentration
     const isAddingConcentration = cursorState.isActive && this.props.tool == 3;
     const isRemovingConcentration = cursorState.isActive && this.props.tool == 4;
+    const activeTracer = this.props.tracer;
     this.wgli.useProgram(this.concentrationProgram);
     this.wgli.uniform1i(this.concentrationProgram.isAddingUniform, isAddingConcentration);
     this.wgli.uniform1i(this.concentrationProgram.isRemovingUniform, isRemovingConcentration);
     this.wgli.uniform1f(this.concentrationProgram.xAspectUniform, aspect.xAspect);
     this.wgli.uniform1f(this.concentrationProgram.yAspectUniform, aspect.yAspect);
     this.wgli.uniform2f(this.concentrationProgram.cursorPosUniform, cursorState.cursorPos.x, cursorState.cursorPos.y);
-    this.wgli.uniform1i(this.concentrationProgram.concentrationUniform, this.tracers[0].concentration.read.attach(0));
+    this.wgli.uniform1i(this.concentrationProgram.concentrationUniform, this.tracers[activeTracer].concentration.read.attach(0));
     this.wgli.uniform1i(this.concentrationProgram.nodeIdUniform, this.nodeId.read.attach(1));
-    this.wgli.blit(this.tracers[0].concentration.write.fbo);
-    this.tracers[0].concentration.swap();
+    this.wgli.blit(this.tracers[activeTracer].concentration.write.fbo);
+    this.tracers[activeTracer].concentration.swap();
 
     // Get imposed forces
     const isAddingForce = cursorState.isActive && this.props.tool == 0;
@@ -643,9 +653,6 @@ class LBMProgram {
       this._performStreaming(tracer);
     }
 
-    // Compute previous average density
-    //this._computeAverageDensity();
-
     // Compute macroscopic fluid density
     this._computeDensity();
 
@@ -660,13 +667,31 @@ class LBMProgram {
     // Draw fluid velocity, tracers and node Id
     this.wgli.useProgram(this.outputProgram);
     this.wgli.uniform1i(this.outputProgram.velocityUniform, this.fluid.velocity.read.attach(0));
-    this.wgli.uniform1i(this.outputProgram.tracerUniform, this.tracers[0].concentration.read.attach(1));
-    this.wgli.uniform1i(this.outputProgram.nodeIdUniform, this.nodeId.read.attach(2));
+    this.wgli.uniform3f(this.outputProgram.tracer0ColUniform, this.normalizedColors[0].r, this.normalizedColors[0].g, this.normalizedColors[0].b);
+    this.wgli.uniform3f(this.outputProgram.tracer1ColUniform, this.normalizedColors[1].r, this.normalizedColors[1].g, this.normalizedColors[1].b);
+    this.wgli.uniform3f(this.outputProgram.tracer2ColUniform, this.normalizedColors[2].r, this.normalizedColors[2].g, this.normalizedColors[2].b);
+    this.wgli.uniform1i(this.outputProgram.tracer0Uniform, this.tracers[0].concentration.read.attach(1));
+    this.wgli.uniform1i(this.outputProgram.tracer1Uniform, this.tracers[1].concentration.read.attach(2));
+    this.wgli.uniform1i(this.outputProgram.tracer2Uniform, this.tracers[2].concentration.read.attach(3));
+    this.wgli.uniform1i(this.outputProgram.nodeIdUniform, this.nodeId.read.attach(4));
     this.wgli.blit(null);
+  }
+
+  setNormalizedColors() {
+    this.normalizedColors = [];
+    for (let c of this.props.colors) {
+      let normalizedColor = {r: c.r / 255.0, g: c.g / 255.0, b: c.b / 255.0};
+      this.normalizedColors.push(normalizedColor);
+    }
   }
 
   setProps(props) {
     this.props = props;
+    this.setNormalizedColors();
+    this.fluid.setViscosity(this.props.viscosity);
+    this.tracers[0].setDiffusivity(this.props.diffusivities[0]);
+    this.tracers[1].setDiffusivity(this.props.diffusivities[1]);
+    this.tracers[2].setDiffusivity(this.props.diffusivities[2]);
   }
 }
 

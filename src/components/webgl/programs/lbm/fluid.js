@@ -1,14 +1,18 @@
 class Fluid {
-  constructor(wgli) {
+  constructor(wgli, viscosity) {
     this.wgli = wgli;
     
     this.params = {};
-    this.params.tau = 1.0;
-    this.params.TRTmagic = 1.0 / 12.0;
-    this.params.plusOmega = 1.0;
-    this.params.minusOmega = 1.0 / ((this.params.TRTmagic / (1.0 / this.params.plusOmega - 0.5)) + 0.5);
+    this.params.TRTmagic = 1.0 / 4.0;
+    this.setViscosity(viscosity);
     
     this._initFBOs();
+  }
+
+  setViscosity(viscosity) {
+    this.params.plusOmega = 1.0 / (3.0 * viscosity + 0.5);
+    this.params.minusOmega = 1.0 / ((this.params.TRTmagic / (1.0 / this.params.plusOmega - 0.5)) + 0.5);
+    this.params.tau = 1.0 / this.params.plusOmega;
   }
 
   _initFBOs() {

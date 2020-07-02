@@ -6,24 +6,20 @@ export default `
   precision highp float;
   precision highp sampler2D;
 
+  uniform vec3 uTracer0Col;
+  uniform vec3 uTracer1Col;
+  uniform vec3 uTracer2Col;
   uniform sampler2D uVelocity;
-  uniform sampler2D uTracer;
+  uniform sampler2D uTracer0;
+  uniform sampler2D uTracer1;
+  uniform sampler2D uTracer2;
   uniform sampler2D uNodeId;
 
   varying vec2 vUV; 
 
-  const float baseBrightness = 0.97;
+  const float baseBrightness = 1.0;
   const vec3 velocityCol = vec3(0.8); 
-  const vec3 tracer1Col = vec3(0.6352941176, 1.0, 0.0);
-  const vec3 tracer2Col = vec3(1.0, 0.73333333334, 0.5764705882);
-  const vec3 wallCol = vec3(0.2);
-  const vec3 yellow = vec3(247.0 / 255.0, 216.0 / 255.0, 84.0 / 255.0);
-
-  vec3 hsv2rgb(vec3 hsv) {
-    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-    vec3 p = abs(fract(hsv.xxx + K.xyz) * 6.0 - K.www);
-    return hsv.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), hsv.y);
-  }
+  const vec3 wallCol = vec3(0.0);
   
   void main(void) {
     int nodeId = int(texture2D(uNodeId, vUV).x + 0.5);
@@ -33,8 +29,10 @@ export default `
     } else {
       // Fluid node
       vec2 velocity = texture2D(uVelocity, vUV).xy;
-      float concentration = texture2D(uTracer, vUV).x;
-      gl_FragColor = vec4(baseBrightness - concentration * (baseBrightness - tracer2Col) - 3.33333333334 * length(velocity) * (baseBrightness - velocityCol), 1.0);
+      float concentration0 = texture2D(uTracer0, vUV).x;
+      float concentration1 = texture2D(uTracer1, vUV).x;
+      float concentration2 = texture2D(uTracer2, vUV).x;
+      gl_FragColor = vec4(baseBrightness - concentration0 * (baseBrightness - uTracer0Col) - concentration1 * (baseBrightness - uTracer1Col) - concentration2 * (baseBrightness - uTracer2Col) - 3.33333333334 * length(velocity) * (baseBrightness - velocityCol), 1.0);
     }
   }
 `;

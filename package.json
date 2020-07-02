@@ -12,7 +12,8 @@
     "normalize.css": "^8.0.1",
     "react": "^16.13.1",
     "react-container-dimensions": "^1.4.1",
-    "react-dom": "^16.13.1"
+    "react-dom": "^16.13.1",
+    "react-range": "^1.6.7"
   },
   "devDependencies": {
     "@babel/preset-react": "^7.10.1",

@@ -1,14 +1,18 @@
 class Tracer {
-  constructor(wgli) {
+  constructor(wgli, diffusivity) {
     this.wgli = wgli;
 
     this.params = {};
-    this.params.tau = 1.0;
-    this.params.TRTmagic = 1.0 / 12.0;
-    this.params.plusOmega = 1.0;
-    this.params.minusOmega = 1.0 / ((this.params.TRTmagic / (1.0 / this.params.plusOmega - 0.5)) + 0.5);
+    this.params.TRTmagic = 1.0 / 4.0;
+    this.setDiffusivity(diffusivity);
 
     this._initFBOs();
+  }
+
+  setDiffusivity(diffusivity) {
+    this.params.minusOmega =   1.0 / (3.0 * diffusivity + 0.5);
+    this.params.plusOmega = 1.0 / ((this.params.TRTmagic / (1.0 / this.params.minusOmega - 0.5)) + 0.5);
+    this.params.tau = 1.0 / this.params.plusOmega;
   }
 
   _initFBOs() {
