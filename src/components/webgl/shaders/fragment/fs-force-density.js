@@ -13,6 +13,8 @@ export default `
   uniform vec2 uCursorVel;
   uniform sampler2D uNodeId;
 
+  const float limit = 0.01;
+
   varying vec2 vUV; 
   
   void main(void) {
@@ -21,7 +23,7 @@ export default `
     float threshold = 0.12;
     if (uIsActive && dist <= threshold && nodeId != 1) {
       float coeff = 5.0 * (1.0 - dist / threshold);
-      gl_FragColor = vec4(coeff * uCursorVel.x, coeff * uCursorVel.y, 0.0, 0.0);
+      gl_FragColor = vec4(coeff * max(-limit, min(uCursorVel.x, limit)), coeff * max(-limit, min(uCursorVel.y, limit)), 0.0, 0.0);
     } else {
       gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
     }
