@@ -6,6 +6,7 @@
   height: 25px;
   border: none;
   border-radius: 25px;
+  cursor: pointer;
 }
 
 .solute-selector-border {

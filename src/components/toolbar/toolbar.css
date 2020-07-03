@@ -13,7 +13,6 @@
 }
 
 .toolbar-button {
-
   display: block;
   width: 20%;
   height: 100%;
@@ -22,6 +21,7 @@
   transition: all 0.2s ease;
   padding: 0px;
   margin: 0px;
+  cursor: pointer;
 }
 
 .toolbar-button:hover {
