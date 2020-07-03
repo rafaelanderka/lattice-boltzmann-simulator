@@ -1,4 +1,4 @@
-.button {
+.header-button {
   display: block;
   width: 55px;
   height: 55px;
@@ -11,11 +11,11 @@
   border-radius: 10px;
 }
 
-.button:hover {
+.header-button:hover {
   background-color: #E7E7E7;
 }
 
-.button img {
+.header-button img {
   display: block;
   margin: 0px auto;
   padding: 0px;
@@ -23,11 +23,11 @@
   height: 60%;
 }
 
-.button-active {
+.header-button-active {
   background-color: #000;
 }
 
-.button-active:hover {
+.header-button-active:hover {
   background-color: #222;
   border: 2px solid #222;
 

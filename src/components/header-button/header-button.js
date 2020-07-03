@@ -1,7 +1,7 @@
 import React from 'react';
-import './button.css';
+import './header-button.css';
 
-export default class Button extends React.Component {
+export default class HeaderButton extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -20,7 +20,7 @@ export default class Button extends React.Component {
   }
 
   render() {
-    const className = "button" + (this.state.isActive ? " button-active" : "");
+    const className = "header-button" + (this.state.isActive ? " header-button-active" : "");
     const img = this.state.isActive ? this.props.activeImage : this.props.image;
     return (
       <button className={className} onClick={this.handleClick}><img src={img} alt={this.props.altText}/></button>

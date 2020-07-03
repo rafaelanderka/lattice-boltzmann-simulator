@@ -1,7 +1,7 @@
 import React from "react";
 import WebGL from "../webgl/webgl";
 import Toolbar from "../toolbar/toolbar";
-import Button from "../button/button";
+import HeaderButton from "../header-button/header-button";
 import Selector from "../selector/selector";
 import SoluteSelector from "../solute-selector/solute-selector";
 import Slider from "../slider/slider";
@@ -98,7 +98,7 @@ class App extends React.Component {
           <img id="logo" src={SynBIMLogo} alt="SynBIM"/>
           <Toolbar tool={this.state.tool} setTool={this.setTool}/>
           <div className="header-buttons-container">
-            <Button
+            <HeaderButton
               image={IconAboutBlack}
               activeImage={IconAboutWhite}
               altText="About"
