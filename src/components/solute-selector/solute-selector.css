@@ -1,4 +1,4 @@
-.tracer-selector {
+.solute-selector {
   position: relative;
   left: 2.5px;
   top: 2.5px;
@@ -8,7 +8,7 @@
   border-radius: 25px;
 }
 
-.tracer-selector-border {
+.solute-selector-border {
   width: 30px;
   height: 30px;
   border-radius: 30px;
@@ -17,6 +17,6 @@
   margin-right: 6px;
 }
 
-.tracer-selector-border-active {
+.solute-selector-border-active {
   border: 2px solid black;
 }

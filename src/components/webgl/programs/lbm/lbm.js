@@ -15,7 +15,7 @@ import fsAverageRowsSource from '../../shaders/fragment/fs-average-rows';
 import fsAverageColumnsSource from '../../shaders/fragment/fs-average-columns';
 import fsCircleSource from '../../shaders/fragment/fs-circle';
 import Fluid from './fluid';
-import Tracer from './tracer';
+import Solute from './solute';
 
 class LBMProgram {
   constructor(wgli, props) {
@@ -32,10 +32,10 @@ class LBMProgram {
     this._initShaderPrograms();
 
     this.fluid = new Fluid(this.wgli, this.props.viscosity);
-    this.tracers = [
-      new Tracer(wgli, this.props.diffusivities[0]), 
-      new Tracer(wgli, this.props.diffusivities[1]),
-      new Tracer(wgli, this.props.diffusivities[2])
+    this.solutes = [
+      new Solute(wgli, this.props.diffusivities[0]), 
+      new Solute(wgli, this.props.diffusivities[1]),
+      new Solute(wgli, this.props.diffusivities[2])
     ];
   }
 
@@ -192,12 +192,12 @@ class LBMProgram {
     const shader = this.wgli.createFragmentShader(fsOutputSource);
     const program = this.wgli.createProgram(shader);
     program.velocityUniform = this.wgli.getUniformLocation(program, "uVelocity");
-    program.tracer0ColUniform = this.wgli.getUniformLocation(program, "uTracer0Col");
-    program.tracer1ColUniform = this.wgli.getUniformLocation(program, "uTracer1Col");
-    program.tracer2ColUniform = this.wgli.getUniformLocation(program, "uTracer2Col");
-    program.tracer0Uniform = this.wgli.getUniformLocation(program, "uTracer0");
-    program.tracer1Uniform = this.wgli.getUniformLocation(program, "uTracer1");
-    program.tracer2Uniform = this.wgli.getUniformLocation(program, "uTracer2");
+    program.solute0ColUniform = this.wgli.getUniformLocation(program, "uSolute0Col");
+    program.solute1ColUniform = this.wgli.getUniformLocation(program, "uSolute1Col");
+    program.solute2ColUniform = this.wgli.getUniformLocation(program, "uSolute2Col");
+    program.solute0Uniform = this.wgli.getUniformLocation(program, "uSolute0");
+    program.solute1Uniform = this.wgli.getUniformLocation(program, "uSolute1");
+    program.solute2Uniform = this.wgli.getUniformLocation(program, "uSolute2");
     program.nodeIdUniform = this.wgli.getUniformLocation(program, "uNodeId");
     return program;
   }
@@ -303,54 +303,54 @@ class LBMProgram {
     this.fluid.distFunc5_8.swap();
   }
 
-  // Initialise tracer variables
-  _initTracer(tracer) {
+  // Initialise solute variables
+  _initSolute(solute) {
     // Initialise concentration field
-    this._initTracerConcentration(tracer);
+    this._initSoluteConcentration(solute);
 
     // Initialise equilibrium distribution functions
-    this._computeInitTracerDist(tracer);
+    this._computeInitSoluteDist(solute);
   }
 
-  _initTracerConcentration(tracer) {
+  _initSoluteConcentration(solute) {
     const aspect = this.wgli.getAspect();
     this.wgli.useProgram(this.circleProgram);
     this.wgli.uniform1f(this.circleProgram.xAspectUniform, aspect.xAspect);
     this.wgli.uniform1f(this.circleProgram.yAspectUniform, aspect.yAspect);
-    this.wgli.blit(tracer.concentration.write.fbo);
-    tracer.concentration.swap();
+    this.wgli.blit(solute.concentration.write.fbo);
+    solute.concentration.swap();
   }
 
-  _computeInitTracerDist(tracer) {
+  _computeInitSoluteDist(solute) {
     // Rest component
     this.wgli.useProgram(this.initEqProgramF0);
-    this.wgli.uniform1f(this.initEqProgramF0.tauUniform, tracer.params.tau);
+    this.wgli.uniform1f(this.initEqProgramF0.tauUniform, solute.params.tau);
     this.wgli.uniform1i(this.initEqProgramF0.velocityUniform, this.fluid.velocity.read.attach(0));
     this.wgli.uniform1i(this.initEqProgramF0.densityUniform, this.fluid.density.read.attach(1));
     this.wgli.uniform1i(this.initEqProgramF0.forceDensityUniform, this.fluid.forceDensity.attach(2));
-    this.wgli.uniform1i(this.initEqProgramF0.scalarFieldUniform, tracer.concentration.read.attach(3));
-    this.wgli.blit(tracer.distFunc0.write.fbo);
-    tracer.distFunc0.swap();
+    this.wgli.uniform1i(this.initEqProgramF0.scalarFieldUniform, solute.concentration.read.attach(3));
+    this.wgli.blit(solute.distFunc0.write.fbo);
+    solute.distFunc0.swap();
 
     // Main cartesian components
     this.wgli.useProgram(this.initEqProgramF1_4);
-    this.wgli.uniform1f(this.initEqProgramF1_4.tauUniform, tracer.params.tau);
+    this.wgli.uniform1f(this.initEqProgramF1_4.tauUniform, solute.params.tau);
     this.wgli.uniform1i(this.initEqProgramF1_4.velocityUniform, this.fluid.velocity.read.attach(0));
     this.wgli.uniform1i(this.initEqProgramF1_4.densityUniform, this.fluid.density.read.attach(1));
     this.wgli.uniform1i(this.initEqProgramF1_4.forceDensityUniform, this.fluid.forceDensity.attach(2));
-    this.wgli.uniform1i(this.initEqProgramF1_4.scalarFieldUniform, tracer.concentration.read.attach(3));
-    this.wgli.blit(tracer.distFunc1_4.write.fbo);
-    tracer.distFunc1_4.swap();
+    this.wgli.uniform1i(this.initEqProgramF1_4.scalarFieldUniform, solute.concentration.read.attach(3));
+    this.wgli.blit(solute.distFunc1_4.write.fbo);
+    solute.distFunc1_4.swap();
     
     // Diagonal components
     this.wgli.useProgram(this.initEqProgramF5_8);
-    this.wgli.uniform1f(this.initEqProgramF5_8.tauUniform, tracer.params.tau);
+    this.wgli.uniform1f(this.initEqProgramF5_8.tauUniform, solute.params.tau);
     this.wgli.uniform1i(this.initEqProgramF5_8.velocityUniform, this.fluid.velocity.read.attach(0));
     this.wgli.uniform1i(this.initEqProgramF5_8.densityUniform, this.fluid.density.read.attach(1));
     this.wgli.uniform1i(this.initEqProgramF5_8.forceDensityUniform, this.fluid.forceDensity.attach(2));
-    this.wgli.uniform1i(this.initEqProgramF5_8.scalarFieldUniform, tracer.concentration.read.attach(3));
-    this.wgli.blit(tracer.distFunc5_8.write.fbo);
-    tracer.distFunc5_8.swap();
+    this.wgli.uniform1i(this.initEqProgramF5_8.scalarFieldUniform, solute.concentration.read.attach(3));
+    this.wgli.blit(solute.distFunc5_8.write.fbo);
+    solute.distFunc5_8.swap();
   }
 
   // Performs TRT colision for fluid populations
@@ -392,46 +392,46 @@ class LBMProgram {
     this.fluid.distFunc5_8.swap();
   }
 
-  // Performs TRT colision for tracer populations
-  _performTracerTRT(tracer) {
+  // Performs TRT colision for solute populations
+  _performSoluteTRT(solute) {
     // Rest component
     this.wgli.useProgram(this.TRTProgramF0);
-    this.wgli.uniform1f(this.TRTProgramF0.plusOmegaUniform, tracer.params.plusOmega);
-    this.wgli.uniform1f(this.TRTProgramF0.minusOmegaUniform, tracer.params.minusOmega);
-    this.wgli.uniform1i(this.TRTProgramF0.distFuncUniform, tracer.distFunc0.read.attach(0));
-    this.wgli.uniform1i(this.TRTProgramF0.scalarFieldUniform, tracer.concentration.read.attach(1));
+    this.wgli.uniform1f(this.TRTProgramF0.plusOmegaUniform, solute.params.plusOmega);
+    this.wgli.uniform1f(this.TRTProgramF0.minusOmegaUniform, solute.params.minusOmega);
+    this.wgli.uniform1i(this.TRTProgramF0.distFuncUniform, solute.distFunc0.read.attach(0));
+    this.wgli.uniform1i(this.TRTProgramF0.scalarFieldUniform, solute.concentration.read.attach(1));
     this.wgli.uniform1i(this.TRTProgramF0.velocityUniform, this.fluid.velocity.read.attach(2));
     this.wgli.uniform1i(this.TRTProgramF0.densityUniform, this.fluid.density.read.attach(3));
     this.wgli.uniform1i(this.TRTProgramF0.forceDensityUniform, this.fluid.forceDensity.attach(4));
-    this.wgli.blit(tracer.distFunc0.write.fbo);
-    tracer.distFunc0.swap();
+    this.wgli.blit(solute.distFunc0.write.fbo);
+    solute.distFunc0.swap();
 
     // Main cartesian components
     this.wgli.useProgram(this.TRTProgramF1_4);
-    this.wgli.uniform1f(this.TRTProgramF1_4.plusOmegaUniform, tracer.params.plusOmega);
-    this.wgli.uniform1f(this.TRTProgramF1_4.minusOmegaUniform, tracer.params.minusOmega);
-    this.wgli.uniform1i(this.TRTProgramF1_4.distFuncUniform, tracer.distFunc1_4.read.attach(0));
-    this.wgli.uniform1i(this.TRTProgramF1_4.scalarFieldUniform, tracer.concentration.read.attach(1));
+    this.wgli.uniform1f(this.TRTProgramF1_4.plusOmegaUniform, solute.params.plusOmega);
+    this.wgli.uniform1f(this.TRTProgramF1_4.minusOmegaUniform, solute.params.minusOmega);
+    this.wgli.uniform1i(this.TRTProgramF1_4.distFuncUniform, solute.distFunc1_4.read.attach(0));
+    this.wgli.uniform1i(this.TRTProgramF1_4.scalarFieldUniform, solute.concentration.read.attach(1));
     this.wgli.uniform1i(this.TRTProgramF1_4.velocityUniform, this.fluid.velocity.read.attach(2));
     this.wgli.uniform1i(this.TRTProgramF1_4.densityUniform, this.fluid.density.read.attach(3));
     this.wgli.uniform1i(this.TRTProgramF1_4.forceDensityUniform, this.fluid.forceDensity.attach(4));
-    this.wgli.blit(tracer.distFunc1_4.write.fbo);
-    tracer.distFunc1_4.swap();
+    this.wgli.blit(solute.distFunc1_4.write.fbo);
+    solute.distFunc1_4.swap();
 
     // Diagonal components
     this.wgli.useProgram(this.TRTProgramF5_8);
-    this.wgli.uniform1f(this.TRTProgramF5_8.plusOmegaUniform, tracer.params.plusOmega);
-    this.wgli.uniform1f(this.TRTProgramF5_8.minusOmegaUniform, tracer.params.minusOmega);
-    this.wgli.uniform1i(this.TRTProgramF5_8.distFuncUniform, tracer.distFunc5_8.read.attach(0));
-    this.wgli.uniform1i(this.TRTProgramF5_8.scalarFieldUniform, tracer.concentration.read.attach(1));
+    this.wgli.uniform1f(this.TRTProgramF5_8.plusOmegaUniform, solute.params.plusOmega);
+    this.wgli.uniform1f(this.TRTProgramF5_8.minusOmegaUniform, solute.params.minusOmega);
+    this.wgli.uniform1i(this.TRTProgramF5_8.distFuncUniform, solute.distFunc5_8.read.attach(0));
+    this.wgli.uniform1i(this.TRTProgramF5_8.scalarFieldUniform, solute.concentration.read.attach(1));
     this.wgli.uniform1i(this.TRTProgramF5_8.velocityUniform, this.fluid.velocity.read.attach(2));
     this.wgli.uniform1i(this.TRTProgramF5_8.densityUniform, this.fluid.density.read.attach(3));
     this.wgli.uniform1i(this.TRTProgramF5_8.forceDensityUniform, this.fluid.forceDensity.attach(4));
-    this.wgli.blit(tracer.distFunc5_8.write.fbo);
-    tracer.distFunc5_8.swap();
+    this.wgli.blit(solute.distFunc5_8.write.fbo);
+    solute.distFunc5_8.swap();
   }
 
-  // Performs streaming on fluid or tracer distribution functions
+  // Performs streaming on fluid or solute distribution functions
   _performStreaming(target) {
     // Rest component
     this.wgli.useProgram(this.streamingProgramF0);
@@ -490,36 +490,36 @@ class LBMProgram {
     this.fluid.density.swap();
   }
 
-  _computeConcentration(tracer) {
+  _computeConcentration(solute) {
     // Clear concentration buffer
-    this.wgli.clear(tracer.concentration.read.fbo, 0, 0, 0);
+    this.wgli.clear(solute.concentration.read.fbo, 0, 0, 0);
 
     // Add rest component
     this.wgli.useProgram(this.sumDistFuncProgram);
-    this.wgli.uniform1i(this.sumDistFuncProgram.summandUniform, tracer.concentration.read.attach(0));
-    this.wgli.uniform1i(this.sumDistFuncProgram.distFuncUniform, tracer.distFunc0.read.attach(1));
+    this.wgli.uniform1i(this.sumDistFuncProgram.summandUniform, solute.concentration.read.attach(0));
+    this.wgli.uniform1i(this.sumDistFuncProgram.distFuncUniform, solute.distFunc0.read.attach(1));
     this.wgli.uniform1i(this.sumDistFuncProgram.nodeIdUniform, this.nodeId.read.attach(2));
     this.wgli.uniform1f(this.sumDistFuncProgram.defaultValUniform, 0.0);
-    this.wgli.blit(tracer.concentration.write.fbo);
-    tracer.concentration.swap();
+    this.wgli.blit(solute.concentration.write.fbo);
+    solute.concentration.swap();
 
     // Add main cartesian components
     this.wgli.useProgram(this.sumDistFuncProgram);
-    this.wgli.uniform1i(this.sumDistFuncProgram.summandUniform, tracer.concentration.read.attach(0));
-    this.wgli.uniform1i(this.sumDistFuncProgram.distFuncUniform, tracer.distFunc1_4.read.attach(1));
+    this.wgli.uniform1i(this.sumDistFuncProgram.summandUniform, solute.concentration.read.attach(0));
+    this.wgli.uniform1i(this.sumDistFuncProgram.distFuncUniform, solute.distFunc1_4.read.attach(1));
     this.wgli.uniform1i(this.sumDistFuncProgram.nodeIdUniform, this.nodeId.read.attach(2));
     this.wgli.uniform1f(this.sumDistFuncProgram.defaultValUniform, 0.0);
-    this.wgli.blit(tracer.concentration.write.fbo);
-    tracer.concentration.swap();
+    this.wgli.blit(solute.concentration.write.fbo);
+    solute.concentration.swap();
 
     // Add diagonal components
     this.wgli.useProgram(this.sumDistFuncProgram);
-    this.wgli.uniform1i(this.sumDistFuncProgram.summandUniform, tracer.concentration.read.attach(0));
-    this.wgli.uniform1i(this.sumDistFuncProgram.distFuncUniform, tracer.distFunc5_8.read.attach(1));
+    this.wgli.uniform1i(this.sumDistFuncProgram.summandUniform, solute.concentration.read.attach(0));
+    this.wgli.uniform1i(this.sumDistFuncProgram.distFuncUniform, solute.distFunc5_8.read.attach(1));
     this.wgli.uniform1i(this.sumDistFuncProgram.nodeIdUniform, this.nodeId.read.attach(2));
     this.wgli.uniform1f(this.sumDistFuncProgram.defaultValUniform, 0.0);
-    this.wgli.blit(tracer.concentration.write.fbo);
-    tracer.concentration.swap();
+    this.wgli.blit(solute.concentration.write.fbo);
+    solute.concentration.swap();
   }
 
   _computeVelocity() {
@@ -580,9 +580,9 @@ class LBMProgram {
     // Initialise fluid parameters
     this._initFluid();
 
-    // Initialise tracers
-    for (let tracer of this.tracers) {
-      this._initTracer(tracer);
+    // Initialise solutes
+    for (let solute of this.solutes) {
+      this._initSolute(solute);
     }
 
     // Begin main update loop
@@ -620,17 +620,17 @@ class LBMProgram {
     // Update concentration
     const isAddingConcentration = cursorState.isActive && this.props.tool == 3;
     const isRemovingConcentration = cursorState.isActive && this.props.tool == 4;
-    const activeTracer = this.props.tracer;
+    const activeSolute = this.props.solute;
     this.wgli.useProgram(this.concentrationProgram);
     this.wgli.uniform1i(this.concentrationProgram.isAddingUniform, isAddingConcentration);
     this.wgli.uniform1i(this.concentrationProgram.isRemovingUniform, isRemovingConcentration);
     this.wgli.uniform1f(this.concentrationProgram.xAspectUniform, aspect.xAspect);
     this.wgli.uniform1f(this.concentrationProgram.yAspectUniform, aspect.yAspect);
     this.wgli.uniform2f(this.concentrationProgram.cursorPosUniform, cursorState.cursorPos.x, cursorState.cursorPos.y);
-    this.wgli.uniform1i(this.concentrationProgram.concentrationUniform, this.tracers[activeTracer].concentration.read.attach(0));
+    this.wgli.uniform1i(this.concentrationProgram.concentrationUniform, this.solutes[activeSolute].concentration.read.attach(0));
     this.wgli.uniform1i(this.concentrationProgram.nodeIdUniform, this.nodeId.read.attach(1));
-    this.wgli.blit(this.tracers[activeTracer].concentration.write.fbo);
-    this.tracers[activeTracer].concentration.swap();
+    this.wgli.blit(this.solutes[activeSolute].concentration.write.fbo);
+    this.solutes[activeSolute].concentration.swap();
 
     // Get imposed forces
     const isAddingForce = cursorState.isActive && this.props.tool == 0;
@@ -649,14 +649,14 @@ class LBMProgram {
     // Perform fluid streaming step
     this._performStreaming(this.fluid);
 
-    // Perform tracer TRT collision step
-    for (let tracer of this.tracers) {
-      this._performTracerTRT(tracer);
+    // Perform solute TRT collision step
+    for (let solute of this.solutes) {
+      this._performSoluteTRT(solute);
     }
 
-    // Perform tracer streaming step
-    for (let tracer of this.tracers) {
-      this._performStreaming(tracer);
+    // Perform solute streaming step
+    for (let solute of this.solutes) {
+      this._performStreaming(solute);
     }
 
     // Compute macroscopic fluid density
@@ -665,20 +665,20 @@ class LBMProgram {
     // Compute macroscopic fluid velocity
     this._computeVelocity();
 
-    // Compute macroscopic tracer concentration
-    for (let tracer of this.tracers) {
-      this._computeConcentration(tracer);
+    // Compute macroscopic solute concentration
+    for (let solute of this.solutes) {
+      this._computeConcentration(solute);
     }
 
-    // Draw fluid velocity, tracers and node Id
+    // Draw fluid velocity, solutes and node Id
     this.wgli.useProgram(this.outputProgram);
     this.wgli.uniform1i(this.outputProgram.velocityUniform, this.fluid.velocity.read.attach(0));
-    this.wgli.uniform3f(this.outputProgram.tracer0ColUniform, this.normalizedColors[0].r, this.normalizedColors[0].g, this.normalizedColors[0].b);
-    this.wgli.uniform3f(this.outputProgram.tracer1ColUniform, this.normalizedColors[1].r, this.normalizedColors[1].g, this.normalizedColors[1].b);
-    this.wgli.uniform3f(this.outputProgram.tracer2ColUniform, this.normalizedColors[2].r, this.normalizedColors[2].g, this.normalizedColors[2].b);
-    this.wgli.uniform1i(this.outputProgram.tracer0Uniform, this.tracers[0].concentration.read.attach(1));
-    this.wgli.uniform1i(this.outputProgram.tracer1Uniform, this.tracers[1].concentration.read.attach(2));
-    this.wgli.uniform1i(this.outputProgram.tracer2Uniform, this.tracers[2].concentration.read.attach(3));
+    this.wgli.uniform3f(this.outputProgram.solute0ColUniform, this.normalizedColors[0].r, this.normalizedColors[0].g, this.normalizedColors[0].b);
+    this.wgli.uniform3f(this.outputProgram.solute1ColUniform, this.normalizedColors[1].r, this.normalizedColors[1].g, this.normalizedColors[1].b);
+    this.wgli.uniform3f(this.outputProgram.solute2ColUniform, this.normalizedColors[2].r, this.normalizedColors[2].g, this.normalizedColors[2].b);
+    this.wgli.uniform1i(this.outputProgram.solute0Uniform, this.solutes[0].concentration.read.attach(1));
+    this.wgli.uniform1i(this.outputProgram.solute1Uniform, this.solutes[1].concentration.read.attach(2));
+    this.wgli.uniform1i(this.outputProgram.solute2Uniform, this.solutes[2].concentration.read.attach(3));
     this.wgli.uniform1i(this.outputProgram.nodeIdUniform, this.nodeId.read.attach(4));
     this.wgli.blit(null);
   }
@@ -695,9 +695,9 @@ class LBMProgram {
     this.props = props;
     this.setNormalizedColors();
     this.fluid.setViscosity(this.props.viscosity);
-    this.tracers[0].setDiffusivity(this.props.diffusivities[0]);
-    this.tracers[1].setDiffusivity(this.props.diffusivities[1]);
-    this.tracers[2].setDiffusivity(this.props.diffusivities[2]);
+    this.solutes[0].setDiffusivity(this.props.diffusivities[0]);
+    this.solutes[1].setDiffusivity(this.props.diffusivities[1]);
+    this.solutes[2].setDiffusivity(this.props.diffusivities[2]);
   }
 }
 

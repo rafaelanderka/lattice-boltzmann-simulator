@@ -1,4 +1,4 @@
-class Tracer {
+class Solute {
   constructor(wgli, diffusivity) {
     this.wgli = wgli;
 
@@ -26,4 +26,4 @@ class Tracer {
   }
 }
 
-export default Tracer;
+export default Solute;

@@ -6,13 +6,13 @@ export default `
   precision highp float;
   precision highp sampler2D;
 
-  uniform vec3 uTracer0Col;
-  uniform vec3 uTracer1Col;
-  uniform vec3 uTracer2Col;
+  uniform vec3 uSolute0Col;
+  uniform vec3 uSolute1Col;
+  uniform vec3 uSolute2Col;
   uniform sampler2D uVelocity;
-  uniform sampler2D uTracer0;
-  uniform sampler2D uTracer1;
-  uniform sampler2D uTracer2;
+  uniform sampler2D uSolute0;
+  uniform sampler2D uSolute1;
+  uniform sampler2D uSolute2;
   uniform sampler2D uNodeId;
 
   varying vec2 vUV; 
@@ -29,10 +29,10 @@ export default `
     } else {
       // Fluid node
       vec2 velocity = texture2D(uVelocity, vUV).xy;
-      float concentration0 = texture2D(uTracer0, vUV).x;
-      float concentration1 = texture2D(uTracer1, vUV).x;
-      float concentration2 = texture2D(uTracer2, vUV).x;
-      gl_FragColor = vec4(baseBrightness - concentration0 * (baseBrightness - uTracer0Col) - concentration1 * (baseBrightness - uTracer1Col) - concentration2 * (baseBrightness - uTracer2Col) - 3.33333333334 * length(velocity) * (baseBrightness - velocityCol), 1.0);
+      float concentration0 = texture2D(uSolute0, vUV).x;
+      float concentration1 = texture2D(uSolute1, vUV).x;
+      float concentration2 = texture2D(uSolute2, vUV).x;
+      gl_FragColor = vec4(baseBrightness - concentration0 * (baseBrightness - uSolute0Col) - concentration1 * (baseBrightness - uSolute1Col) - concentration2 * (baseBrightness - uSolute2Col) - 3.33333333334 * length(velocity) * (baseBrightness - velocityCol), 1.0);
     }
   }
 `;

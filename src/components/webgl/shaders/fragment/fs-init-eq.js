@@ -1,7 +1,7 @@
 export default `
   // FRAGMENT SHADER
 
-  // Computes the initial equilibrium distributions of a fluid or tracer
+  // Computes the initial equilibrium distributions of a fluid or solute
 
   precision highp float;
   precision highp sampler2D;
