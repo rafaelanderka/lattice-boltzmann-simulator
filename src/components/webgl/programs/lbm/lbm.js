@@ -353,6 +353,14 @@ class LBMProgram {
     solute.distFunc5_8.swap();
   }
 
+  // Resets the solute with the given Id
+  resetSolute(id) {
+    const solute = this.solutes[id];
+    this.wgli.clear(solute.concentration.write.fbo, 0.0, 0.0, 0.0);
+    solute.concentration.swap();
+    this._computeInitSoluteDist(solute);
+  }
+
   // Performs TRT colision for fluid populations
   _performFluidTRT() {
     // Rest component

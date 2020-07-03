@@ -27,15 +27,20 @@ export default class WebGL extends React.Component {
         break;
     }
 
+    // Expose program to parent
+    this.props.exposeProgram(this.program);
+
     // Start program
     this.program.run();
   }
 
   componentDidUpdate() {
+    // Pass props to program
     this.program.setProps(this.props);
   }
 
   render() {
+    // Render a single canvas element as the host to the WebGL context
     return (<canvas 
       id={this.props.id} 
       width={this.props.width * this.props.resolution / this.props.width} 

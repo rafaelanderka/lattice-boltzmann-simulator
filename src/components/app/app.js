@@ -1,6 +1,7 @@
 import React from "react";
 import WebGL from "../webgl/webgl";
 import Toolbar from "../toolbar/toolbar";
+import Button from "../button/button";
 import HeaderButton from "../header-button/header-button";
 import Selector from "../selector/selector";
 import SoluteSelector from "../solute-selector/solute-selector";
@@ -20,6 +21,7 @@ class App extends React.Component {
       resolution: 256,
       tool: 0,
       solute: 0,
+      soluteCount: 3,
       viscosity: 0.1,
       boundaryWalls: 0,
       diffusivities: [0.1, 0.3, 0.4],
@@ -33,6 +35,7 @@ class App extends React.Component {
     this.setActiveSoluteColorR = this.setActiveSoluteColorR.bind(this);
     this.setActiveSoluteColorG = this.setActiveSoluteColorG.bind(this);
     this.setActiveSoluteColorB = this.setActiveSoluteColorB.bind(this);
+    this.resetAllSolutes = this.resetAllSolutes.bind(this);
   }
 
   setTool(id) {
@@ -85,6 +88,12 @@ class App extends React.Component {
     this.setColor(this.state.solute, color);
   }
 
+  resetAllSolutes() {
+    for (let i = 0; i < this.state.soluteCount; i++) {
+      this.program.resetSolute(i);
+    }
+  }
+
   rgbToHex(rgb) {
     return "#" + ((1 << 24) + (rgb.r << 16) + (rgb.g << 8) + rgb.b).toString(16).slice(1);
   }
@@ -119,6 +128,7 @@ class App extends React.Component {
                 colors={this.state.colors}
                 leftRightWall={leftRightWall}
                 topBottomWall={topBottomWall}
+                exposeProgram={program => this.program = program}
               />
             </ContainerDimensions>
           </div>
@@ -237,6 +247,24 @@ class App extends React.Component {
                   decimals={2}
                   setValue={this.setActiveSoluteDiffusivity}
                 />
+              </div>
+            </div>
+            <div className="settings-subcontainer">
+              <div className="solute-reset-buttons-container">
+                <div className="solute-reset-button">
+                  <Button 
+                    text="CLEAR SOLUTE"
+                    onClick={() => this.program.resetSolute(this.state.solute)} 
+                    color="#000"
+                  />
+                </div>
+                <div className="solute-reset-button">
+                  <Button 
+                    text="CLEAR ALL SOLUTES"
+                    onClick={this.resetAllSolutes} 
+                    color="#F00"
+                  />
+                </div>
               </div>
             </div>
             <br/>

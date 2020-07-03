@@ -151,3 +151,16 @@
   border-radius: 100px;
   margin-bottom: -30px;
 }
+
+.solute-reset-buttons-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+}
+
+.solute-reset-button {
+  display: inline-block;
+  margin-right: 10px;
+}

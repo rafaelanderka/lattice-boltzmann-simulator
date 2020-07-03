@@ -1,0 +1,15 @@
+.button {
+  display: inline-block;
+  width: auto;
+  height: 30px;
+  border: none;
+  background-color: #FFF;
+  transition: all 0.2s ease;
+  padding: 0px 15px;
+  margin: 0px;
+  border: 2px solid black;
+  border-radius: 10px;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  font-size: 12px;
+  font-weight: 500;
+}
