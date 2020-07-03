@@ -159,6 +159,17 @@ class App extends React.Component {
                 setSelection={this.setBoundaryWalls}
               />
             </div>
+            <div className="settings-subcontainer">
+              <div className="reset-buttons-container">
+                <div className="reset-button">
+                  <Button 
+                    text="RESET FLUID"
+                    onClick={() => this.program.resetFluid()} 
+                    color="#F00"
+                  />
+                </div>
+              </div>
+            </div>
             <div className="settings-title">
               <img src={IconSoluteSettingsBlack} alt=""/>
               SOLUTE SETTINGS
@@ -250,15 +261,15 @@ class App extends React.Component {
               </div>
             </div>
             <div className="settings-subcontainer">
-              <div className="solute-reset-buttons-container">
-                <div className="solute-reset-button">
+              <div className="reset-buttons-container">
+                <div className="reset-button">
                   <Button 
                     text="CLEAR SOLUTE"
                     onClick={() => this.program.resetSolute(this.state.solute)} 
                     color="#000"
                   />
                 </div>
-                <div className="solute-reset-button">
+                <div className="reset-button">
                   <Button 
                     text="CLEAR ALL SOLUTES"
                     onClick={this.resetAllSolutes} 

@@ -303,6 +303,11 @@ class LBMProgram {
     this.fluid.distFunc5_8.swap();
   }
 
+  // Resets the fluid
+  resetFluid() {
+    this._initFluid();
+  }
+
   // Initialise solute variables
   _initSolute(solute) {
     // Initialise concentration field

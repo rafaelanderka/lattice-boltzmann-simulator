@@ -152,7 +152,7 @@
   margin-bottom: -30px;
 }
 
-.solute-reset-buttons-container {
+.reset-buttons-container {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
@@ -160,7 +160,7 @@
   width: 100%;
 }
 
-.solute-reset-button {
+.reset-button {
   display: inline-block;
   margin-right: 10px;
 }
