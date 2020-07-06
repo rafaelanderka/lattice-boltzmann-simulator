@@ -10,6 +10,7 @@ export default `
   uniform bool uIsRemoving;
   uniform bool uLeftRightWall;
   uniform bool uTopBottomWall;
+  uniform float uToolSize;
   uniform float uXAspect;
   uniform float uYAspect;
   uniform vec2 uCursorPos;
@@ -20,8 +21,7 @@ export default `
   
   void main(void) {
     float dist = length(vec2(uXAspect * uCursorPos.x, uYAspect * uCursorPos.y) - vec2(uXAspect * vUV.x, uYAspect * vUV.y));
-    float threshold = 0.02;
-    bool isActiveNode = dist <= threshold;
+    bool isActiveNode = dist <= uToolSize;
     bool isAdding = uIsAdding && isActiveNode;
     bool isRemoving = uIsRemoving && isActiveNode;
     bool liesOnRightWall = vUV.x >= 1.0 - uTexelSize.x;

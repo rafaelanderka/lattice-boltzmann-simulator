@@ -8,6 +8,7 @@ export default `
 
   uniform bool uIsAdding;
   uniform bool uIsRemoving;
+  uniform float uToolSize;
   uniform float uXAspect;
   uniform float uYAspect;
   uniform vec2 uCursorPos;
@@ -18,9 +19,8 @@ export default `
   
   void main(void) {
     float dist = length(vec2(uXAspect * uCursorPos.x, uYAspect * uCursorPos.y) - vec2(uXAspect * vUV.x, uYAspect * vUV.y));
-    float threshold = 0.1;
-    float val = 0.05 * (1.0 - dist / threshold);
-    bool isActiveNode = dist <= threshold;
+    float val = 0.05 * (1.0 - dist / uToolSize);
+    bool isActiveNode = dist <= uToolSize;
     bool isAdding = uIsAdding && isActiveNode;
     bool isRemoving = uIsRemoving && isActiveNode;
     float nodalConcentration = texture2D(uConcentration, vUV).x;

@@ -20,6 +20,7 @@ class App extends React.Component {
     this.state = {
       resolution: 256,
       tool: 0,
+      toolSize: 0.05,
       solute: 0,
       soluteCount: 3,
       viscosity: 0.1,
@@ -28,6 +29,7 @@ class App extends React.Component {
       colors: [{r: 162, g: 255, b: 0}, {r: 255, g: 100, b: 100}, {r: 70, g: 200, b: 255}]
     }
     this.setTool = this.setTool.bind(this);
+    this.setToolSize = this.setToolSize.bind(this);
     this.setSolute = this.setSolute.bind(this);
     this.setViscosity = this.setViscosity.bind(this);
     this.setBoundaryWalls = this.setBoundaryWalls.bind(this);
@@ -42,6 +44,10 @@ class App extends React.Component {
 
   setTool(id) {
     this.setState({tool: id});
+  }
+
+  setToolSize(value) {
+    this.setState({toolSize: value});
   }
 
   setSolute(id) {
@@ -118,6 +124,20 @@ class App extends React.Component {
         <div id="header">
           <img id="logo" src={SynBIMLogo} alt="SynBIM"/>
           <Toolbar tool={this.state.tool} setTool={this.setTool}/>
+          <div id="tool-size-container">
+              <div id="tool-size-title">TOOL SIZE</div>
+              <div className="slider-unlabeled-container">
+                <Slider
+                  value={this.state.toolSize}
+                  min={0.0025}
+                  max={0.2}
+                  step={0.0005}
+                  decimals={2}
+                  setValue={this.setToolSize}
+                  labeled={false}
+                />
+              </div>
+            </div>
           <div className="header-buttons-container">
             <HeaderButton
               image={IconAboutBlack}
@@ -134,6 +154,7 @@ class App extends React.Component {
                 program="lbm" 
                 resolution={this.state.resolution}
                 tool={this.state.tool} 
+                toolSize={this.state.toolSize}
                 solute={this.state.solute}
                 viscosity={this.state.viscosity}
                 diffusivities={this.state.diffusivities}
@@ -160,6 +181,7 @@ class App extends React.Component {
                   step={0.01}
                   decimals={2}
                   setValue={this.setViscosity}
+                  labeled={true}
                 />
               </div>
             </div>
@@ -228,7 +250,8 @@ class App extends React.Component {
                         step={1}
                         decimals={0}
                         setValue={this.setActiveSoluteColorR}
-                      />
+                        labeled={true}
+                  />
                     </div>
                   </div>
                   <div className="solute-color-slider">
@@ -241,6 +264,7 @@ class App extends React.Component {
                         step={1}
                         decimals={0}
                         setValue={this.setActiveSoluteColorG}
+                        labeled={true}
                       />
                     </div>
                   </div>
@@ -254,6 +278,7 @@ class App extends React.Component {
                         step={1}
                         decimals={0}
                         setValue={this.setActiveSoluteColorB}
+                        labeled={true}
                       />
                     </div>
                   </div>
@@ -276,7 +301,8 @@ class App extends React.Component {
                   step={0.01}
                   decimals={2}
                   setValue={this.setActiveSoluteDiffusivity}
-                />
+                  labeled={true}
+                  />
               </div>
             </div>
             <div className="settings-subcontainer">

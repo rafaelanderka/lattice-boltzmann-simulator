@@ -109,6 +109,7 @@ class LBMProgram {
     const shader = this.wgli.createFragmentShader(fsForceDensitySource);
     const program = this.wgli.createProgram(shader);
     program.isActiveUniform = this.wgli.getUniformLocation(program, "uIsActive");
+    program.toolSizeUniform = this.wgli.getUniformLocation(program, "uToolSize");
     program.xAspectUniform = this.wgli.getUniformLocation(program, "uXAspect");
     program.yAspectUniform = this.wgli.getUniformLocation(program, "uYAspect");
     program.cursorPosUniform = this.wgli.getUniformLocation(program, "uCursorPos");
@@ -124,6 +125,7 @@ class LBMProgram {
     program.isRemovingUniform = this.wgli.getUniformLocation(program, "uIsRemoving");
     program.leftRightWallUniform = this.wgli.getUniformLocation(program, "uLeftRightWall");
     program.topBottomWallUniform = this.wgli.getUniformLocation(program, "uTopBottomWall");
+    program.toolSizeUniform = this.wgli.getUniformLocation(program, "uToolSize");
     program.xAspectUniform = this.wgli.getUniformLocation(program, "uXAspect");
     program.yAspectUniform = this.wgli.getUniformLocation(program, "uYAspect");
     program.cursorPosUniform = this.wgli.getUniformLocation(program, "uCursorPos");
@@ -137,6 +139,7 @@ class LBMProgram {
     const program = this.wgli.createProgram(shader);
     program.isAddingUniform = this.wgli.getUniformLocation(program, "uIsAdding");
     program.isRemovingUniform = this.wgli.getUniformLocation(program, "uIsRemoving");
+    program.toolSizeUniform = this.wgli.getUniformLocation(program, "uToolSize");
     program.xAspectUniform = this.wgli.getUniformLocation(program, "uXAspect");
     program.yAspectUniform = this.wgli.getUniformLocation(program, "uYAspect");
     program.cursorPosUniform = this.wgli.getUniformLocation(program, "uCursorPos");
@@ -622,6 +625,7 @@ class LBMProgram {
     this.wgli.uniform1i(this.wallProgram.isRemovingUniform, isRemovingWalls);
     this.wgli.uniform1i(this.wallProgram.leftRightWallUniform, this.props.leftRightWall);
     this.wgli.uniform1i(this.wallProgram.topBottomWallUniform, this.props.topBottomWall);
+    this.wgli.uniform1f(this.wallProgram.toolSizeUniform, this.props.toolSize);
     this.wgli.uniform1f(this.wallProgram.xAspectUniform, aspect.xAspect);
     this.wgli.uniform1f(this.wallProgram.yAspectUniform, aspect.yAspect);
     this.wgli.uniform2f(this.wallProgram.cursorPosUniform, cursorState.cursorPos.x, cursorState.cursorPos.y);
@@ -637,6 +641,7 @@ class LBMProgram {
     this.wgli.useProgram(this.concentrationProgram);
     this.wgli.uniform1i(this.concentrationProgram.isAddingUniform, isAddingConcentration);
     this.wgli.uniform1i(this.concentrationProgram.isRemovingUniform, isRemovingConcentration);
+    this.wgli.uniform1f(this.concentrationProgram.toolSizeUniform, this.props.toolSize);
     this.wgli.uniform1f(this.concentrationProgram.xAspectUniform, aspect.xAspect);
     this.wgli.uniform1f(this.concentrationProgram.yAspectUniform, aspect.yAspect);
     this.wgli.uniform2f(this.concentrationProgram.cursorPosUniform, cursorState.cursorPos.x, cursorState.cursorPos.y);
@@ -649,6 +654,7 @@ class LBMProgram {
     const isAddingForce = cursorState.isActive && this.props.tool == 0;
     this.wgli.useProgram(this.forceProgram);
     this.wgli.uniform1i(this.forceProgram.isActiveUniform, isAddingForce);
+    this.wgli.uniform1f(this.forceProgram.toolSizeUniform, this.props.toolSize);
     this.wgli.uniform1f(this.forceProgram.xAspectUniform, aspect.xAspect);
     this.wgli.uniform1f(this.forceProgram.yAspectUniform, aspect.yAspect);
     this.wgli.uniform2f(this.forceProgram.cursorPosUniform, cursorState.cursorPos.x, cursorState.cursorPos.y);

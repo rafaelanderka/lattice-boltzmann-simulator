@@ -82,6 +82,7 @@ export default class Slider extends React.Component {
             >
               <div
                 style={{
+                  display: this.props.labeled ? 'block' : 'none',
                   position: 'absolute',
                   top: '-28px',
                   color: '#fff',
