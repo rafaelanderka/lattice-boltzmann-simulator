@@ -36,6 +36,7 @@ class App extends React.Component {
     this.setActiveSoluteColorG = this.setActiveSoluteColorG.bind(this);
     this.setActiveSoluteColorB = this.setActiveSoluteColorB.bind(this);
     this.resetAllSolutes = this.resetAllSolutes.bind(this);
+    this.resetFluid = this.resetFluid.bind(this);
     this.resetWalls = this.resetWalls.bind(this);
   }
 
@@ -95,9 +96,14 @@ class App extends React.Component {
     }
   }
 
+  resetFluid() {
+    this.setState({viscosity: 0.1});
+    this.program.resetFluid();
+  }
+
   resetWalls() {
-    this.program.resetWalls();
     this.setState({boundaryWalls: 0});
+    this.program.resetWalls();
   }
 
   rgbToHex(rgb) {
@@ -170,7 +176,7 @@ class App extends React.Component {
                 <div className="reset-button">
                   <Button 
                     text="RESET FLUID"
-                    onClick={() => this.program.resetFluid()} 
+                    onClick={this.resetFluid} 
                     color="#000"
                   />
                 </div>
