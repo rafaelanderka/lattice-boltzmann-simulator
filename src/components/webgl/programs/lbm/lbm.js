@@ -712,6 +712,11 @@ class LBMProgram {
     this.solutes[1].setDiffusivity(this.props.diffusivities[1]);
     this.solutes[2].setDiffusivity(this.props.diffusivities[2]);
   }
+
+  resetWalls() {
+    this.wgli.clear(this.nodeId.write.fbo, 0.0, 0.0, 0.0);
+    this.nodeId.swap();
+  }
 }
 
 export default LBMProgram;

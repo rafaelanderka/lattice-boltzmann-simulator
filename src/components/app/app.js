@@ -36,6 +36,7 @@ class App extends React.Component {
     this.setActiveSoluteColorG = this.setActiveSoluteColorG.bind(this);
     this.setActiveSoluteColorB = this.setActiveSoluteColorB.bind(this);
     this.resetAllSolutes = this.resetAllSolutes.bind(this);
+    this.resetWalls = this.resetWalls.bind(this);
   }
 
   setTool(id) {
@@ -92,6 +93,11 @@ class App extends React.Component {
     for (let i = 0; i < this.state.soluteCount; i++) {
       this.program.resetSolute(i);
     }
+  }
+
+  resetWalls() {
+    this.program.resetWalls();
+    this.setState({boundaryWalls: 0});
   }
 
   rgbToHex(rgb) {
@@ -165,7 +171,14 @@ class App extends React.Component {
                   <Button 
                     text="RESET FLUID"
                     onClick={() => this.program.resetFluid()} 
-                    color="#F00"
+                    color="#000"
+                  />
+                </div>
+                <div className="reset-button">
+                  <Button 
+                    text="RESET WALLS"
+                    onClick={this.resetWalls} 
+                    color="#000"
                   />
                 </div>
               </div>
