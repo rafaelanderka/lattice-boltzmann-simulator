@@ -67,7 +67,6 @@ This software uses the following open source packages:
 - [Parcel](https://parceljs.org)
 - [Normalize.css](http://necolas.github.io/normalize.css/)
 - [nano-react-app](https://github.com/nano-react-app/nano-react-app)
-- [react-container-dimensions](https://github.com/okonet/react-container-dimensions)
 - [react-range](https://github.com/tajo/react-range)
 - [gh-pages](https://github.com/tschaub/gh-pages)
 

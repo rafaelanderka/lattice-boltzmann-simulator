@@ -31,7 +31,6 @@ class WebGLInterface {
     this._initFloatRendering();
     this._initVertexBuffer();
     this._initBaseVertexShader();
-    this._initEventListeners();
   }
 
   // Initialises the canvas and WebGL 1 or 2 context
@@ -140,92 +139,6 @@ class WebGLInterface {
 
   _initBaseVertexShader() {
     this.vertexShader = this._createShader(vsBaseSource, 'vertex');
-  }
-
-  // Inintializes event listeners for mouse and touch input
-  _initEventListeners() {
-    // Initialize input state variables
-    this._setCanvasPos();
-    this.isActive = false;
-    this.cursorPos = {
-      x: 0.5,
-      y: 0.5
-    };
-    this.prevMousePos = {
-      x: 0.5,
-      y: 0.5
-    };
-    this.cursorVel = {
-      x: 0.0,
-      y: 0.0
-    };
-    
-    // Handle mouse input
-    this.canvas.addEventListener("mousemove", e => this._setCursorPos(e), false);
-    this.canvas.addEventListener("mousedown", e => {this.isActive = true;});
-    this.canvas.addEventListener("mouseup", e => {this.isActive = false;});
-
-    // Handle touch input
-    this.canvas.addEventListener("touchstart", e => { 
-      e.preventDefault();
-      this.isActive = true;
-      this._setCursorPos(e.targetTouches[0]);
-    });
-    this.canvas.addEventListener("touchend", e => {this.isActive = false;});
-    this.canvas.addEventListener("touchmove", e => { 
-      e.preventDefault();
-      this._setCursorPos(e.targetTouches[0]);
-    }, false);
-  }
-
-  _setCursorPos(e) {
-    this.lastCursorPos = this.cursorPos;
-    this.cursorPos = {
-      x: (e.clientX - this.canvasPos.x) / this.canvas.width * this.scale,
-      y: 1.0 - ((e.clientY - this.canvasPos.y)) / this.canvas.height * this.scale
-    };
-    this.cursorVel = {
-      x: this.cursorPos.x - this.lastCursorPos.x,
-      y: this.cursorPos.y - this.lastCursorPos.y
-    };
-  }
-
-  // Returns the current cursor state
-  getCursorState() {
-    return {
-      cursorPos: this.cursorPos,
-      cursorVel: this.cursorVel,
-      isActive: this.isActive
-    }
-  }
-
-  _setCanvasPos() {
-    this.canvasPos = this._getPosition(this.canvas);
-  }
-
-  // Helper function to get an element's exact position
-  _getPosition(el) {
-    let xPos = 0;
-    let yPos = 0;
-    
-    while (el) {
-      if (el.tagName == "BODY") {
-        // Deal with browser quirks with body/window/document and page scroll
-        let xScroll = el.scrollLeft || document.documentElement.scrollLeft;
-        let yScroll = el.scrollTop || document.documentElement.scrollTop;
-        xPos += (el.offsetLeft - xScroll + el.clientLeft);
-        yPos += (el.offsetTop - yScroll + el.clientTop);
-      } else {
-        // For all other non-BODY elements  
-        xPos += (el.offsetLeft - el.scrollLeft + el.clientLeft);
-        yPos += (el.offsetTop - el.scrollTop + el.clientTop);
-      }
-      el = el.offsetParent;
-    }
-    return {
-      x: xPos,
-      y: yPos
-    };
   }
 
   // Creates a framebuffer to use as a render target
@@ -429,7 +342,6 @@ class WebGLInterface {
 
   // Update WebGL state
   update() {
-    this._setCanvasPos();
     this.aspect = this.canvas.width / this.canvas.height;
     this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
   }

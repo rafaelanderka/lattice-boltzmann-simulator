@@ -34,9 +34,8 @@ class CursorFollowProgram {
     this.wgli.update();
 
     // Draw mouse follow shader
-    const cursorState = this.wgli.getCursorState();
     this.wgli.useProgram(this.cursorFollowProgram);
-    this.wgli.uniform2f(this.cursorFollowProgram.cursorPosUniform, cursorState.cursorPos.x, cursorState.cursorPos.y);
+    this.wgli.uniform2f(this.cursorFollowProgram.cursorPosUniform, this.props.cursorPos.x, this.props.cursorPos.y);
     this.wgli.blit(null);
   }
 }

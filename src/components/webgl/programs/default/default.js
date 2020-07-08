@@ -24,9 +24,8 @@ class DefaultProgram {
     // Pre-update: ensure WebGL interface state is up to date
     this.wgli.update();
 
-    // Clear screen based on current mouse position
-    const cursorState = this.wgli.getCursorState();
-    this.wgli.clear(null, cursorState.cursorPos.x, cursorState.cursorPos.y, cursorState.isActive ? 1.0 : 0.0, 1.0);
+    // Clear screen based on current cursor position
+    this.wgli.clear(null, this.props.cursorPos.x, this.props.cursorPos.y, this.props.isCursorActive ? 1.0 : 0.0, 1.0);
   }
 }
 

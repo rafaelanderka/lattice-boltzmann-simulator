@@ -27,6 +27,8 @@ class LBMProgram {
     this.params.initVelocity = [0.0, 0.0];
     this.params.initDensity = 1.0;
     this.params.speedOfSound = 0.3;
+
+    this.aspect = this.wgli.getAspect();
     
     this._initFBOs();
     this._initShaderPrograms();
@@ -108,7 +110,7 @@ class LBMProgram {
   _createForceShaderProgram() {
     const shader = this.wgli.createFragmentShader(fsForceDensitySource);
     const program = this.wgli.createProgram(shader);
-    program.isActiveUniform = this.wgli.getUniformLocation(program, "uIsActive");
+    program.isCursorActiveUniform = this.wgli.getUniformLocation(program, "uIsActive");
     program.toolSizeUniform = this.wgli.getUniformLocation(program, "uToolSize");
     program.xAspectUniform = this.wgli.getUniformLocation(program, "uXAspect");
     program.yAspectUniform = this.wgli.getUniformLocation(program, "uYAspect");
@@ -234,10 +236,10 @@ class LBMProgram {
   // Set initial node Ids
   _setInitNodeId() {
     /*
-    const aspect = this.wgli.getAspect();
+    this.aspect = this.wgli.getAspect();
     this.wgli.useProgram(this.circleProgram);
-    this.wgli.uniform1f(this.circleProgram.xAspectUniform, aspect.xAspect);
-    this.wgli.uniform1f(this.circleProgram.yAspectUniform, aspect.yAspect);
+    this.wgli.uniform1f(this.circleProgram.xAspectUniform, this.aspect.xAspect);
+    this.wgli.uniform1f(this.circleProgram.yAspectUniform, this.aspect.yAspect);
     this.wgli.blit(this.nodeId.write.fbo);
     this.nodeId.swap();
     */
@@ -321,10 +323,10 @@ class LBMProgram {
   }
 
   _initSoluteConcentration(solute) {
-    const aspect = this.wgli.getAspect();
+    this.aspect = this.wgli.getAspect();
     this.wgli.useProgram(this.circleProgram);
-    this.wgli.uniform1f(this.circleProgram.xAspectUniform, aspect.xAspect);
-    this.wgli.uniform1f(this.circleProgram.yAspectUniform, aspect.yAspect);
+    this.wgli.uniform1f(this.circleProgram.xAspectUniform, this.aspect.xAspect);
+    this.wgli.uniform1f(this.circleProgram.yAspectUniform, this.aspect.yAspect);
     this.wgli.blit(solute.concentration.write.fbo);
     solute.concentration.swap();
   }
@@ -567,7 +569,7 @@ class LBMProgram {
     // Average rows
     this.wgli.useProgram(this.averageRowsProgram);
     this.wgli.uniform2f(this.averageRowsProgram.texelSizeUniform, this.fluid.density.read.texelSizeX, this.fluid.density.read.texelSizeY);
-    this.wgli.uniform2f(this.averageRowsProgram.canvasSizeUniform, this.props.width, this.props.height);
+    this.wgli.uniform2f(this.averageRowsProgram.canvasSizeUniform, this.props.containerWidth, this.props.containerHeight);
     this.wgli.uniform1i(this.averageRowsProgram.targetUniform, this.fluid.density.read.attach(0));
     this.wgli.blit(this.fluid.averageDensity.write.fbo);
     this.fluid.averageDensity.swap();
@@ -575,7 +577,7 @@ class LBMProgram {
     // Average columns
     this.wgli.useProgram(this.averageColumnsProgram);
     this.wgli.uniform2f(this.averageColumnsProgram.texelSizeUniform, this.fluid.density.read.texelSizeX, this.fluid.density.read.texelSizeY);
-    this.wgli.uniform2f(this.averageColumnsProgram.canvasSizeUniform, this.props.width, this.props.height);
+    this.wgli.uniform2f(this.averageColumnsProgram.canvasSizeUniform, this.props.containerWidth, this.props.containerHeight);
     this.wgli.uniform1i(this.averageColumnsProgram.targetUniform, this.fluid.averageDensity.read.attach(0));
     this.wgli.blit(this.fluid.averageDensity.write.fbo);
     this.fluid.averageDensity.swap();
@@ -613,52 +615,51 @@ class LBMProgram {
     // Pre-update: ensure WebGL interface state is up to date
     this.wgli.update();
 
-    // Get WebGl state
-    const cursorState = this.wgli.getCursorState();
-    const aspect = this.wgli.getAspect();
+    // Get aspect ratios
+    this.aspect = this.wgli.getAspect();
     
     // Update walls
-    const isAddingWalls = cursorState.isActive && this.props.tool == 1;
-    const isRemovingWalls = cursorState.isActive && this.props.tool == 2;
+    const isAddingWalls = this.props.isCursorOver && this.props.isCursorActive && this.props.tool == 1;
+    const isRemovingWalls = this.props.isCursorOver && this.props.isCursorActive && this.props.tool == 2;
     this.wgli.useProgram(this.wallProgram);
     this.wgli.uniform1i(this.wallProgram.isAddingUniform, isAddingWalls);
     this.wgli.uniform1i(this.wallProgram.isRemovingUniform, isRemovingWalls);
     this.wgli.uniform1i(this.wallProgram.leftRightWallUniform, this.props.leftRightWall);
     this.wgli.uniform1i(this.wallProgram.topBottomWallUniform, this.props.topBottomWall);
     this.wgli.uniform1f(this.wallProgram.toolSizeUniform, this.props.toolSize);
-    this.wgli.uniform1f(this.wallProgram.xAspectUniform, aspect.xAspect);
-    this.wgli.uniform1f(this.wallProgram.yAspectUniform, aspect.yAspect);
-    this.wgli.uniform2f(this.wallProgram.cursorPosUniform, cursorState.cursorPos.x, cursorState.cursorPos.y);
+    this.wgli.uniform1f(this.wallProgram.xAspectUniform, this.aspect.xAspect);
+    this.wgli.uniform1f(this.wallProgram.yAspectUniform, this.aspect.yAspect);
+    this.wgli.uniform2f(this.wallProgram.cursorPosUniform, this.props.cursorPos.x, this.props.cursorPos.y);
     this.wgli.uniform2f(this.wallProgram.texelSizeUniform, this.nodeId.write.texelSizeX, this.nodeId.write.texelSizeY);
     this.wgli.uniform1i(this.wallProgram.nodeIdUniform, this.nodeId.read.attach(0));
     this.wgli.blit(this.nodeId.write.fbo);
     this.nodeId.swap();
 
     // Update concentration
-    const isAddingConcentration = cursorState.isActive && this.props.tool == 3;
-    const isRemovingConcentration = cursorState.isActive && this.props.tool == 4;
+    const isAddingConcentration = this.props.isCursorOver && this.props.isCursorActive && this.props.tool == 3;
+    const isRemovingConcentration = this.props.isCursorOver && this.props.isCursorActive && this.props.tool == 4;
     const activeSolute = this.props.solute;
     this.wgli.useProgram(this.concentrationProgram);
     this.wgli.uniform1i(this.concentrationProgram.isAddingUniform, isAddingConcentration);
     this.wgli.uniform1i(this.concentrationProgram.isRemovingUniform, isRemovingConcentration);
     this.wgli.uniform1f(this.concentrationProgram.toolSizeUniform, this.props.toolSize);
-    this.wgli.uniform1f(this.concentrationProgram.xAspectUniform, aspect.xAspect);
-    this.wgli.uniform1f(this.concentrationProgram.yAspectUniform, aspect.yAspect);
-    this.wgli.uniform2f(this.concentrationProgram.cursorPosUniform, cursorState.cursorPos.x, cursorState.cursorPos.y);
+    this.wgli.uniform1f(this.concentrationProgram.xAspectUniform, this.aspect.xAspect);
+    this.wgli.uniform1f(this.concentrationProgram.yAspectUniform, this.aspect.yAspect);
+    this.wgli.uniform2f(this.concentrationProgram.cursorPosUniform, this.props.cursorPos.x, this.props.cursorPos.y);
     this.wgli.uniform1i(this.concentrationProgram.concentrationUniform, this.solutes[activeSolute].concentration.read.attach(0));
     this.wgli.uniform1i(this.concentrationProgram.nodeIdUniform, this.nodeId.read.attach(1));
     this.wgli.blit(this.solutes[activeSolute].concentration.write.fbo);
     this.solutes[activeSolute].concentration.swap();
 
     // Get imposed forces
-    const isAddingForce = cursorState.isActive && this.props.tool == 0;
+    const isAddingForce = this.props.isCursorOver && this.props.isCursorActive && this.props.tool == 0;
     this.wgli.useProgram(this.forceProgram);
-    this.wgli.uniform1i(this.forceProgram.isActiveUniform, isAddingForce);
+    this.wgli.uniform1i(this.forceProgram.isCursorActiveUniform, isAddingForce);
     this.wgli.uniform1f(this.forceProgram.toolSizeUniform, this.props.toolSize);
-    this.wgli.uniform1f(this.forceProgram.xAspectUniform, aspect.xAspect);
-    this.wgli.uniform1f(this.forceProgram.yAspectUniform, aspect.yAspect);
-    this.wgli.uniform2f(this.forceProgram.cursorPosUniform, cursorState.cursorPos.x, cursorState.cursorPos.y);
-    this.wgli.uniform2f(this.forceProgram.cursorVelUniform, cursorState.cursorVel.x, cursorState.cursorVel.y);
+    this.wgli.uniform1f(this.forceProgram.xAspectUniform, this.aspect.xAspect);
+    this.wgli.uniform1f(this.forceProgram.yAspectUniform, this.aspect.yAspect);
+    this.wgli.uniform2f(this.forceProgram.cursorPosUniform, this.props.cursorPos.x, this.props.cursorPos.y);
+    this.wgli.uniform2f(this.forceProgram.cursorVelUniform, this.props.cursorVel.x, this.props.cursorVel.y);
     this.wgli.uniform1i(this.forceProgram.nodeIdUniform, this.nodeId.read.attach(0));
     this.wgli.blit(this.fluid.forceDensity.fbo);
 

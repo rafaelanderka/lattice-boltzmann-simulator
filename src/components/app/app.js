@@ -6,7 +6,8 @@ import HeaderButton from "../header-button/header-button";
 import Selector from "../selector/selector";
 import SoluteSelector from "../solute-selector/solute-selector";
 import Slider from "../slider/slider";
-import ContainerDimensions from 'react-container-dimensions';
+import CursorPositon from "../cursor-position/cursor-position";
+import ToolOverlay from "../tool-overlay/tool-overlay";
 import SynBIMLogo from 'url:~/src/public/synbim-logo.jpg';
 import IconFluidSettingsBlack from 'url:~/src/public/icon-fluid-settings-black.png';
 import IconSoluteSettingsBlack from 'url:~/src/public/icon-solute-settings-black.png';
@@ -148,7 +149,7 @@ class App extends React.Component {
         </div>
         <div id="main">
           <div id="webgl-container">
-            <ContainerDimensions>
+            <CursorPositon>
               <WebGL 
                 id="webgl" 
                 program="lbm" 
@@ -163,7 +164,10 @@ class App extends React.Component {
                 topBottomWall={topBottomWall}
                 exposeProgram={program => this.program = program}
               />
-            </ContainerDimensions>
+              <ToolOverlay
+                toolSize={this.state.toolSize}
+              />
+            </CursorPositon>
           </div>
           <div id="settings-container">
             <div className="settings-title">
