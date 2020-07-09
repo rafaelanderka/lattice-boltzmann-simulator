@@ -108,6 +108,8 @@ export default class CursorPosition extends React.Component {
       this.setState({isCursorOver: this.isCursorOver});
     });
     this.container.addEventListener("mouseleave", () => {
+      this.isCursorActive = false;
+      this.setState({isCursorActive: this.isCursorActive});
       this.isCursorOver = false;
       this.setState({isCursorOver: this.isCursorOver});
     });
