@@ -52,7 +52,7 @@ class LBMProgram {
     this.overlayCtx.lineWidth = this.params.overlayLineWidth;
 
     // Initialise array to temporarily hold sampled velocity values
-    this.overlayBuffer = new Float32Array(4);
+    this.overlayBuffer = new Float32Array(4 * Math.pow(this.props.resolution, 2));
 
     // Initialise indicator offsets
     this.overlayXOffset = this.overlay.width / this.props.velXCount;
@@ -63,7 +63,7 @@ class LBMProgram {
     // Initialise indicator magnitude factor
     const xFactor = this.overlay.width / this.props.velXCount;
     const yFactor = this.overlay.height / this.props.velYCount;
-    this.overlayMagnitude = 3.3 * Math.min(xFactor, yFactor) / this.params.speedOfSound;
+    this.overlayMagnitude = Math.min(xFactor, yFactor) / this.params.speedOfSound;
   }
 
   _initFBOs() {
@@ -608,10 +608,10 @@ class LBMProgram {
     this.fluid.averageDensity.swap();
   }
 
-  _drawIndicator(x, y, magnitude, angle) {
+  _drawIndicator(x, y, xOffset, yOffset) {
     this.overlayCtx.beginPath();
     this.overlayCtx.moveTo(x, y);
-    this.overlayCtx.lineTo(x + magnitude * Math.cos(angle), y - magnitude * Math.sin(angle));
+    this.overlayCtx.lineTo(x + xOffset, y - yOffset);
     this.overlayCtx.stroke();
   }
 
@@ -619,25 +619,25 @@ class LBMProgram {
     // Clear previous overlay
     this.overlayCtx.clearRect(0, 0, this.overlay.width, this.overlay.height);
 
-    // Sample and draw velocities
+    // Sample entire velocity field in single call
+    this.wgli.readPixels(this.fluid.velocity.read, 0, 0, this.props.resolution, this.props.resolution, this.overlayBuffer);
+
+    // Draw velocity indicators
     let x = this.overlayXOffset / 2;
     let sampleX = this.overlayXSampleOffset / 2;
     for (let Xi = 0; Xi < this.props.velXCount; Xi++) {
       let y = this.overlay.height - this.overlayYOffset / 2;
       let sampleY = this.overlayYSampleOffset / 2;
       for (let Yi = 0; Yi < this.props.velYCount; Yi++) {
-        // Sample velocity
-        this.wgli.readPixels(this.fluid.velocity.read, sampleX, sampleY, 1, 1, this.overlayBuffer);
-        
-        // Calculate magnitude
-        const magnitude = this.overlayMagnitude * (Math.pow(this.overlayBuffer[0], 2) + Math.pow(this.overlayBuffer[1], 2));
-        
-        // Calculate angle
-        let angle = this.overlayBuffer[0] == 0.0 ? 0.0 : Math.atan(this.overlayBuffer[1] / this.overlayBuffer[0]);
-        angle = this.overlayBuffer[0] >= 0.0 ? angle : angle + Math.PI;
-        
+        // Calculate texel index
+        const i = 4 * (sampleX + this.props.resolution * sampleY);
+
+        // Get velocity values
+        const velX = this.overlayMagnitude * this.overlayBuffer[i];
+        const velY = this.overlayMagnitude * this.overlayBuffer[i + 1];
+
         // Draw indicator to screen
-        this._drawIndicator(x, y, magnitude, angle);
+        this._drawIndicator(x, y, velX, velY);
        
         // Increment coordinates
         y -= this.overlayYOffset;
