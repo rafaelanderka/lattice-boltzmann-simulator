@@ -20,14 +20,16 @@ class App extends React.Component {
     super(props);
     this.state = {
       resolution: 256,
+      velXCount: 32,
+      velYCount: 32,
       tool: 0,
-      toolSize: 0.05,
+      toolSize: 0.1,
       solute: 0,
       soluteCount: 3,
       viscosity: 0.1,
       boundaryWalls: 0,
       diffusivities: [0.1, 0.3, 0.4],
-      colors: [{r: 162, g: 255, b: 0}, {r: 255, g: 100, b: 100}, {r: 70, g: 200, b: 255}]
+      colors: [{r: 162, g: 255, b: 0}, {r: 255, g: 100, b: 100}, {r: 70, g: 200, b: 255}],
     }
     this.setTool = this.setTool.bind(this);
     this.setToolSize = this.setToolSize.bind(this);
@@ -152,8 +154,11 @@ class App extends React.Component {
             <CursorPositon>
               <WebGL 
                 id="webgl" 
-                program="lbm" 
+                program="lbm"
+                hasOverlay={true}
                 resolution={this.state.resolution}
+                velXCount={this.state.velXCount}
+                velYCount={this.state.velYCount}
                 tool={this.state.tool} 
                 toolSize={this.state.toolSize}
                 solute={this.state.solute}

@@ -3,6 +3,7 @@ import WebGLInterface from './helpers/webgl-interface'
 import DefaultProgram from './programs/default/default';
 import LBMProgram from './programs/lbm/lbm';
 import CursorFollowProgram from './programs/cursor-follow/cursor-follow';
+import { relativeValue } from 'react-range';
 
 export default class WebGL extends React.Component {
   constructor(props) {
@@ -40,15 +41,41 @@ export default class WebGL extends React.Component {
   }
 
   render() {
-    // Render a single canvas element as the host to the WebGL context
-    return (<canvas 
-      id={this.props.id} 
-      width={this.props.containerWidth * this.props.resolution / this.props.containerWidth} 
-      height={this.props.containerHeight * this.props.resolution / this.props.containerHeight} 
-      style={{
-        width: this.props.containerWidth, 
-        height: this.props.containerHeight
-      }}
-    />);
+    // Render canvas elements as hosts to WebGL and its optional overlay
+    const containerStyle = {
+      position: "relative",
+      width: this.props.containerWidth, 
+      height: this.props.containerHeight,
+      left: 0,
+      top: 0,
+    };
+
+    const canvasStyle = {
+      position: "absolute",
+      width: "100%", 
+      height: "100%",
+      left: 0,
+      top: 0
+    };
+    
+    return (
+      <div style={containerStyle}>
+        <canvas 
+          id={this.props.id} 
+          width={this.props.resolution} 
+          height={this.props.resolution} 
+          style={canvasStyle}
+        />
+        {this.props.hasOverlay
+          ? <canvas 
+              id={this.props.id + "-overlay"} 
+              width={this.props.containerWidth}
+              height={this.props.containerHeight}
+              style={canvasStyle}
+            />
+          : null
+        }
+      </div>
+    );
   }
 }

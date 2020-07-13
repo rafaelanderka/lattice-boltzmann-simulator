@@ -200,6 +200,7 @@ class WebGLInterface {
       fbo,
       width: this.canvas.width,
       height: this.canvas.height,
+      format,
       texelSizeX,
       texelSizeY,
       attach(id) {
@@ -330,6 +331,12 @@ class WebGLInterface {
     this.gl.vertexAttribPointer(0, 2, this.gl.FLOAT, false, 0, 0);
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, destination);
     this.gl.drawElements(this.gl.TRIANGLES, 6, this.gl.UNSIGNED_SHORT, 0);
+  }
+
+  // Read pixels from specified frame buffer
+  readPixels(source, x, y, width, height, target) {
+    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, source.fbo);
+    this.gl.readPixels(x, y, width, height, source.format, this.floatTexType, target);
   }
 
   // Gets canvas aspect ratio

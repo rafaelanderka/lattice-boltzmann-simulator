@@ -18,7 +18,7 @@ export default `
   varying vec2 vUV; 
 
   const float baseBrightness = 1.0;
-  const vec3 velocityCol = vec3(0.8); 
+  const vec3 velocityCol = vec3(0.95); 
   const vec3 wallCol = vec3(0.0);
   
   void main(void) {

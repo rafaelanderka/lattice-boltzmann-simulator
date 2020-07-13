@@ -27,9 +27,11 @@ class LBMProgram {
     this.params.initVelocity = [0.0, 0.0];
     this.params.initDensity = 1.0;
     this.params.speedOfSound = 0.3;
+    this.params.overlayLineWidth = 1;
 
     this.aspect = this.wgli.getAspect();
-    
+
+    this._initOverlay();
     this._initFBOs();
     this._initShaderPrograms();
 
@@ -39,6 +41,29 @@ class LBMProgram {
       new Solute(wgli, this.props.diffusivities[1]),
       new Solute(wgli, this.props.diffusivities[2])
     ];
+  }
+
+  _initOverlay() {
+    // Get overlay canvas element and corresponding 2D context
+    this.overlay = document.querySelector(`#${this.props.id}-overlay`);
+    this.overlayCtx = this.overlay.getContext("2d");
+
+    // Set overlay line width
+    this.overlayCtx.lineWidth = this.params.overlayLineWidth;
+
+    // Initialise array to temporarily hold sampled velocity values
+    this.overlayBuffer = new Float32Array(4);
+
+    // Initialise indicator offsets
+    this.overlayXOffset = this.overlay.width / this.props.velXCount;
+    this.overlayYOffset = this.overlay.height / this.props.velYCount;
+    this.overlayXSampleOffset = this.props.resolution / this.props.velXCount;
+    this.overlayYSampleOffset = this.props.resolution / this.props.velYCount;
+
+    // Initialise indicator magnitude factor
+    const xFactor = this.overlay.width / this.props.velXCount;
+    const yFactor = this.overlay.height / this.props.velYCount;
+    this.overlayMagnitude = 3.3 * Math.min(xFactor, yFactor) / this.params.speedOfSound;
   }
 
   _initFBOs() {
@@ -583,6 +608,46 @@ class LBMProgram {
     this.fluid.averageDensity.swap();
   }
 
+  _drawIndicator(x, y, magnitude, angle) {
+    this.overlayCtx.beginPath();
+    this.overlayCtx.moveTo(x, y);
+    this.overlayCtx.lineTo(x + magnitude * Math.cos(angle), y - magnitude * Math.sin(angle));
+    this.overlayCtx.stroke();
+  }
+
+  _drawOverlay() {
+    // Clear previous overlay
+    this.overlayCtx.clearRect(0, 0, this.overlay.width, this.overlay.height);
+
+    // Sample and draw velocities
+    let x = this.overlayXOffset / 2;
+    let sampleX = this.overlayXSampleOffset / 2;
+    for (let Xi = 0; Xi < this.props.velXCount; Xi++) {
+      let y = this.overlay.height - this.overlayYOffset / 2;
+      let sampleY = this.overlayYSampleOffset / 2;
+      for (let Yi = 0; Yi < this.props.velYCount; Yi++) {
+        // Sample velocity
+        this.wgli.readPixels(this.fluid.velocity.read, sampleX, sampleY, 1, 1, this.overlayBuffer);
+        
+        // Calculate magnitude
+        const magnitude = this.overlayMagnitude * (Math.pow(this.overlayBuffer[0], 2) + Math.pow(this.overlayBuffer[1], 2));
+        
+        // Calculate angle
+        let angle = this.overlayBuffer[0] == 0.0 ? 0.0 : Math.atan(this.overlayBuffer[1] / this.overlayBuffer[0]);
+        angle = this.overlayBuffer[0] >= 0.0 ? angle : angle + Math.PI;
+        
+        // Draw indicator to screen
+        this._drawIndicator(x, y, magnitude, angle);
+       
+        // Increment coordinates
+        y -= this.overlayYOffset;
+        sampleY += this.overlayYSampleOffset;
+      }
+      x += this.overlayXOffset;
+      sampleX += this.overlayXSampleOffset;
+    }
+  }
+
   // Copies one FBO to another
   _copy(source, destination) {
     this.wgli.useProgram(this.passthroughProgram);
@@ -701,6 +766,9 @@ class LBMProgram {
     this.wgli.uniform1i(this.outputProgram.solute2Uniform, this.solutes[2].concentration.read.attach(3));
     this.wgli.uniform1i(this.outputProgram.nodeIdUniform, this.nodeId.read.attach(4));
     this.wgli.blit(null);
+
+    // Draw velocity field overlay
+    this._drawOverlay();
   }
 
   setNormalizedColors() {
