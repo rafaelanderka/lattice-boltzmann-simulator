@@ -5,7 +5,7 @@ export default class ToolOverlay extends React.Component {
   constructor(props) {
     super(props);
     this.xCorrection = -1;
-    this.yCorrection = 4;
+    this.yCorrection = 1;
   }
 
   render() {
