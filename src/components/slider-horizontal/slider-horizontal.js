@@ -1,8 +1,7 @@
 import React from 'react';
 import {Range, getTrackBackground} from 'react-range';
-import './slider.css';
 
-export default class Slider extends React.Component {
+export default class SliderHorizontal extends React.Component {
   constructor(props) {
     super(props);
 
@@ -16,7 +15,6 @@ export default class Slider extends React.Component {
   render() {
     return (
       <div
-        className="slider"
         style={{
           display: 'flex',
           justifyContent: 'center',

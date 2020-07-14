@@ -5,7 +5,7 @@ import Button from "../button/button";
 import HeaderButton from "../header-button/header-button";
 import Selector from "../selector/selector";
 import SoluteSelector from "../solute-selector/solute-selector";
-import Slider from "../slider/slider";
+import SliderHorizontal from "../slider-horizontal/slider-horizontal";
 import CursorPositon from "../cursor-position/cursor-position";
 import ToolOverlay from "../tool-overlay/tool-overlay";
 import SynBIMLogo from 'url:~/src/public/synbim-logo.jpg';
@@ -32,7 +32,7 @@ class App extends React.Component {
       colors: [{r: 162, g: 255, b: 0}, {r: 255, g: 100, b: 100}, {r: 70, g: 200, b: 255}],
     }
     this.setTool = this.setTool.bind(this);
-    this.setActiveToolSize = this.setActiveToolSize.bind(this);
+    this.setToolSize = this.setToolSize.bind(this);
     this.setSolute = this.setSolute.bind(this);
     this.setViscosity = this.setViscosity.bind(this);
     this.setBoundaryWalls = this.setBoundaryWalls.bind(this);
@@ -53,10 +53,6 @@ class App extends React.Component {
     const toolSizes = [...this.state.toolSizes];
     toolSizes[id] = value;
     this.setState({toolSizes: toolSizes});
-  }
-
-  setActiveToolSize(value) {
-    this.setToolSize(this.state.tool, value);
   }
 
   setSolute(id) {
@@ -132,21 +128,12 @@ class App extends React.Component {
       <div id="app">
         <div id="header">
           <img id="logo" src={SynBIMLogo} alt="SynBIM"/>
-          <Toolbar tool={this.state.tool} setTool={this.setTool}/>
-          <div id="tool-size-container">
-              <div id="tool-size-title">TOOL SIZE</div>
-              <div className="slider-unlabeled-container">
-                <Slider
-                  value={this.state.toolSizes[this.state.tool]}
-                  min={0.0025}
-                  max={0.15}
-                  step={0.0005}
-                  decimals={2}
-                  setValue={this.setActiveToolSize}
-                  labeled={false}
-                />
-              </div>
-            </div>
+          <Toolbar 
+            tool={this.state.tool} 
+            setTool={this.setTool}
+            toolSizes={this.state.toolSizes}
+            setToolSize={this.setToolSize}
+          />
           <div className="header-buttons-container">
             <HeaderButton
               image={IconAboutBlack}
@@ -188,8 +175,8 @@ class App extends React.Component {
             </div>
             <div className="settings-subcontainer">
               <div className="settings-subtitle">VISCOSITY</div>
-              <div className="slider-container">
-                <Slider
+              <div className="slider-horizontal-container">
+                <SliderHorizontal
                   value={this.state.viscosity}
                   min={0.05}
                   max={1}
@@ -257,8 +244,8 @@ class App extends React.Component {
                 <div className="solute-color-sliders-container">
                   <div className="solute-color-slider">
                     R
-                    <div className="slider-container">
-                      <Slider
+                    <div className="slider-horizontal-container">
+                      <SliderHorizontal
                         value={this.state.colors[this.state.solute].r}
                         min={0}
                         max={255}
@@ -271,8 +258,8 @@ class App extends React.Component {
                   </div>
                   <div className="solute-color-slider">
                     G
-                    <div className="slider-container">
-                      <Slider
+                    <div className="slider-horizontal-container">
+                      <SliderHorizontal
                         value={this.state.colors[this.state.solute].g}
                         min={0}
                         max={255}
@@ -285,8 +272,8 @@ class App extends React.Component {
                   </div>
                   <div className="solute-color-slider">
                     B
-                    <div className="slider-container">
-                      <Slider
+                    <div className="slider-horizontal-container">
+                      <SliderHorizontal
                         value={this.state.colors[this.state.solute].b}
                         min={0}
                         max={255}
@@ -308,8 +295,8 @@ class App extends React.Component {
             </div>
             <div className="settings-subcontainer">
               <div className="settings-subtitle">DIFFUSIVITY</div>
-              <div className="slider-container">
-                <Slider
+              <div className="slider-horizontal-container">
+                <SliderHorizontal
                   value={this.state.diffusivities[this.state.solute]}
                   min={0.05}
                   max={1}

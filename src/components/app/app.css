@@ -99,12 +99,12 @@
   margin-bottom: 20px;
 }
 
-.slider-container {
+.slider-horizontal-container {
   width: 100%;
   margin: 20px 0px 0px;
 }
 
-.slider-unlabeled-container {
+.slider-horizontal-unlabeled-container {
   width: 100%;
 }
 
@@ -142,7 +142,7 @@
   font-size: 12px;
 }
 
-.solute-color-slider .slider-container {
+.solute-color-slider .slider-horizontal-container {
   margin-left: 25px;
   margin-top: 28px;
   margin-bottom: -12px;
