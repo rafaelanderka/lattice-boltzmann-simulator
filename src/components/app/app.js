@@ -23,7 +23,7 @@ class App extends React.Component {
       velXCount: 32,
       velYCount: 32,
       tool: 0,
-      toolSize: 0.1,
+      toolSizes: [0.1, 0.02, 0.05, 0.1, 0.12],
       solute: 0,
       soluteCount: 3,
       viscosity: 0.1,
@@ -32,14 +32,14 @@ class App extends React.Component {
       colors: [{r: 162, g: 255, b: 0}, {r: 255, g: 100, b: 100}, {r: 70, g: 200, b: 255}],
     }
     this.setTool = this.setTool.bind(this);
-    this.setToolSize = this.setToolSize.bind(this);
+    this.setActiveToolSize = this.setActiveToolSize.bind(this);
     this.setSolute = this.setSolute.bind(this);
     this.setViscosity = this.setViscosity.bind(this);
     this.setBoundaryWalls = this.setBoundaryWalls.bind(this);
-    this.setActiveSoluteDiffusivity = this.setActiveSoluteDiffusivity.bind(this);
-    this.setActiveSoluteColorR = this.setActiveSoluteColorR.bind(this);
-    this.setActiveSoluteColorG = this.setActiveSoluteColorG.bind(this);
-    this.setActiveSoluteColorB = this.setActiveSoluteColorB.bind(this);
+    this.setActiveDiffusivity = this.setActiveDiffusivity.bind(this);
+    this.setActiveColorR = this.setActiveColorR.bind(this);
+    this.setActiveColorG = this.setActiveColorG.bind(this);
+    this.setActiveColorB = this.setActiveColorB.bind(this);
     this.resetAllSolutes = this.resetAllSolutes.bind(this);
     this.resetFluid = this.resetFluid.bind(this);
     this.resetWalls = this.resetWalls.bind(this);
@@ -49,8 +49,14 @@ class App extends React.Component {
     this.setState({tool: id});
   }
 
-  setToolSize(value) {
-    this.setState({toolSize: value});
+  setToolSize(id, value) {
+    const toolSizes = [...this.state.toolSizes];
+    toolSizes[id] = value;
+    this.setState({toolSizes: toolSizes});
+  }
+
+  setActiveToolSize(value) {
+    this.setToolSize(this.state.tool, value);
   }
 
   setSolute(id) {
@@ -65,35 +71,35 @@ class App extends React.Component {
     this.setState({boundaryWalls: id});
   }
 
-  setDiffusivity(index, value) {
+  setDiffusivity(id, value) {
     const diffusivities = [...this.state.diffusivities];
-    diffusivities[index] = value;
+    diffusivities[id] = value;
     this.setState({diffusivities: diffusivities});
   }
 
-  setActiveSoluteDiffusivity(value) {
+  setActiveDiffusivity(value) {
     this.setDiffusivity(this.state.solute, value);
   }
 
-  setColor(index, value) {
+  setColor(id, value) {
     const colors = [...this.state.colors];
-    colors[index] = value;
+    colors[id] = value;
     this.setState({colors: colors});
   }
 
-  setActiveSoluteColorR(value) {
+  setActiveColorR(value) {
     const color = this.state.colors[this.state.solute];
     color.r = value;
     this.setColor(this.state.solute, color);
   }
 
-  setActiveSoluteColorG(value) {
+  setActiveColorG(value) {
     const color = this.state.colors[this.state.solute];
     color.g = value;
     this.setColor(this.state.solute, color);
   }
 
-  setActiveSoluteColorB(value) {
+  setActiveColorB(value) {
     const color = this.state.colors[this.state.solute];
     color.b = value;
     this.setColor(this.state.solute, color);
@@ -131,12 +137,12 @@ class App extends React.Component {
               <div id="tool-size-title">TOOL SIZE</div>
               <div className="slider-unlabeled-container">
                 <Slider
-                  value={this.state.toolSize}
+                  value={this.state.toolSizes[this.state.tool]}
                   min={0.0025}
-                  max={0.2}
+                  max={0.15}
                   step={0.0005}
                   decimals={2}
-                  setValue={this.setToolSize}
+                  setValue={this.setActiveToolSize}
                   labeled={false}
                 />
               </div>
@@ -160,7 +166,7 @@ class App extends React.Component {
                 velXCount={this.state.velXCount}
                 velYCount={this.state.velYCount}
                 tool={this.state.tool} 
-                toolSize={this.state.toolSize}
+                toolSize={this.state.toolSizes[this.state.tool]}
                 solute={this.state.solute}
                 viscosity={this.state.viscosity}
                 diffusivities={this.state.diffusivities}
@@ -170,7 +176,7 @@ class App extends React.Component {
                 exposeProgram={program => this.program = program}
               />
               <ToolOverlay
-                toolSize={this.state.toolSize}
+                toolSize={this.state.toolSizes[this.state.tool]}
               />
             </CursorPositon>
           </div>
@@ -258,7 +264,7 @@ class App extends React.Component {
                         max={255}
                         step={1}
                         decimals={0}
-                        setValue={this.setActiveSoluteColorR}
+                        setValue={this.setActiveColorR}
                         labeled={true}
                   />
                     </div>
@@ -272,7 +278,7 @@ class App extends React.Component {
                         max={255}
                         step={1}
                         decimals={0}
-                        setValue={this.setActiveSoluteColorG}
+                        setValue={this.setActiveColorG}
                         labeled={true}
                       />
                     </div>
@@ -286,7 +292,7 @@ class App extends React.Component {
                         max={255}
                         step={1}
                         decimals={0}
-                        setValue={this.setActiveSoluteColorB}
+                        setValue={this.setActiveColorB}
                         labeled={true}
                       />
                     </div>
@@ -309,7 +315,7 @@ class App extends React.Component {
                   max={1}
                   step={0.01}
                   decimals={2}
-                  setValue={this.setActiveSoluteDiffusivity}
+                  setValue={this.setActiveDiffusivity}
                   labeled={true}
                   />
               </div>
