@@ -13,9 +13,11 @@ import fsVelocitySource from '../../shaders/fragment/fs-velocity';
 import fsOutputSource from '../../shaders/fragment/fs-output';
 import fsAverageRowsSource from '../../shaders/fragment/fs-average-rows';
 import fsAverageColumnsSource from '../../shaders/fragment/fs-average-columns';
+import fsMulTexturesSource from '../../shaders/fragment/fs-mul-textures';
 import fsCircleSource from '../../shaders/fragment/fs-circle';
 import Fluid from './fluid';
 import Solute from './solute';
+import Reaction from './reaction';
 
 class LBMProgram {
   constructor(wgli, props) {
@@ -40,6 +42,10 @@ class LBMProgram {
       new Solute(wgli, this.props.diffusivities[0]), 
       new Solute(wgli, this.props.diffusivities[1]),
       new Solute(wgli, this.props.diffusivities[2])
+    ];
+
+    this.reactions = [
+      new Reaction(wgli, [0, 1, 2], [1, 1, 1], [-1, -1, 1], 0.1)
     ];
   }
 
@@ -95,6 +101,7 @@ class LBMProgram {
     this.outputProgram = this._createOutputShaderProgram();
     this.averageRowsProgram = this._createAverageRowsShaderProgram();
     this.averageColumnsProgram = this._createAverageColumnsShaderProgram();
+    this.mulTexturesProgram = this._createMulTexturesShaderProgram();
     this.circleProgram = this._createCircleShaderProgram();
   }
 
@@ -250,6 +257,14 @@ class LBMProgram {
     program.texelSizeUniform = this.wgli.getUniformLocation(program, "uTexelSize");
     program.canvasSizeUniform = this.wgli.getUniformLocation(program, "uCanvasSize");
     program.targetUniform = this.wgli.getUniformLocation(program, "uTarget");
+    return program;
+  }
+
+  _createMulTexturesShaderProgram() {
+    const shader = this.wgli.createFragmentShader(fsMulTexturesSource);
+    const program = this.wgli.createProgram(shader);
+    program.texture0Uniform = this.wgli.getUniformLocation(program, "uTexture0");
+    program.texture1Uniform = this.wgli.getUniformLocation(program, "uTexture1");
     return program;
   }
 
@@ -623,6 +638,44 @@ class LBMProgram {
     this.fluid.averageDensity.swap();
   }
 
+  _react(reaction) {
+    // Return early if reaction rate is zero
+    if (reaction.params.reactionRate == 0.0) {
+      return;
+    }
+
+    // Calculate instantaneous rate of reaction for each node
+    this.wgli.clear(reaction.nodalRateOfReaction.read.fbo, reaction.params.reactionRate, 0.0, 0.0, 0.0);
+    for (let i = 0; i < reaction.params.soluteIds.length; i++) {
+      const soluteId = reaction.params.soluteIds[i];
+      if (reaction.params.stoichiometricCoeffs[soluteId] >= 0) {
+        continue;
+      }
+
+      // Multiply with solute concentration
+      this.wgli.useProgram(this.mulTexturesProgram);
+      this.wgli.uniform1i(this.mulTexturesProgram.texture0Uniform, reaction.nodalRateOfReaction.read.attach(0));
+      this.wgli.uniform1i(this.mulTexturesProgram.texture1Uniform, this.solutes[soluteId].concentration.read.attach(1));
+      this.wgli.blit(reaction.nodalRateOfReaction.write.fbo);
+      reaction.nodalRateOfReaction.swap();
+    }
+
+    // Calculate the resulting concentrate source for each solute
+    for (let i = 0; i < reaction.params.soluteIds.length; i++) {
+      const soluteId = reaction.params.soluteIds[i];
+
+      // Set concentrate source to molar mass times reaction coefficient
+      this.wgli.clear(this.solutes[soluteId].concentrateSource.read.fbo, reaction.params.molMassTimesCoeffs[soluteId], 0.0, 0.0, 0.0);
+
+      // Multiply concentrate source by nodal reaction rate
+      this.wgli.useProgram(this.mulTexturesProgram);
+      this.wgli.uniform1i(this.mulTexturesProgram.texture0Uniform, reaction.nodalRateOfReaction.read.attach(0));
+      this.wgli.uniform1i(this.mulTexturesProgram.texture1Uniform, this.solutes[soluteId].concentrateSource.read.attach(1));
+      this.wgli.blit(this.solutes[soluteId].concentrateSource.write.fbo);
+      this.solutes[soluteId].concentrateSource.swap();
+    }
+  }
+
   _drawIndicator(x, y, xOffset, yOffset) {
     this.overlayCtx.beginPath();
     this.overlayCtx.moveTo(x, y);
@@ -715,7 +768,14 @@ class LBMProgram {
     this.wgli.blit(this.nodeId.write.fbo);
     this.nodeId.swap();
 
-    // Update concentration source
+    // Handle reactions
+    if (this.props.reactionsEnabled) {
+      for (let reaction of this.reactions) {
+        this._react(reaction);
+      }
+    }
+
+    // Add user imposed concentration source
     const isAddingConcentration = this.props.isCursorOver && this.props.isCursorActive && this.props.tool == 3;
     const isRemovingConcentration = this.props.isCursorOver && this.props.isCursorActive && this.props.tool == 4;
     const activeSolute = this.props.solute;
@@ -804,6 +864,7 @@ class LBMProgram {
     this.solutes[0].setDiffusivity(this.props.diffusivities[0]);
     this.solutes[1].setDiffusivity(this.props.diffusivities[1]);
     this.solutes[2].setDiffusivity(this.props.diffusivities[2]);
+    this.reactions[0].setReactionRate(this.props.reactionRate);
   }
 
   resetWalls() {

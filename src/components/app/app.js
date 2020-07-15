@@ -11,6 +11,7 @@ import ToolOverlay from "../tool-overlay/tool-overlay";
 import SynBIMLogo from 'url:~/src/public/synbim-logo.jpg';
 import IconFluidSettingsBlack from 'url:~/src/public/icon-fluid-settings-black.png';
 import IconSoluteSettingsBlack from 'url:~/src/public/icon-solute-settings-black.png';
+import IconReactionSettingsBlack from 'url:~/src/public/icon-reaction-settings-black.png';
 import IconAboutBlack from 'url:~/src/public/icon-about-black.png';
 import IconAboutWhite from 'url:~/src/public/icon-about-white.png';
 import './app.css';
@@ -28,8 +29,10 @@ class App extends React.Component {
       soluteCount: 3,
       viscosity: 0.1,
       boundaryWalls: 0,
-      diffusivities: [0.1, 0.3, 0.4],
+      diffusivities: [0.1, 0.3, 0.05],
       colors: [{r: 162, g: 255, b: 0}, {r: 255, g: 100, b: 100}, {r: 70, g: 200, b: 255}],
+      reactionsEnabled: 1,
+      reactionRate: 0.1
     }
     this.setTool = this.setTool.bind(this);
     this.setToolSize = this.setToolSize.bind(this);
@@ -40,6 +43,8 @@ class App extends React.Component {
     this.setActiveColorR = this.setActiveColorR.bind(this);
     this.setActiveColorG = this.setActiveColorG.bind(this);
     this.setActiveColorB = this.setActiveColorB.bind(this);
+    this.setReactionsEnabled = this.setReactionsEnabled.bind(this);
+    this.setReactionRate = this.setReactionRate.bind(this);
     this.resetAllSolutes = this.resetAllSolutes.bind(this);
     this.resetFluid = this.resetFluid.bind(this);
     this.resetWalls = this.resetWalls.bind(this);
@@ -101,6 +106,14 @@ class App extends React.Component {
     this.setColor(this.state.solute, color);
   }
 
+  setReactionsEnabled(id) {
+    this.setState({reactionsEnabled: id});
+  }
+
+  setReactionRate(value) {
+    this.setState({reactionRate: value});
+  }
+
   resetAllSolutes() {
     for (let i = 0; i < this.state.soluteCount; i++) {
       this.program.resetSolute(i);
@@ -124,6 +137,7 @@ class App extends React.Component {
   render() {
     const leftRightWall = (this.state.boundaryWalls == 1 || this.state.boundaryWalls == 3) ? true : false;
     const topBottomWall = (this.state.boundaryWalls == 2 || this.state.boundaryWalls == 3) ? true : false;
+    const reactionsEnabledBool = this.state.reactionsEnabled == 1;
     return (
       <div id="app">
         <div id="header">
@@ -161,6 +175,8 @@ class App extends React.Component {
                 leftRightWall={leftRightWall}
                 topBottomWall={topBottomWall}
                 exposeProgram={program => this.program = program}
+                reactionsEnabled={reactionsEnabledBool}
+                reactionRate={this.state.reactionRate}
               />
               <ToolOverlay
                 toolSize={this.state.toolSizes[this.state.tool]}
@@ -298,7 +314,7 @@ class App extends React.Component {
               <div className="slider-horizontal-container">
                 <SliderHorizontal
                   value={this.state.diffusivities[this.state.solute]}
-                  min={0.05}
+                  min={0.01}
                   max={1}
                   step={0.01}
                   decimals={2}
@@ -325,7 +341,35 @@ class App extends React.Component {
                 </div>
               </div>
             </div>
-            <br/>
+            <div className="settings-title">
+              <img src={IconReactionSettingsBlack} alt=""/>
+              REACTION SETTINGS
+              <hr/>
+            </div>
+            <div className="settings-subcontainer">
+              <div className="settings-subtitle">ENABLE REACTION</div>
+              <Selector
+                values={["OFF", "ON"]}
+                selection={this.state.reactionsEnabled}
+                setSelection={this.setReactionsEnabled}
+              />
+            </div>
+            {reactionsEnabledBool &&
+              <div className="settings-subcontainer">
+                <div className="settings-subtitle">REACTION RATE</div>
+                <div className="slider-horizontal-container">
+                  <SliderHorizontal
+                    value={this.state.reactionRate}
+                    min={0.05}
+                    max={1}
+                    step={0.01}
+                    decimals={2}
+                    setValue={this.setReactionRate}
+                    labeled={true}
+                  />
+                </div>
+              </div>
+            }
           </div>
         </div>
       </div>
