@@ -5,7 +5,7 @@ import fsInitDensitySource from '../../shaders/fragment/fs-init-density';
 import fsInitEqSource from '../../shaders/fragment/fs-init-eq';
 import fsForceDensitySource from '../../shaders/fragment/fs-force-density';
 import fsWallSource from '../../shaders/fragment/fs-wall';
-import fsConcentrationSource from '../../shaders/fragment/fs-concentration';
+import fsConcentrateSourceSource from '../../shaders/fragment/fs-concentrate-source';
 import fsTRTSource from '../../shaders/fragment/fs-trt';
 import fsStreamingSource from '../../shaders/fragment/fs-streaming';
 import fsSumDistFuncSource from '../../shaders/fragment/fs-sum-dist-func';
@@ -82,7 +82,7 @@ class LBMProgram {
     this.initEqProgramF5_8 = this._createInitEqShaderProgram("#define F5_8 \n");
     this.forceProgram = this._createForceShaderProgram();
     this.wallProgram = this._createWallShaderProgram();
-    this.concentrationProgram = this._createConcentrationShaderProgram();
+    this.concentrateSourceProgram = this._createConcentrateSourceShaderProgram();
     this.TRTProgramF0 = this._createTRTShaderProgram("#define F0 \n");
     this.TRTProgramF1_4 = this._createTRTShaderProgram("#define F1_4 \n");
     this.TRTProgramF5_8 = this._createTRTShaderProgram("#define F5_8 \n");
@@ -161,8 +161,8 @@ class LBMProgram {
     return program;
   }
 
-  _createConcentrationShaderProgram() {
-    const shader = this.wgli.createFragmentShader(fsConcentrationSource);
+  _createConcentrateSourceShaderProgram() {
+    const shader = this.wgli.createFragmentShader(fsConcentrateSourceSource);
     const program = this.wgli.createProgram(shader);
     program.isAddingUniform = this.wgli.getUniformLocation(program, "uIsAdding");
     program.isRemovingUniform = this.wgli.getUniformLocation(program, "uIsRemoving");
@@ -170,7 +170,7 @@ class LBMProgram {
     program.xAspectUniform = this.wgli.getUniformLocation(program, "uXAspect");
     program.yAspectUniform = this.wgli.getUniformLocation(program, "uYAspect");
     program.cursorPosUniform = this.wgli.getUniformLocation(program, "uCursorPos");
-    program.concentrationUniform = this.wgli.getUniformLocation(program, "uConcentration");
+    program.concentrateSourceUniform = this.wgli.getUniformLocation(program, "uConcentrateSource");
     program.nodeIdUniform = this.wgli.getUniformLocation(program, "uNodeId");
     return program;
   }
@@ -178,10 +178,13 @@ class LBMProgram {
   _createTRTShaderProgram(define) {
     const shader = this.wgli.createFragmentShader(define + fsTRTSource);
     const program = this.wgli.createProgram(shader);
+    program.hasScalarFieldSourceUniform = this.wgli.getUniformLocation(program, "uHasScalarFieldSource");
     program.plusOmegaUniform = this.wgli.getUniformLocation(program, "uPlusOmega");
     program.minusOmegaUniform = this.wgli.getUniformLocation(program, "uMinusOmega");
+    program.oneMinusInvTwoTauUniform = this.wgli.getUniformLocation(program, "uOneMinusInvTwoTau");
     program.distFuncUniform = this.wgli.getUniformLocation(program, "uDistFunc");
     program.scalarFieldUniform = this.wgli.getUniformLocation(program, "uScalarField");
+    program.scalarFieldSourceUniform = this.wgli.getUniformLocation(program, "uScalarFieldSource");
     program.velocityUniform = this.wgli.getUniformLocation(program, "uVelocity");
     program.densityUniform = this.wgli.getUniformLocation(program, "uDensity");
     program.forceDensityUniform = this.wgli.getUniformLocation(program, "uForceDensity");
@@ -400,6 +403,7 @@ class LBMProgram {
   _performFluidTRT() {
     // Rest component
     this.wgli.useProgram(this.TRTProgramF0);
+    this.wgli.uniform1i(this.TRTProgramF0.hasScalarFieldSourceUniform, false);
     this.wgli.uniform1f(this.TRTProgramF0.plusOmegaUniform, this.fluid.params.plusOmega);
     this.wgli.uniform1f(this.TRTProgramF0.minusOmegaUniform, this.fluid.params.minusOmega);
     this.wgli.uniform1i(this.TRTProgramF0.distFuncUniform, this.fluid.distFunc0.read.attach(0));
@@ -412,6 +416,7 @@ class LBMProgram {
 
     // Main cartesian components
     this.wgli.useProgram(this.TRTProgramF1_4);
+    this.wgli.uniform1i(this.TRTProgramF1_4.hasScalarFieldSourceUniform, false);
     this.wgli.uniform1f(this.TRTProgramF1_4.plusOmegaUniform, this.fluid.params.plusOmega);
     this.wgli.uniform1f(this.TRTProgramF1_4.minusOmegaUniform, this.fluid.params.minusOmega);
     this.wgli.uniform1i(this.TRTProgramF1_4.distFuncUniform, this.fluid.distFunc1_4.read.attach(0));
@@ -424,6 +429,7 @@ class LBMProgram {
 
     // Diagonal components
     this.wgli.useProgram(this.TRTProgramF5_8);
+    this.wgli.uniform1i(this.TRTProgramF5_8.hasScalarFieldSourceUniform, false);
     this.wgli.uniform1f(this.TRTProgramF5_8.plusOmegaUniform, this.fluid.params.plusOmega);
     this.wgli.uniform1f(this.TRTProgramF5_8.minusOmegaUniform, this.fluid.params.minusOmega);
     this.wgli.uniform1i(this.TRTProgramF5_8.distFuncUniform, this.fluid.distFunc5_8.read.attach(0));
@@ -439,37 +445,46 @@ class LBMProgram {
   _performSoluteTRT(solute) {
     // Rest component
     this.wgli.useProgram(this.TRTProgramF0);
+    this.wgli.uniform1i(this.TRTProgramF0.hasScalarFieldSourceUniform, true);
     this.wgli.uniform1f(this.TRTProgramF0.plusOmegaUniform, solute.params.plusOmega);
     this.wgli.uniform1f(this.TRTProgramF0.minusOmegaUniform, solute.params.minusOmega);
+    this.wgli.uniform1f(this.TRTProgramF0.oneMinusInvTwoTauUniform, solute.params.oneMinusInvTwoTau);
     this.wgli.uniform1i(this.TRTProgramF0.distFuncUniform, solute.distFunc0.read.attach(0));
     this.wgli.uniform1i(this.TRTProgramF0.scalarFieldUniform, solute.concentration.read.attach(1));
-    this.wgli.uniform1i(this.TRTProgramF0.velocityUniform, this.fluid.velocity.read.attach(2));
-    this.wgli.uniform1i(this.TRTProgramF0.densityUniform, this.fluid.density.read.attach(3));
-    this.wgli.uniform1i(this.TRTProgramF0.forceDensityUniform, this.fluid.forceDensity.attach(4));
+    this.wgli.uniform1i(this.TRTProgramF0.scalarFieldSourceUniform, solute.concentrateSource.read.attach(2));
+    this.wgli.uniform1i(this.TRTProgramF0.velocityUniform, this.fluid.velocity.read.attach(3));
+    this.wgli.uniform1i(this.TRTProgramF0.densityUniform, this.fluid.density.read.attach(4));
+    this.wgli.uniform1i(this.TRTProgramF0.forceDensityUniform, this.fluid.forceDensity.attach(5));
     this.wgli.blit(solute.distFunc0.write.fbo);
     solute.distFunc0.swap();
 
     // Main cartesian components
     this.wgli.useProgram(this.TRTProgramF1_4);
+    this.wgli.uniform1i(this.TRTProgramF1_4.hasScalarFieldSourceUniform, true);
     this.wgli.uniform1f(this.TRTProgramF1_4.plusOmegaUniform, solute.params.plusOmega);
     this.wgli.uniform1f(this.TRTProgramF1_4.minusOmegaUniform, solute.params.minusOmega);
+    this.wgli.uniform1f(this.TRTProgramF1_4.oneMinusInvTwoTauUniform, solute.params.oneMinusInvTwoTau);
     this.wgli.uniform1i(this.TRTProgramF1_4.distFuncUniform, solute.distFunc1_4.read.attach(0));
     this.wgli.uniform1i(this.TRTProgramF1_4.scalarFieldUniform, solute.concentration.read.attach(1));
-    this.wgli.uniform1i(this.TRTProgramF1_4.velocityUniform, this.fluid.velocity.read.attach(2));
-    this.wgli.uniform1i(this.TRTProgramF1_4.densityUniform, this.fluid.density.read.attach(3));
-    this.wgli.uniform1i(this.TRTProgramF1_4.forceDensityUniform, this.fluid.forceDensity.attach(4));
+    this.wgli.uniform1i(this.TRTProgramF1_4.scalarFieldSourceUniform, solute.concentrateSource.read.attach(2));
+    this.wgli.uniform1i(this.TRTProgramF1_4.velocityUniform, this.fluid.velocity.read.attach(3));
+    this.wgli.uniform1i(this.TRTProgramF1_4.densityUniform, this.fluid.density.read.attach(4));
+    this.wgli.uniform1i(this.TRTProgramF1_4.forceDensityUniform, this.fluid.forceDensity.attach(5));
     this.wgli.blit(solute.distFunc1_4.write.fbo);
     solute.distFunc1_4.swap();
 
     // Diagonal components
     this.wgli.useProgram(this.TRTProgramF5_8);
+    this.wgli.uniform1i(this.TRTProgramF5_8.hasScalarFieldSourceUniform, true);
     this.wgli.uniform1f(this.TRTProgramF5_8.plusOmegaUniform, solute.params.plusOmega);
     this.wgli.uniform1f(this.TRTProgramF5_8.minusOmegaUniform, solute.params.minusOmega);
+    this.wgli.uniform1f(this.TRTProgramF5_8.oneMinusInvTwoTauUniform, solute.params.oneMinusInvTwoTau);
     this.wgli.uniform1i(this.TRTProgramF5_8.distFuncUniform, solute.distFunc5_8.read.attach(0));
     this.wgli.uniform1i(this.TRTProgramF5_8.scalarFieldUniform, solute.concentration.read.attach(1));
-    this.wgli.uniform1i(this.TRTProgramF5_8.velocityUniform, this.fluid.velocity.read.attach(2));
-    this.wgli.uniform1i(this.TRTProgramF5_8.densityUniform, this.fluid.density.read.attach(3));
-    this.wgli.uniform1i(this.TRTProgramF5_8.forceDensityUniform, this.fluid.forceDensity.attach(4));
+    this.wgli.uniform1i(this.TRTProgramF5_8.scalarFieldSourceUniform, solute.concentrateSource.read.attach(2));
+    this.wgli.uniform1i(this.TRTProgramF5_8.velocityUniform, this.fluid.velocity.read.attach(3));
+    this.wgli.uniform1i(this.TRTProgramF5_8.densityUniform, this.fluid.density.read.attach(4));
+    this.wgli.uniform1i(this.TRTProgramF5_8.forceDensityUniform, this.fluid.forceDensity.attach(5));
     this.wgli.blit(solute.distFunc5_8.write.fbo);
     solute.distFunc5_8.swap();
   }
@@ -700,21 +715,21 @@ class LBMProgram {
     this.wgli.blit(this.nodeId.write.fbo);
     this.nodeId.swap();
 
-    // Update concentration
+    // Update concentration source
     const isAddingConcentration = this.props.isCursorOver && this.props.isCursorActive && this.props.tool == 3;
     const isRemovingConcentration = this.props.isCursorOver && this.props.isCursorActive && this.props.tool == 4;
     const activeSolute = this.props.solute;
-    this.wgli.useProgram(this.concentrationProgram);
-    this.wgli.uniform1i(this.concentrationProgram.isAddingUniform, isAddingConcentration);
-    this.wgli.uniform1i(this.concentrationProgram.isRemovingUniform, isRemovingConcentration);
-    this.wgli.uniform1f(this.concentrationProgram.toolSizeUniform, this.props.toolSize);
-    this.wgli.uniform1f(this.concentrationProgram.xAspectUniform, this.aspect.xAspect);
-    this.wgli.uniform1f(this.concentrationProgram.yAspectUniform, this.aspect.yAspect);
-    this.wgli.uniform2f(this.concentrationProgram.cursorPosUniform, this.props.cursorPos.x, this.props.cursorPos.y);
-    this.wgli.uniform1i(this.concentrationProgram.concentrationUniform, this.solutes[activeSolute].concentration.read.attach(0));
-    this.wgli.uniform1i(this.concentrationProgram.nodeIdUniform, this.nodeId.read.attach(1));
-    this.wgli.blit(this.solutes[activeSolute].concentration.write.fbo);
-    this.solutes[activeSolute].concentration.swap();
+    this.wgli.useProgram(this.concentrateSourceProgram);
+    this.wgli.uniform1i(this.concentrateSourceProgram.isAddingUniform, isAddingConcentration);
+    this.wgli.uniform1i(this.concentrateSourceProgram.isRemovingUniform, isRemovingConcentration);
+    this.wgli.uniform1f(this.concentrateSourceProgram.toolSizeUniform, this.props.toolSize);
+    this.wgli.uniform1f(this.concentrateSourceProgram.xAspectUniform, this.aspect.xAspect);
+    this.wgli.uniform1f(this.concentrateSourceProgram.yAspectUniform, this.aspect.yAspect);
+    this.wgli.uniform2f(this.concentrateSourceProgram.cursorPosUniform, this.props.cursorPos.x, this.props.cursorPos.y);
+    this.wgli.uniform1i(this.concentrateSourceProgram.concentrateSourceUniform, this.solutes[activeSolute].concentrateSource.read.attach(0));
+    this.wgli.uniform1i(this.concentrateSourceProgram.nodeIdUniform, this.nodeId.read.attach(1));
+    this.wgli.blit(this.solutes[activeSolute].concentrateSource.write.fbo);
+    this.solutes[activeSolute].concentrateSource.swap();
 
     // Get imposed forces
     const isAddingForce = this.props.isCursorOver && this.props.isCursorActive && this.props.tool == 0;
@@ -737,6 +752,9 @@ class LBMProgram {
     // Perform solute TRT collision step
     for (let solute of this.solutes) {
       this._performSoluteTRT(solute);
+
+      // Reset concentration source
+      this.wgli.clear(solute.concentrateSource.read.fbo, 0.0, 0.0, 0.0, 0.0);
     }
 
     // Perform solute streaming step

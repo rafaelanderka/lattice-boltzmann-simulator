@@ -10,10 +10,13 @@ export default `
   const float prefactor1_4 = 1.0 / 18.0;
   const float prefactor5_8 = 1.0 / 72.0;
 
+  uniform bool uHasScalarFieldSource;
   uniform float uPlusOmega;
   uniform float uMinusOmega;
+  uniform float uOneMinusInvTwoTau;
   uniform sampler2D uDistFunc;
   uniform sampler2D uScalarField;
+  uniform sampler2D uScalarFieldSource;
   uniform sampler2D uVelocity;
   uniform sampler2D uDensity;
   uniform sampler2D uForceDensity;
@@ -29,6 +32,7 @@ export default `
     float nodalVelPlusSquared = dot(nodalVelPlus, nodalVelPlus);
     
     float nodalScalarField = texture2D(uScalarField, vUV).x;
+    float nodalScalarFieldSource = 0.0;
     vec4 nodalDistFunc = texture2D(uDistFunc, vUV);
     vec4 plusDistFunc = vec4(0);
     vec4 minusDistFunc = vec4(0);
@@ -44,6 +48,11 @@ export default `
     // Post-collision distribution calculation
     plusDistFunc.x = nodalDistFunc.x;
     minusDistFunc.x = 0.0;
+
+    // Calculate scalar field source
+    if (uHasScalarFieldSource) {
+      nodalScalarFieldSource = uOneMinusInvTwoTau * texture2D(uScalarFieldSource, vUV).x * 2.0 * prefactor0;
+    }
     #elif defined(F1_4)
     // Main cartesian components
     // Equilibrium calculation
@@ -65,6 +74,11 @@ export default `
     minusDistFunc.z = -minusDistFunc.x;
     plusDistFunc.w = plusDistFunc.y;
     minusDistFunc.w = -minusDistFunc.y;
+
+    // Calculate scalar field source
+    if (uHasScalarFieldSource) {
+      nodalScalarFieldSource = uOneMinusInvTwoTau * texture2D(uScalarFieldSource, vUV).x * 2.0 * prefactor1_4;
+    }
     #elif defined(F5_8)
     // Diagonal components
     // Equilibrium calculation
@@ -86,8 +100,22 @@ export default `
     minusDistFunc.z = -minusDistFunc.x;
     plusDistFunc.w = plusDistFunc.y;
     minusDistFunc.w = -minusDistFunc.y;
+
+    // Calculate scalar field source
+    if (uHasScalarFieldSource) {
+      nodalScalarFieldSource = uOneMinusInvTwoTau * texture2D(uScalarFieldSource, vUV).x * 2.0 * prefactor5_8;
+    }
     #endif
     
-    gl_FragColor = nodalDistFunc - uPlusOmega * (plusDistFunc - plusEqDistFunc) - uMinusOmega * (minusDistFunc - minusEqDistFunc);
+    // Put it all together
+    vec4 newDistFunc = nodalDistFunc - uPlusOmega * (plusDistFunc - plusEqDistFunc) - uMinusOmega * (minusDistFunc - minusEqDistFunc) + nodalScalarFieldSource;
+
+    // Ensure distributions are non-negative
+    newDistFunc.x = max(newDistFunc.x, 0.0);
+    newDistFunc.y = max(newDistFunc.y, 0.0);
+    newDistFunc.z = max(newDistFunc.z, 0.0);
+    newDistFunc.w = max(newDistFunc.w, 0.0);
+
+    gl_FragColor = newDistFunc;
   }
 `;

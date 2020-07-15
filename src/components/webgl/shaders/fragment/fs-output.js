@@ -29,9 +29,9 @@ export default `
     } else {
       // Fluid node
       vec2 velocity = texture2D(uVelocity, vUV).xy;
-      float concentration0 = texture2D(uSolute0, vUV).x;
-      float concentration1 = texture2D(uSolute1, vUV).x;
-      float concentration2 = texture2D(uSolute2, vUV).x;
+      float concentration0 = min(1.0, texture2D(uSolute0, vUV).x);
+      float concentration1 = min(1.0, texture2D(uSolute1, vUV).x);
+      float concentration2 = min(1.0, texture2D(uSolute2, vUV).x);
       gl_FragColor = vec4(baseBrightness - concentration0 * (baseBrightness - uSolute0Col) - concentration1 * (baseBrightness - uSolute1Col) - concentration2 * (baseBrightness - uSolute2Col) - 3.33333333334 * length(velocity) * (baseBrightness - velocityCol), 1.0);
     }
   }
