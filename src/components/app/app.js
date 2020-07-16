@@ -29,11 +29,11 @@ class App extends React.Component {
       soluteCount: 3,
       viscosity: 0.1,
       boundaryWalls: 0,
-      diffusivities: [0.1, 0.3, 0.05],
-      colors: [{r: 162, g: 255, b: 0}, {r: 255, g: 100, b: 100}, {r: 70, g: 200, b: 255}],
+      diffusivities: [0.05, 0.18, 0.05],
+      colors: [{r: 162, g: 255, b: 0}, {r: 255, g: 179, b: 13}, {r: 135, g: 0, b: 255}],
       reactionsEnabled: 1,
-      reactionRate: 0.1
-    }
+      reactionRate: 0.03
+    };
     this.setTool = this.setTool.bind(this);
     this.setToolSize = this.setToolSize.bind(this);
     this.setSolute = this.setSolute.bind(this);
@@ -314,7 +314,7 @@ class App extends React.Component {
               <div className="slider-horizontal-container">
                 <SliderHorizontal
                   value={this.state.diffusivities[this.state.solute]}
-                  min={0.01}
+                  min={0.05}
                   max={1}
                   step={0.01}
                   decimals={2}
@@ -360,7 +360,7 @@ class App extends React.Component {
                 <div className="slider-horizontal-container">
                   <SliderHorizontal
                     value={this.state.reactionRate}
-                    min={0.05}
+                    min={0.01}
                     max={1}
                     step={0.01}
                     decimals={2}
