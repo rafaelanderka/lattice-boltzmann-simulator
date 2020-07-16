@@ -12,7 +12,7 @@ class Solute {
   setDiffusivity(diffusivity) {
     this.params.minusOmega =   1.0 / (3.0 * diffusivity + 0.5);
     this.params.plusOmega = 1.0 / ((this.params.TRTmagic / (1.0 / this.params.minusOmega - 0.5)) + 0.5);
-    this.params.tau = 1.0 / this.params.plusOmega;
+    this.params.tau = 1.0 / this.params.minusOmega;
     this.params.oneMinusInvTwoTau = (1.0 - 0.5 / this.params.tau);
   }
 
