@@ -11,11 +11,11 @@ export default class SoluteSelector extends React.Component {
   }
 
   render() {
-    const containerClassName = "solute-selector-border" + (this.props.isActive ? " solute-selector-border-active" : "");
+    const containerClassName = "solute-selector-container" + (this.props.isActive ? " solute-selector-container-active" : "");
     return (
-      <div className={containerClassName}>
-        <button className="solute-selector" onClick={this.props.setSolute} style={{backgroundColor: this.rgbToHex(this.props.color)}} />
-      </div>
+      <button className={containerClassName} onClick={this.props.setSolute}>
+        <div className="solute-selector" style={{backgroundColor: this.rgbToHex(this.props.color)}} />
+      </button>
     );
   }
 }
