@@ -1,0 +1,60 @@
+.settings-card-container {
+  width: 100%;
+}
+
+.settings-card-title {
+  width: 100%;
+  font-weight: 500;
+  font-size: 18px;
+  padding-bottom: 5px;
+}
+
+.settings-card-title button {
+  width: 100%;
+  border: none;
+  background-color: #FFF;
+  text-align: left;
+  cursor: pointer;
+  padding: 5px 0px 5px 0px;
+  transition: all 0.3s ease;
+}
+
+.settings-card-title button:hover {
+  background-color: #E7E7E7; 
+}
+
+.settings-card-title img {
+  width: 20px;
+  margin-bottom: -3px;
+}
+
+.settings-card-title hr {
+  height: 2px;
+  margin-top: 0;
+  border: none;
+  background-color: #000;
+}
+
+.settings-card-icon {
+  margin-right: 10px;
+}
+
+.settings-card-expander {
+  margin-right: 5px;
+  transition: transform 0.2s ease;
+}
+
+.settings-card-expander-inactive {
+  transform: rotate(-90deg);
+}
+
+.settings-card-children {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.settings-card-children-hidden {
+  height: 0px;
+  overflow: hidden;
+}
