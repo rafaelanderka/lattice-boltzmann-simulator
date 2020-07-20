@@ -369,7 +369,7 @@ class WebGLInterface {
   // Read pixels from specified frame buffer
   readPixels(source, x, y, width, height, target) {
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, source.fbo);
-    this.gl.readPixels(x, y, width, height, source.format, this.floatTexType, target);
+    this.gl.readPixels(x, y, width, height, source.format, this.gl.FLOAT, target);
   }
 
   // Gets canvas aspect ratio
