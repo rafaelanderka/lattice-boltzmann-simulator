@@ -29,6 +29,9 @@ class WebGLInterface {
     this.scale = scale;
     this._initWebGLContext();
     this._initFloatRendering();
+    if (!this.supportsFloatRendering) {
+      this._initHalfFloatRendering();
+    }
     this._initVertexBuffer();
     this._initBaseVertexShader();
   }
@@ -77,6 +80,36 @@ class WebGLInterface {
       this.formatRGBA = this.getSupportedFormat(this.gl.RGBA32F, this.gl.RGBA, this.floatTexType);
       this.formatRG = this.getSupportedFormat(this.gl.RG32F, this.gl.RG, this.floatTexType);
       this.formatR = this.getSupportedFormat(this.gl.R32F, this.gl.RED, this.floatTexType);
+    } else {
+      this.formatRGBA = this.getSupportedFormat(this.gl.RGBA, this.gl.RGBA, this.floatTexType);
+      this.formatRG = this.getSupportedFormat(this.gl.RGBA, this.gl.RGBA, this.floatTexType);
+      this.formatR = this.getSupportedFormat(this.gl.RGBA, this.gl.RGBA, this.floatTexType);
+    }
+
+    // Store whether GPU supports float rendering
+    this.supportsFloatRendering = (this.formatR != null) && (this.formatRG != null) && (this.formatRGBA != null);
+  }
+
+  // Initialises half float rendering (textures and framebuffers)
+  // Note: Originally taken from Pavel Dobryakov's WebGL Fluid Simulation
+  // https://github.com/PavelDoGreat/WebGL-Fluid-Simulation
+  _initHalfFloatRendering() {
+    // Enable WebGL extensions
+    let halfFloat;
+    if (this.isWebGL2) {
+      this.gl.getExtension('EXT_color_buffer_float');
+      this.supportsLinearFiltering = this.gl.getExtension('OES_texture_float_linear');
+    } else {
+      halfFloat = this.gl.getExtension('OES_texture_half_float');
+      this.supportsLinearFiltering = this.gl.getExtension('OES_texture_half_float_linear');
+    }
+
+    // Set supported texture formats
+    this.floatTexType = this.isWebGL2 ? this.gl.HALF_FLOAT : halfFloat.HALF_FLOAT_OES;
+    if (this.isWebGL2) {
+      this.formatRGBA = this.getSupportedFormat(this.gl.RGBA16F, this.gl.RGBA, this.floatTexType);
+      this.formatRG = this.getSupportedFormat(this.gl.RG16F, this.gl.RG, this.floatTexType);
+      this.formatR = this.getSupportedFormat(this.gl.R16F, this.gl.RED, this.floatTexType);
     } else {
       this.formatRGBA = this.getSupportedFormat(this.gl.RGBA, this.gl.RGBA, this.floatTexType);
       this.formatRG = this.getSupportedFormat(this.gl.RGBA, this.gl.RGBA, this.floatTexType);
