@@ -135,6 +135,9 @@ export default class CursorPosition extends React.Component {
       this._setCursorState(e.targetTouches[0]);
     }, false);
 
+    // Handle resizing
+    window.addEventListener("resize", () => this._setContainerState());
+
     this.setState({isInitialised: true});
   }
 

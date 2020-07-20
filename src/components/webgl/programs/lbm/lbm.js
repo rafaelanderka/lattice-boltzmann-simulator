@@ -60,13 +60,18 @@ class LBMProgram {
     // Initialise array to temporarily hold sampled velocity values
     this.overlayBuffer = new Float32Array(4 * Math.pow(this.props.resolution, 2));
 
-    // Initialise indicator offsets
+    // Initialise overlay parameters
+    this._setOverlayParameters();
+  }
+
+  _setOverlayParameters() {
+    // Set indicator offsets
     this.overlayXOffset = this.overlay.width / this.props.velXCount;
     this.overlayYOffset = this.overlay.height / this.props.velYCount;
     this.overlayXSampleOffset = this.props.resolution / this.props.velXCount;
     this.overlayYSampleOffset = this.props.resolution / this.props.velYCount;
 
-    // Initialise indicator magnitude factor
+    // Set indicator magnitude factor
     const xFactor = this.overlay.width / this.props.velXCount;
     const yFactor = this.overlay.height / this.props.velYCount;
     this.overlayMagnitude = Math.min(xFactor, yFactor) / this.params.speedOfSound;
@@ -865,6 +870,7 @@ class LBMProgram {
     this.solutes[1].setDiffusivity(this.props.diffusivities[1]);
     this.solutes[2].setDiffusivity(this.props.diffusivities[2]);
     this.reactions[0].setReactionRate(this.props.reactionRate);
+    this._setOverlayParameters();
   }
 
   resetWalls() {
