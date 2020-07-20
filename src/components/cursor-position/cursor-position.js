@@ -119,9 +119,9 @@ export default class CursorPosition extends React.Component {
     this.container.addEventListener("touchstart", e => { 
       e.preventDefault();
       this._setCursorState(e.targetTouches[0]);
-      this.isCursorOver = true;
-      this.setState({isCursorActive: this.isCursorActive});
       this.isCursorActive = true;
+      this.setState({isCursorActive: this.isCursorActive});
+      this.isCursorOver = true;
       this.setState({isCursorOver: this.isCursorOver});
     });
     this.container.addEventListener("touchend", () => {
