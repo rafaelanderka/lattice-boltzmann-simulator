@@ -7,6 +7,7 @@ export default `
   precision highp sampler2D;
 
   uniform float uSpeedOfSound;
+  uniform float uInitDensity;
   uniform sampler2D uDensity;
   uniform sampler2D uVelocity;
   uniform sampler2D uDistFunc;
@@ -21,7 +22,7 @@ export default `
       gl_FragColor = vec4(0.0);
     } else {
       // Fluid node
-      float invDensity = 1.0 / texture2D(uDensity, vUV).x;
+      float invDensity = 1.0 / (uInitDensity + texture2D(uDensity, vUV).x);
       vec2 velocity = texture2D(uVelocity, vUV).xy;
       vec4 nodalDistFunc = texture2D(uDistFunc, vUV);
 

@@ -2,8 +2,11 @@ class Fluid {
   constructor(wgli, viscosity) {
     this.wgli = wgli;
     
-    this.params = {};
-    this.params.TRTmagic = 1.0 / 4.0;
+    this.params = {
+      initVelocity: [0.0, 0.0],
+      initDensity: 1.0,
+      TRTmagic: 1.0 / 4.0
+    };
     this.setViscosity(viscosity);
     
     this._initFBOs();

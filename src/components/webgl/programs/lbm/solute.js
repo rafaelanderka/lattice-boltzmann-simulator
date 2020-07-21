@@ -2,8 +2,10 @@ class Solute {
   constructor(wgli, diffusivity) {
     this.wgli = wgli;
 
-    this.params = {};
-    this.params.TRTmagic = 1.0 / 4.0;
+    this.params = {
+      initConcentration: 0.0,
+      TRTmagic: 1.0 / 4.0
+    };
     this.setDiffusivity(diffusivity);
 
     this._initFBOs();

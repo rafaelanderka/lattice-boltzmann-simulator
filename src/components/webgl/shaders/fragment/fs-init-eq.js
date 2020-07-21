@@ -11,6 +11,7 @@ export default `
   const float prefactor5_8 = 1.0 / 72.0;
 
   uniform float uTau;
+  uniform float uInitDensity;
   uniform sampler2D uVelocity;
   uniform sampler2D uDensity;
   uniform sampler2D uForceDensity;
@@ -20,7 +21,7 @@ export default `
   
   void main(void) {
     float nodalScalarField = texture2D(uScalarField, vUV).x;
-    float nodalDensity = texture2D(uDensity, vUV).x;
+    float nodalDensity = uInitDensity + texture2D(uDensity, vUV).x;
     vec2 nodalVel = texture2D(uVelocity, vUV).xy + (uTau / nodalDensity) * texture2D(uForceDensity, vUV).xy;
     float nodalVelMagSquared = dot(nodalVel, nodalVel);
 

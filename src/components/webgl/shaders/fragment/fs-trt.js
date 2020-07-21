@@ -14,6 +14,8 @@ export default `
   uniform float uPlusOmega;
   uniform float uMinusOmega;
   uniform float uOneMinusInvTwoTau;
+  uniform float uInitDensity;
+  uniform float uInitScalarField;
   uniform sampler2D uDistFunc;
   uniform sampler2D uScalarField;
   uniform sampler2D uScalarFieldSource;
@@ -24,14 +26,14 @@ export default `
   varying vec2 vUV; 
   
   void main(void) {
-    float nodalDensity = texture2D(uDensity, vUV).x;
+    float nodalDensity = uInitDensity + texture2D(uDensity, vUV).x;
     vec2 nodalVel = texture2D(uVelocity, vUV).xy;
     vec2 nodalForceDensity = texture2D(uForceDensity, vUV).xy;
     vec2 nodalVelPlus = nodalVel + (nodalForceDensity / (uPlusOmega * nodalDensity));
     vec2 nodalVelMinus = nodalVel + (nodalForceDensity / (uMinusOmega * nodalDensity));
     float nodalVelPlusSquared = dot(nodalVelPlus, nodalVelPlus);
     
-    float nodalScalarField = texture2D(uScalarField, vUV).x;
+    float nodalScalarField = uInitScalarField + texture2D(uScalarField, vUV).x;
     float nodalScalarFieldSource = 0.0;
     vec4 nodalDistFunc = texture2D(uDistFunc, vUV);
     vec4 plusDistFunc = vec4(0);

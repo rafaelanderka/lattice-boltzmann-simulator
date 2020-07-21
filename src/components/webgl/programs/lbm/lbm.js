@@ -1,7 +1,6 @@
 import requestAnimFrame from '../../helpers/request-anim-frame';
 import fsPassthroughSource from '../../shaders/fragment/fs-passthrough';
 import fsInitVelocitySource from '../../shaders/fragment/fs-init-velocity';
-import fsInitDensitySource from '../../shaders/fragment/fs-init-density';
 import fsInitEqSource from '../../shaders/fragment/fs-init-eq';
 import fsForceDensitySource from '../../shaders/fragment/fs-force-density';
 import fsWallSource from '../../shaders/fragment/fs-wall';
@@ -25,11 +24,10 @@ class LBMProgram {
     this.props = props;
     this.setNormalizedColors();
 
-    this.params = {};
-    this.params.initVelocity = [0.0, 0.0];
-    this.params.initDensity = 1.0;
-    this.params.speedOfSound = 0.3;
-    this.params.overlayLineWidth = 1;
+    this.params = {
+      speedOfSound: 0.3,
+      overlayLineWidth: 1
+    };
 
     this.aspect = this.wgli.getAspect();
 
@@ -87,7 +85,6 @@ class LBMProgram {
   _initShaderPrograms() {
     this.passthroughProgram = this._createPassthroughShaderProgram();
     this.initVelocityProgram = this._createInitVelocityShaderProgram();
-    this.initDensityProgram = this._createInitDensityShaderProgram();
     this.initEqProgramF0 = this._createInitEqShaderProgram("#define F0 \n");
     this.initEqProgramF1_4 = this._createInitEqShaderProgram("#define F1_4 \n");
     this.initEqProgramF5_8 = this._createInitEqShaderProgram("#define F5_8 \n");
@@ -125,18 +122,11 @@ class LBMProgram {
     return program;
   }
 
-  _createInitDensityShaderProgram() {
-    const shader = this.wgli.createFragmentShader(fsInitDensitySource);
-    const program = this.wgli.createProgram(shader);
-    program.densityUniform = this.wgli.getUniformLocation(program, "uDensity");
-    program.nodeIdUniform = this.wgli.getUniformLocation(program, "uNodeId");
-    return program;
-  }
-
   _createInitEqShaderProgram(define) {
     const shader = this.wgli.createFragmentShader(define + fsInitEqSource);
     const program = this.wgli.createProgram(shader);
     program.tauUniform = this.wgli.getUniformLocation(program, "uTau");
+    program.initDensityUniform = this.wgli.getUniformLocation(program, "uInitDensity");
     program.velocityUniform = this.wgli.getUniformLocation(program, "uVelocity");
     program.densityUniform = this.wgli.getUniformLocation(program, "uDensity");
     program.forceDensityUniform = this.wgli.getUniformLocation(program, "uForceDensity");
@@ -194,6 +184,8 @@ class LBMProgram {
     program.plusOmegaUniform = this.wgli.getUniformLocation(program, "uPlusOmega");
     program.minusOmegaUniform = this.wgli.getUniformLocation(program, "uMinusOmega");
     program.oneMinusInvTwoTauUniform = this.wgli.getUniformLocation(program, "uOneMinusInvTwoTau");
+    program.initDensityUniform = this.wgli.getUniformLocation(program, "uInitDensity");
+    program.initScalarFieldUniform = this.wgli.getUniformLocation(program, "uInitScalarField");
     program.distFuncUniform = this.wgli.getUniformLocation(program, "uDistFunc");
     program.scalarFieldUniform = this.wgli.getUniformLocation(program, "uScalarField");
     program.scalarFieldSourceUniform = this.wgli.getUniformLocation(program, "uScalarFieldSource");
@@ -215,10 +207,10 @@ class LBMProgram {
   _createSumDistFuncShaderProgram() {
     const shader = this.wgli.createFragmentShader(fsSumDistFuncSource);
     const program = this.wgli.createProgram(shader);
+    program.defaultValUniform = this.wgli.getUniformLocation(program, "uDefaultVal");
     program.summandUniform = this.wgli.getUniformLocation(program, "uSummand");
     program.distFuncUniform = this.wgli.getUniformLocation(program, "uDistFunc");
     program.nodeIdUniform = this.wgli.getUniformLocation(program, "uNodeId");
-    program.defaultValUniform = this.wgli.getUniformLocation(program, "uDefaultVal");
     return program;
   }
 
@@ -226,6 +218,7 @@ class LBMProgram {
     const shader = this.wgli.createFragmentShader(define + fsVelocitySource);
     const program = this.wgli.createProgram(shader);
     program.speedOfSoundUniform = this.wgli.getUniformLocation(program, "uSpeedOfSound");
+    program.initDensityUniform = this.wgli.getUniformLocation(program, "uInitDensity");
     program.densityUniform = this.wgli.getUniformLocation(program, "uDensity");
     program.velocityUniform = this.wgli.getUniformLocation(program, "uVelocity");
     program.distFuncUniform = this.wgli.getUniformLocation(program, "uDistFunc");
@@ -283,14 +276,7 @@ class LBMProgram {
 
   // Set initial node Ids
   _setInitNodeId() {
-    /*
-    this.aspect = this.wgli.getAspect();
-    this.wgli.useProgram(this.circleProgram);
-    this.wgli.uniform1f(this.circleProgram.xAspectUniform, this.aspect.xAspect);
-    this.wgli.uniform1f(this.circleProgram.yAspectUniform, this.aspect.yAspect);
-    this.wgli.blit(this.nodeId.write.fbo);
-    this.nodeId.swap();
-    */
+    this.wgli.clear(this.nodeId.read.fbo, 0, 0, 0, 0);
   }
 
   // Initialise all fluid variables
@@ -308,7 +294,7 @@ class LBMProgram {
   // Set initial velocity
   _setInitVelocity() {
     this.wgli.useProgram(this.initVelocityProgram);
-    this.wgli.uniform2f(this.initVelocityProgram.velocityUniform, this.params.initVelocity[0], this.params.initVelocity[1]);
+    this.wgli.uniform2f(this.initVelocityProgram.velocityUniform, this.fluid.params.initVelocity[0], this.fluid.params.initVelocity[1]);
     this.wgli.uniform1i(this.initVelocityProgram.nodeIdUniform, this.nodeId.read.attach(0));
     this.wgli.blit(this.fluid.velocity.write.fbo);
     this.fluid.velocity.swap();
@@ -316,11 +302,7 @@ class LBMProgram {
 
   // Set initial density
   _setInitDensity() {
-    this.wgli.useProgram(this.initDensityProgram);
-    this.wgli.uniform1f(this.initDensityProgram.densityUniform, this.params.initDensity);
-    this.wgli.uniform1i(this.initDensityProgram.nodeIdUniform, this.nodeId.read.attach(0));
-    this.wgli.blit(this.fluid.density.write.fbo);
-    this.fluid.density.swap();
+    this.wgli.clear(this.fluid.density.read.fbo, 0.0, 0.0, 0.0, 0.0);
   }
 
   // Initialises the fluid distribution functions to equilibrium
@@ -328,6 +310,7 @@ class LBMProgram {
     // Rest component
     this.wgli.useProgram(this.initEqProgramF0);
     this.wgli.uniform1f(this.initEqProgramF0.tauUniform, this.fluid.params.tau);
+    this.wgli.uniform1f(this.initEqProgramF0.initDensityUniform, this.fluid.params.initDensity);
     this.wgli.uniform1i(this.initEqProgramF0.velocityUniform, this.fluid.velocity.read.attach(0));
     this.wgli.uniform1i(this.initEqProgramF0.densityUniform, this.fluid.density.read.attach(1));
     this.wgli.uniform1i(this.initEqProgramF0.forceDensityUniform, this.fluid.forceDensity.attach(2));
@@ -338,6 +321,7 @@ class LBMProgram {
     // Main cartesian components
     this.wgli.useProgram(this.initEqProgramF1_4);
     this.wgli.uniform1f(this.initEqProgramF1_4.tauUniform, this.fluid.params.tau);
+    this.wgli.uniform1f(this.initEqProgramF1_4.initDensityUniform, this.fluid.params.initDensity);
     this.wgli.uniform1i(this.initEqProgramF1_4.velocityUniform, this.fluid.velocity.read.attach(0));
     this.wgli.uniform1i(this.initEqProgramF1_4.densityUniform, this.fluid.density.read.attach(1));
     this.wgli.uniform1i(this.initEqProgramF1_4.forceDensityUniform, this.fluid.forceDensity.attach(2));
@@ -348,6 +332,7 @@ class LBMProgram {
     // Diagonal components
     this.wgli.useProgram(this.initEqProgramF5_8);
     this.wgli.uniform1f(this.initEqProgramF5_8.tauUniform, this.fluid.params.tau);
+    this.wgli.uniform1f(this.initEqProgramF5_8.initDensityUniform, this.fluid.params.initDensity);
     this.wgli.uniform1i(this.initEqProgramF5_8.velocityUniform, this.fluid.velocity.read.attach(0));
     this.wgli.uniform1i(this.initEqProgramF5_8.densityUniform, this.fluid.density.read.attach(1));
     this.wgli.uniform1i(this.initEqProgramF5_8.forceDensityUniform, this.fluid.forceDensity.attach(2));
@@ -383,6 +368,7 @@ class LBMProgram {
     // Rest component
     this.wgli.useProgram(this.initEqProgramF0);
     this.wgli.uniform1f(this.initEqProgramF0.tauUniform, solute.params.tau);
+    this.wgli.uniform1f(this.initEqProgramF0.initDensityUniform, this.fluid.params.initDensity);
     this.wgli.uniform1i(this.initEqProgramF0.velocityUniform, this.fluid.velocity.read.attach(0));
     this.wgli.uniform1i(this.initEqProgramF0.densityUniform, this.fluid.density.read.attach(1));
     this.wgli.uniform1i(this.initEqProgramF0.forceDensityUniform, this.fluid.forceDensity.attach(2));
@@ -393,6 +379,7 @@ class LBMProgram {
     // Main cartesian components
     this.wgli.useProgram(this.initEqProgramF1_4);
     this.wgli.uniform1f(this.initEqProgramF1_4.tauUniform, solute.params.tau);
+    this.wgli.uniform1f(this.initEqProgramF1_4.initDensityUniform, this.fluid.params.initDensity);
     this.wgli.uniform1i(this.initEqProgramF1_4.velocityUniform, this.fluid.velocity.read.attach(0));
     this.wgli.uniform1i(this.initEqProgramF1_4.densityUniform, this.fluid.density.read.attach(1));
     this.wgli.uniform1i(this.initEqProgramF1_4.forceDensityUniform, this.fluid.forceDensity.attach(2));
@@ -403,6 +390,7 @@ class LBMProgram {
     // Diagonal components
     this.wgli.useProgram(this.initEqProgramF5_8);
     this.wgli.uniform1f(this.initEqProgramF5_8.tauUniform, solute.params.tau);
+    this.wgli.uniform1f(this.initEqProgramF5_8.initDensityUniform, this.fluid.params.initDensity);
     this.wgli.uniform1i(this.initEqProgramF5_8.velocityUniform, this.fluid.velocity.read.attach(0));
     this.wgli.uniform1i(this.initEqProgramF5_8.densityUniform, this.fluid.density.read.attach(1));
     this.wgli.uniform1i(this.initEqProgramF5_8.forceDensityUniform, this.fluid.forceDensity.attach(2));
@@ -426,6 +414,8 @@ class LBMProgram {
     this.wgli.uniform1i(this.TRTProgramF0.hasScalarFieldSourceUniform, false);
     this.wgli.uniform1f(this.TRTProgramF0.plusOmegaUniform, this.fluid.params.plusOmega);
     this.wgli.uniform1f(this.TRTProgramF0.minusOmegaUniform, this.fluid.params.minusOmega);
+    this.wgli.uniform1f(this.TRTProgramF0.initDensityUniform, this.fluid.params.initDensity);
+    this.wgli.uniform1f(this.TRTProgramF0.initScalarFieldUniform, this.fluid.params.initDensity);
     this.wgli.uniform1i(this.TRTProgramF0.distFuncUniform, this.fluid.distFunc0.read.attach(0));
     this.wgli.uniform1i(this.TRTProgramF0.scalarFieldUniform, this.fluid.density.read.attach(1));
     this.wgli.uniform1i(this.TRTProgramF0.velocityUniform, this.fluid.velocity.read.attach(2));
@@ -439,6 +429,8 @@ class LBMProgram {
     this.wgli.uniform1i(this.TRTProgramF1_4.hasScalarFieldSourceUniform, false);
     this.wgli.uniform1f(this.TRTProgramF1_4.plusOmegaUniform, this.fluid.params.plusOmega);
     this.wgli.uniform1f(this.TRTProgramF1_4.minusOmegaUniform, this.fluid.params.minusOmega);
+    this.wgli.uniform1f(this.TRTProgramF1_4.initDensityUniform, this.fluid.params.initDensity);
+    this.wgli.uniform1f(this.TRTProgramF1_4.initScalarFieldUniform, this.fluid.params.initDensity);
     this.wgli.uniform1i(this.TRTProgramF1_4.distFuncUniform, this.fluid.distFunc1_4.read.attach(0));
     this.wgli.uniform1i(this.TRTProgramF1_4.scalarFieldUniform, this.fluid.density.read.attach(1));
     this.wgli.uniform1i(this.TRTProgramF1_4.velocityUniform, this.fluid.velocity.read.attach(2));
@@ -452,6 +444,8 @@ class LBMProgram {
     this.wgli.uniform1i(this.TRTProgramF5_8.hasScalarFieldSourceUniform, false);
     this.wgli.uniform1f(this.TRTProgramF5_8.plusOmegaUniform, this.fluid.params.plusOmega);
     this.wgli.uniform1f(this.TRTProgramF5_8.minusOmegaUniform, this.fluid.params.minusOmega);
+    this.wgli.uniform1f(this.TRTProgramF5_8.initDensityUniform, this.fluid.params.initDensity);
+    this.wgli.uniform1f(this.TRTProgramF5_8.initScalarFieldUniform, this.fluid.params.initDensity);
     this.wgli.uniform1i(this.TRTProgramF5_8.distFuncUniform, this.fluid.distFunc5_8.read.attach(0));
     this.wgli.uniform1i(this.TRTProgramF5_8.scalarFieldUniform, this.fluid.density.read.attach(1));
     this.wgli.uniform1i(this.TRTProgramF5_8.velocityUniform, this.fluid.velocity.read.attach(2));
@@ -469,6 +463,8 @@ class LBMProgram {
     this.wgli.uniform1f(this.TRTProgramF0.plusOmegaUniform, solute.params.plusOmega);
     this.wgli.uniform1f(this.TRTProgramF0.minusOmegaUniform, solute.params.minusOmega);
     this.wgli.uniform1f(this.TRTProgramF0.oneMinusInvTwoTauUniform, solute.params.oneMinusInvTwoTau);
+    this.wgli.uniform1f(this.TRTProgramF0.initDensityUniform, this.fluid.params.initDensity);
+    this.wgli.uniform1f(this.TRTProgramF0.initScalarFieldUniform, solute.params.initConcentration);
     this.wgli.uniform1i(this.TRTProgramF0.distFuncUniform, solute.distFunc0.read.attach(0));
     this.wgli.uniform1i(this.TRTProgramF0.scalarFieldUniform, solute.concentration.read.attach(1));
     this.wgli.uniform1i(this.TRTProgramF0.scalarFieldSourceUniform, solute.concentrateSource.read.attach(2));
@@ -484,6 +480,8 @@ class LBMProgram {
     this.wgli.uniform1f(this.TRTProgramF1_4.plusOmegaUniform, solute.params.plusOmega);
     this.wgli.uniform1f(this.TRTProgramF1_4.minusOmegaUniform, solute.params.minusOmega);
     this.wgli.uniform1f(this.TRTProgramF1_4.oneMinusInvTwoTauUniform, solute.params.oneMinusInvTwoTau);
+    this.wgli.uniform1f(this.TRTProgramF1_4.initDensityUniform, this.fluid.params.initDensity);
+    this.wgli.uniform1f(this.TRTProgramF1_4.initScalarFieldUniform, solute.params.initConcentration);
     this.wgli.uniform1i(this.TRTProgramF1_4.distFuncUniform, solute.distFunc1_4.read.attach(0));
     this.wgli.uniform1i(this.TRTProgramF1_4.scalarFieldUniform, solute.concentration.read.attach(1));
     this.wgli.uniform1i(this.TRTProgramF1_4.scalarFieldSourceUniform, solute.concentrateSource.read.attach(2));
@@ -499,6 +497,8 @@ class LBMProgram {
     this.wgli.uniform1f(this.TRTProgramF5_8.plusOmegaUniform, solute.params.plusOmega);
     this.wgli.uniform1f(this.TRTProgramF5_8.minusOmegaUniform, solute.params.minusOmega);
     this.wgli.uniform1f(this.TRTProgramF5_8.oneMinusInvTwoTauUniform, solute.params.oneMinusInvTwoTau);
+    this.wgli.uniform1f(this.TRTProgramF5_8.initDensityUniform, this.fluid.params.initDensity);
+    this.wgli.uniform1f(this.TRTProgramF5_8.initScalarFieldUniform, solute.params.initConcentration);
     this.wgli.uniform1i(this.TRTProgramF5_8.distFuncUniform, solute.distFunc5_8.read.attach(0));
     this.wgli.uniform1i(this.TRTProgramF5_8.scalarFieldUniform, solute.concentration.read.attach(1));
     this.wgli.uniform1i(this.TRTProgramF5_8.scalarFieldSourceUniform, solute.concentrateSource.read.attach(2));
@@ -538,75 +538,76 @@ class LBMProgram {
 
   _computeDensity() {
     // Clear density buffer
-    this.wgli.clear(this.fluid.density.read.fbo, 0, 0, 0);
+    this.wgli.clear(this.fluid.density.read.fbo, -this.fluid.params.initDensity, 0, 0, 0);
 
     // Add rest component
     this.wgli.useProgram(this.sumDistFuncProgram);
+    this.wgli.uniform1f(this.sumDistFuncProgram.defaultValUniform, this.fluid.params.initDensity);
     this.wgli.uniform1i(this.sumDistFuncProgram.summandUniform, this.fluid.density.read.attach(0));
     this.wgli.uniform1i(this.sumDistFuncProgram.distFuncUniform, this.fluid.distFunc0.read.attach(1));
     this.wgli.uniform1i(this.sumDistFuncProgram.nodeIdUniform, this.nodeId.read.attach(2));
-    this.wgli.uniform1f(this.sumDistFuncProgram.defaultValUniform, this.params.initDensity);
     this.wgli.blit(this.fluid.density.write.fbo);
     this.fluid.density.swap();
 
     // Add main cartesian components
     this.wgli.useProgram(this.sumDistFuncProgram);
+    this.wgli.uniform1f(this.sumDistFuncProgram.defaultValUniform, this.fluid.params.initDensity);
     this.wgli.uniform1i(this.sumDistFuncProgram.summandUniform, this.fluid.density.read.attach(0));
     this.wgli.uniform1i(this.sumDistFuncProgram.distFuncUniform, this.fluid.distFunc1_4.read.attach(1));
     this.wgli.uniform1i(this.sumDistFuncProgram.nodeIdUniform, this.nodeId.read.attach(2));
-    this.wgli.uniform1f(this.sumDistFuncProgram.defaultValUniform, this.params.initDensity);
     this.wgli.blit(this.fluid.density.write.fbo);
     this.fluid.density.swap();
 
     // Add diagonal components
     this.wgli.useProgram(this.sumDistFuncProgram);
+    this.wgli.uniform1f(this.sumDistFuncProgram.defaultValUniform, this.fluid.params.initDensity);
     this.wgli.uniform1i(this.sumDistFuncProgram.summandUniform, this.fluid.density.read.attach(0));
     this.wgli.uniform1i(this.sumDistFuncProgram.distFuncUniform, this.fluid.distFunc5_8.read.attach(1));
     this.wgli.uniform1i(this.sumDistFuncProgram.nodeIdUniform, this.nodeId.read.attach(2));
-    this.wgli.uniform1f(this.sumDistFuncProgram.defaultValUniform, this.params.initDensity);
     this.wgli.blit(this.fluid.density.write.fbo);
     this.fluid.density.swap();
   }
 
   _computeConcentration(solute) {
     // Clear concentration buffer
-    this.wgli.clear(solute.concentration.read.fbo, 0, 0, 0);
+    this.wgli.clear(solute.concentration.read.fbo, -solute.params.initConcentration, 0, 0, 0);
 
     // Add rest component
     this.wgli.useProgram(this.sumDistFuncProgram);
+    this.wgli.uniform1f(this.sumDistFuncProgram.defaultValUniform, solute.params.initConcentration);
     this.wgli.uniform1i(this.sumDistFuncProgram.summandUniform, solute.concentration.read.attach(0));
     this.wgli.uniform1i(this.sumDistFuncProgram.distFuncUniform, solute.distFunc0.read.attach(1));
     this.wgli.uniform1i(this.sumDistFuncProgram.nodeIdUniform, this.nodeId.read.attach(2));
-    this.wgli.uniform1f(this.sumDistFuncProgram.defaultValUniform, 0.0);
     this.wgli.blit(solute.concentration.write.fbo);
     solute.concentration.swap();
 
     // Add main cartesian components
     this.wgli.useProgram(this.sumDistFuncProgram);
+    this.wgli.uniform1f(this.sumDistFuncProgram.defaultValUniform, solute.params.initConcentration);
     this.wgli.uniform1i(this.sumDistFuncProgram.summandUniform, solute.concentration.read.attach(0));
     this.wgli.uniform1i(this.sumDistFuncProgram.distFuncUniform, solute.distFunc1_4.read.attach(1));
     this.wgli.uniform1i(this.sumDistFuncProgram.nodeIdUniform, this.nodeId.read.attach(2));
-    this.wgli.uniform1f(this.sumDistFuncProgram.defaultValUniform, 0.0);
     this.wgli.blit(solute.concentration.write.fbo);
     solute.concentration.swap();
 
     // Add diagonal components
     this.wgli.useProgram(this.sumDistFuncProgram);
+    this.wgli.uniform1f(this.sumDistFuncProgram.defaultValUniform, solute.params.initConcentration);
     this.wgli.uniform1i(this.sumDistFuncProgram.summandUniform, solute.concentration.read.attach(0));
     this.wgli.uniform1i(this.sumDistFuncProgram.distFuncUniform, solute.distFunc5_8.read.attach(1));
     this.wgli.uniform1i(this.sumDistFuncProgram.nodeIdUniform, this.nodeId.read.attach(2));
-    this.wgli.uniform1f(this.sumDistFuncProgram.defaultValUniform, 0.0);
     this.wgli.blit(solute.concentration.write.fbo);
     solute.concentration.swap();
   }
 
   _computeVelocity() {
     // Clear velocity buffer
-    this.wgli.clear(this.fluid.velocity.read.fbo, 0, 0, 0);
+    this.wgli.clear(this.fluid.velocity.read.fbo, 0, 0, 0, 0);
 
     // Add main cartesian components
     this.wgli.useProgram(this.velocityProgramF1_4);
     this.wgli.uniform1f(this.velocityProgramF1_4.speedOfSoundUniform, this.params.speedOfSound);
+    this.wgli.uniform1f(this.velocityProgramF1_4.initDensityUniform, this.fluid.params.initDensity);
     this.wgli.uniform1i(this.velocityProgramF1_4.densityUniform, this.fluid.density.read.attach(0));
     this.wgli.uniform1i(this.velocityProgramF1_4.velocityUniform, this.fluid.velocity.read.attach(1));
     this.wgli.uniform1i(this.velocityProgramF1_4.distFuncUniform, this.fluid.distFunc1_4.read.attach(2));
@@ -617,6 +618,7 @@ class LBMProgram {
     // Add diagonal components
     this.wgli.useProgram(this.velocityProgramF5_8);
     this.wgli.uniform1f(this.velocityProgramF5_8.speedOfSoundUniform, this.params.speedOfSound);
+    this.wgli.uniform1f(this.velocityProgramF5_8.initDensityUniform, this.fluid.params.initDensity);
     this.wgli.uniform1i(this.velocityProgramF5_8.densityUniform, this.fluid.density.read.attach(0));
     this.wgli.uniform1i(this.velocityProgramF5_8.velocityUniform, this.fluid.velocity.read.attach(1));
     this.wgli.uniform1i(this.velocityProgramF5_8.distFuncUniform, this.fluid.distFunc5_8.read.attach(2));
