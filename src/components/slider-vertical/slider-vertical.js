@@ -105,7 +105,7 @@ export default class SliderVertical extends React.Component {
                   height: '14px',
                   width: '14px',
                   borderRadius: '7px',
-                  backgroundColor: isDragged ? '#FFF' : '#FFF',
+                  backgroundColor: isDragged ? '#000' : '#FFF',
                   outline: '0'
                 }}
               />

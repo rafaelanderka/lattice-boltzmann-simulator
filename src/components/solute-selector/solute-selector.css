@@ -1,12 +1,14 @@
 .solute-selector-container {
+  flex-grow: 0;
+  flex-shrink: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 33px;
-  height: 33px;
-  border-radius: 100px;
+  width: 36px;
+  height: 36px;
   transition: all 0.2s ease;
   border: 2px solid white;
+  border-radius: 34px;
   margin-right: 6px;
   background-color: #FFF;
   cursor: pointer;
@@ -27,8 +29,8 @@
 
 .solute-selector {
   flex-shrink: 0;
-  width: 25px;
-  height: 25px;
-  border: none;
+  flex-grow: 0;
+  width: 28px;
+  height: 28px;
   border-radius: 100px;
 }

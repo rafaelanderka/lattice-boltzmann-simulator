@@ -82,10 +82,10 @@ export default class SliderHorizontal extends React.Component {
                 style={{
                   display: this.props.labeled ? 'block' : 'none',
                   position: 'absolute',
-                  top: '-28px',
+                  top: '-24px',
                   color: '#fff',
                   fontWeight: 500,
-                  fontSize: '14px',
+                  fontSize: '11px',
                   fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji',
                   padding: '4px',
                   borderRadius: '4px',
@@ -100,7 +100,7 @@ export default class SliderHorizontal extends React.Component {
                   height: '14px',
                   width: '14px',
                   borderRadius: '7px',
-                  backgroundColor: isDragged ? '#FFF' : '#FFF',
+                  backgroundColor: isDragged ? '#000' : '#FFF',
                   outline: '0'
                 }}
               />

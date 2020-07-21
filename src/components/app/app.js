@@ -271,7 +271,7 @@ class App extends React.Component {
                   <div className="solute-color-sliders-container">
                     <div className="solute-color-slider">
                       R
-                      <div className="slider-horizontal-container">
+                      <div className="slider-horizontal-unlabeled-container">
                         <SliderHorizontal
                           value={this.state.colors[this.state.solute].r}
                           min={0}
@@ -279,13 +279,13 @@ class App extends React.Component {
                           step={1}
                           decimals={0}
                           setValue={this.setActiveColorR}
-                          labeled={true}
+                          labeled={false}
                     />
                       </div>
                     </div>
                     <div className="solute-color-slider">
                       G
-                      <div className="slider-horizontal-container">
+                      <div className="slider-horizontal-unlabeled-container">
                         <SliderHorizontal
                           value={this.state.colors[this.state.solute].g}
                           min={0}
@@ -293,13 +293,13 @@ class App extends React.Component {
                           step={1}
                           decimals={0}
                           setValue={this.setActiveColorG}
-                          labeled={true}
+                          labeled={false}
                         />
                       </div>
                     </div>
                     <div className="solute-color-slider">
                       B
-                      <div className="slider-horizontal-container">
+                      <div className="slider-horizontal-unlabeled-container">
                         <SliderHorizontal
                           value={this.state.colors[this.state.solute].b}
                           min={0}
@@ -307,7 +307,7 @@ class App extends React.Component {
                           step={1}
                           decimals={0}
                           setValue={this.setActiveColorB}
-                          labeled={true}
+                          labeled={false}
                         />
                       </div>
                     </div>

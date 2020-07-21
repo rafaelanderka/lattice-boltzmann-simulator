@@ -13,7 +13,7 @@ export default class WebGL extends React.Component {
   componentDidMount() {
     // Initialize WebGL interface
     const scale = this.props.resolution / this.props.containerWidth;
-    this.wgli = new WebGLInterface(this.props.id, scale);
+    this.wgli = new WebGLInterface(this.props);
     
     // Get corresponding program
     switch (this.props.program) {
@@ -36,7 +36,8 @@ export default class WebGL extends React.Component {
   }
 
   componentDidUpdate() {
-    // Pass props to program
+    // Pass props to WebGL interface and program
+    this.wgli.setProps(this.props);
     this.program.setProps(this.props);
   }
 

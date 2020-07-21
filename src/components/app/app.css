@@ -3,12 +3,12 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 90%;
-  min-width: 1100px;
+  width: 92%;
+  min-width: 740px;
   max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
-  padding: 0px 5%;
+  padding: 2.5vh 4vw;
   background-color: #FFFFFF;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
 }
@@ -19,15 +19,14 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  height: 60x;
-  margin-top: 10px;
-  margin-bottom: 40px;
+  height: 60px;
+  margin-bottom: 3%;
 }
 
 #logo {
-  height: 90px;
+  height: 85px;
   width: auto;
-  padding-bottom: 5px;
+  padding-bottom: 3px;
 }
 
 #main {
@@ -41,8 +40,8 @@
 #webgl-container {
   position: relative;
   width: 66%;
-  height: 0px;
-  padding-bottom: 66%;
+  height: 75vmin;
+  padding-bottom: 0;
   max-width: 800px;
   max-height: 800px;
   border: 2px solid black;
@@ -55,6 +54,7 @@
   align-items: flex-start;
   justify-content: flex-start;
   width: 28%;
+  min-width: 265px;
   max-width: 330px;
   margin-left: 3%;
   padding-right: 1%;
@@ -75,7 +75,7 @@
 
 .slider-horizontal-container {
   width: 100%;
-  margin: 20px 0px 0px;
+  margin: 12px 0px 0px;
 }
 
 .slider-horizontal-unlabeled-container {
@@ -96,6 +96,7 @@
   align-items: center;
   justify-content: space-between;
   margin-top: -10px;
+  width: 100%;
 }
 
 .solute-color-sliders-container {
@@ -103,7 +104,7 @@
   flex-direction: column;
   align-items: baseline;
   justify-content: center;
-  width: 180px;
+  width: 65%;
   margin-bottom: 6px;
 }
 
@@ -116,9 +117,9 @@
   font-size: 12px;
 }
 
-.solute-color-slider .slider-horizontal-container {
-  margin-left: 25px;
-  margin-top: 28px;
+.solute-color-slider .slider-horizontal-unlabeled-container {
+  margin-left: 20px;
+  margin-top: 10px;
   margin-bottom: -12px;
 }
 
@@ -126,17 +127,19 @@
   position: relative;
   left: 3px;
   top: 3px;
-  width: 94px;
-  height: 94px;
+  width: 74px;
+  height: 74px;
   border-radius: 94px;
 }
 
 .solute-color-preview-border {
-  width: 100px;
-  height: 100px;
+  flex-shrink: 0;
+  width: 80px;
+  height: 80px;
   border: 2px solid black;
-  border-radius: 100px;
-  margin-bottom: -30px;
+  border-radius: 80px;
+  margin-left: 25px;
+  margin-bottom: -15px;
 }
 
 .reset-buttons-container {

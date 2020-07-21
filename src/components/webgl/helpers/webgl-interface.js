@@ -24,9 +24,9 @@
 import vsBaseSource from '../shaders/vertex/vs-base';
 
 class WebGLInterface {
-  constructor(id, scale) {
-    this.id = id;
-    this.scale = scale;
+  constructor(props) {
+    this.props = props;
+    this._setAspect();
     this._initWebGLContext();
     this._initFloatRendering();
     if (!this.supportsFloatRendering) {
@@ -41,8 +41,7 @@ class WebGLInterface {
   // https://github.com/PavelDoGreat/WebGL-Fluid-Simulation
   _initWebGLContext() {
     // Get canvas
-    this.canvas = document.querySelector(`#${this.id}`);
-    this.aspect = this.canvas.width / this.canvas.height;
+    this.canvas = document.querySelector(`#${this.props.id}`);
 
     // Initialize WebGL context
     const params = {
@@ -372,6 +371,14 @@ class WebGLInterface {
     this.gl.readPixels(x, y, width, height, source.format, this.gl.FLOAT, target);
   }
 
+  setProps(props) {
+    this.props = props;
+  }
+
+  _setAspect() {
+    this.aspect = this.props.containerWidth / this.props.containerHeight;
+  }
+
   // Gets canvas aspect ratio
   getAspect() {
     return {
@@ -382,7 +389,7 @@ class WebGLInterface {
 
   // Update WebGL state
   update() {
-    this.aspect = this.canvas.width / this.canvas.height;
+    this._setAspect();
     this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
   }
 }
