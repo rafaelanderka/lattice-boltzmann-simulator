@@ -70,8 +70,8 @@ export default class WebGL extends React.Component {
         {this.props.hasOverlay
           ? <canvas 
               id={this.props.id + "-overlay"} 
-              width={this.props.containerWidth}
-              height={this.props.containerHeight}
+              width={this.props.containerWidth * this.props.pixelRatio}
+              height={this.props.containerHeight * this.props.pixelRatio}
               style={canvasStyle}
             />
           : null

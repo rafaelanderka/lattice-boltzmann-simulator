@@ -52,9 +52,6 @@ class LBMProgram {
     this.overlay = document.querySelector(`#${this.props.id}-overlay`);
     this.overlayCtx = this.overlay.getContext("2d");
 
-    // Set overlay line width
-    this.overlayCtx.lineWidth = this.params.overlayLineWidth;
-
     // Initialise array to temporarily hold sampled velocity values
     this.overlayBuffer = new Float32Array(4 * Math.pow(this.props.resolution, 2));
 
@@ -63,6 +60,9 @@ class LBMProgram {
   }
 
   _setOverlayParameters() {
+    // Set overlay line width
+    this.overlayCtx.lineWidth = this.params.overlayLineWidth * this.props.pixelRatio;
+
     // Set indicator offsets
     this.overlayXOffset = this.overlay.width / this.props.velXCount;
     this.overlayYOffset = this.overlay.height / this.props.velYCount;
@@ -631,7 +631,7 @@ class LBMProgram {
     // Average rows
     this.wgli.useProgram(this.averageRowsProgram);
     this.wgli.uniform2f(this.averageRowsProgram.texelSizeUniform, this.fluid.density.read.texelSizeX, this.fluid.density.read.texelSizeY);
-    this.wgli.uniform2f(this.averageRowsProgram.canvasSizeUniform, this.props.containerWidth, this.props.containerHeight);
+    this.wgli.uniform2f(this.averageRowsProgram.canvasSizeUniform, this.props.resolution, this.props.resolution);
     this.wgli.uniform1i(this.averageRowsProgram.targetUniform, this.fluid.density.read.attach(0));
     this.wgli.blit(this.fluid.averageDensity.write.fbo);
     this.fluid.averageDensity.swap();
@@ -639,7 +639,7 @@ class LBMProgram {
     // Average columns
     this.wgli.useProgram(this.averageColumnsProgram);
     this.wgli.uniform2f(this.averageColumnsProgram.texelSizeUniform, this.fluid.density.read.texelSizeX, this.fluid.density.read.texelSizeY);
-    this.wgli.uniform2f(this.averageColumnsProgram.canvasSizeUniform, this.props.containerWidth, this.props.containerHeight);
+    this.wgli.uniform2f(this.averageColumnsProgram.canvasSizeUniform, this.props.resolution, this.props.resolution);
     this.wgli.uniform1i(this.averageColumnsProgram.targetUniform, this.fluid.averageDensity.read.attach(0));
     this.wgli.blit(this.fluid.averageDensity.write.fbo);
     this.fluid.averageDensity.swap();

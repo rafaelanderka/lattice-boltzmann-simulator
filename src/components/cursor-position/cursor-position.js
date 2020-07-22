@@ -148,6 +148,7 @@ export default class CursorPosition extends React.Component {
         return React.cloneElement(child, {
           containerWidth: this.state.containerWidth,
           containerHeight: this.state.containerHeight,
+          pixelRatio: window.devicePixelRatio || 1.0,
           cursorPos: this.state.cursorPos,
           cursorVel: this.state.cursorVel,
           isCursorActive: this.state.isCursorActive,
