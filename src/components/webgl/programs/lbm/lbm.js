@@ -271,6 +271,8 @@ class LBMProgram {
     const program = this.wgli.createProgram(shader);
     program.xAspectUniform = this.wgli.getUniformLocation(program, "uXAspect");
     program.yAspectUniform = this.wgli.getUniformLocation(program, "uYAspect");
+    program.radiusUniform = this.wgli.getUniformLocation(program, "uRadius");
+    program.centerUniform = this.wgli.getUniformLocation(program, "uCenter");
     return program;
   }
 
@@ -347,19 +349,21 @@ class LBMProgram {
   }
 
   // Initialise solute variables
-  _initSolute(solute) {
+  _initSolute(solute, center, radius) {
     // Initialise concentration field
-    this._initSoluteConcentration(solute);
+    this._initSoluteConcentration(solute, center, radius);
 
     // Initialise equilibrium distribution functions
     this._computeInitSoluteDist(solute);
   }
 
-  _initSoluteConcentration(solute) {
+  _initSoluteConcentration(solute, center, radius) {
     this.aspect = this.wgli.getAspect();
     this.wgli.useProgram(this.circleProgram);
     this.wgli.uniform1f(this.circleProgram.xAspectUniform, this.aspect.xAspect);
     this.wgli.uniform1f(this.circleProgram.yAspectUniform, this.aspect.yAspect);
+    this.wgli.uniform1f(this.circleProgram.radiusUniform, radius);
+    this.wgli.uniform2f(this.circleProgram.centerUniform, center[0], center[1]);
     this.wgli.blit(solute.concentration.write.fbo);
     solute.concentration.swap();
   }
@@ -745,9 +749,9 @@ class LBMProgram {
     this._initFluid();
 
     // Initialise solutes
-    for (let solute of this.solutes) {
-      this._initSolute(solute);
-    }
+    this._initSolute(this.solutes[0], [this.aspect.xAspect * 0.5 - 0.1, this.aspect.yAspect * 0.515 - 0.1 * Math.sin(Math.PI / 3)], 0.2);
+    this._initSolute(this.solutes[1], [this.aspect.xAspect * 0.5 + 0.1, this.aspect.yAspect * 0.515 - 0.1 * Math.sin(Math.PI / 3)], 0.2);
+    this._initSolute(this.solutes[2], [this.aspect.xAspect * 0.5,       this.aspect.yAspect * 0.515 + 0.1 * Math.sin(Math.PI / 3)], 0.2);
 
     // Begin main update loop
     requestAnimFrame(() => this._update());

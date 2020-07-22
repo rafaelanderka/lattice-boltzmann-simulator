@@ -7,14 +7,15 @@ export default `
 
   uniform float uXAspect;
   uniform float uYAspect;
+  uniform float uRadius;
+  uniform vec2 uCenter;
 
   varying vec2 vUV; 
   
   void main(void) {
-    vec2 center = vec2(uXAspect * 0.5, uYAspect * 0.5);
     vec2 newUV = vec2(uXAspect * vUV.x, uYAspect * vUV.y);
-    float dist = length(newUV - center);
-    if (dist < 0.1) {
+    float dist = length(newUV - uCenter);
+    if (dist < uRadius) {
       gl_FragColor = vec4(1.0);
     } else {
       gl_FragColor = vec4(0.0);

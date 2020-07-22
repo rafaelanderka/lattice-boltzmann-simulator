@@ -30,17 +30,17 @@ class App extends React.Component {
       resolution: 256,
       velXCount: 32,
       velYCount: 32,
-      activeSetttings: 0,
+      activeSetttings: 1,
       tool: 0,
       toolSizes: [0.1, 0.02, 0.05, 0.1, 0.12],
       solute: 0,
       soluteCount: 3,
       viscosity: 0.1,
       boundaryWalls: 0,
-      diffusivities: [0.05, 0.18, 0.05],
-      colors: [{r: 255, g: 255, b: 0}, {r: 0, g: 255, b: 255}, {r: 255, g: 0, b: 255}],
+      diffusivities: [0.3, 0.18, 0.1],
+      colors: [{r: 0, g: 255, b: 255}, {r: 255, g: 255, b: 0}, {r: 255, g: 0, b: 255}],
       reactionsEnabled: 1,
-      reactionRate: 0.03,
+      reactionRate: 0.001,
       aboutOverlay: false
     };
 
@@ -392,10 +392,10 @@ class App extends React.Component {
                   <div className="slider-horizontal-container">
                     <SliderHorizontal
                       value={this.state.reactionRate}
-                      min={0.01}
+                      min={0.001}
                       max={1}
-                      step={0.01}
-                      decimals={2}
+                      step={0.001}
+                      decimals={3}
                       setValue={this.setReactionRate}
                       labeled={true}
                     />
