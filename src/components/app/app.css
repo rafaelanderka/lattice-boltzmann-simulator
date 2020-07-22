@@ -52,10 +52,6 @@
   width: auto;
 }
 
-#header-buttons-container {
-
-}
-
 #main {
   display: flex;
   flex-direction: row;
@@ -65,9 +61,10 @@
 }
 
 #webgl-container {
+  flex-shrink: 0;
   position: relative;
   width: 66%;
-  height: 75vmin;
+  height: calc(93vmin - 100px);
   padding-bottom: 0;
   max-width: 800px;
   max-height: 800px;
