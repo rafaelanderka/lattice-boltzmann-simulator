@@ -38,7 +38,7 @@ class App extends React.Component {
       viscosity: 0.1,
       boundaryWalls: 0,
       diffusivities: [0.05, 0.18, 0.05],
-      colors: [{r: 162, g: 255, b: 0}, {r: 255, g: 179, b: 13}, {r: 135, g: 0, b: 255}],
+      colors: [{r: 255, g: 255, b: 0}, {r: 0, g: 255, b: 255}, {r: 255, g: 0, b: 255}],
       reactionsEnabled: 1,
       reactionRate: 0.03,
       aboutOverlay: false
@@ -366,7 +366,7 @@ class App extends React.Component {
                     <Button 
                       text="CLEAR ALL SOLUTES"
                       onClick={this.resetAllSolutes} 
-                      color="#F00"
+                      color="#D00"
                     />
                   </div>
                 </div>
