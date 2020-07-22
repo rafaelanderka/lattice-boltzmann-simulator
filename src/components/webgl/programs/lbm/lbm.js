@@ -686,7 +686,13 @@ class LBMProgram {
   _drawIndicator(x, y, xOffset, yOffset) {
     this.overlayCtx.beginPath();
     this.overlayCtx.moveTo(x, y);
+    this.overlayCtx.lineTo(x + xOffset * 0.7, y - yOffset * 0.7);
+    this.overlayCtx.lineTo(x + xOffset * 0.7 - yOffset * 0.08, y - yOffset * 0.7 - xOffset * 0.08);
     this.overlayCtx.lineTo(x + xOffset, y - yOffset);
+    this.overlayCtx.lineTo(x + xOffset * 0.7 + yOffset * 0.08, y - yOffset * 0.7 + xOffset * 0.08);
+    this.overlayCtx.lineTo(x + xOffset * 0.7, y - yOffset * 0.7);
+    this.overlayCtx.lineTo(x, y);
+    this.overlayCtx.fill();
     this.overlayCtx.stroke();
   }
 
