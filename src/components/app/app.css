@@ -23,10 +23,37 @@
   margin-bottom: 3%;
 }
 
+#logo-container {
+  font-weight: 500;
+  position: relative;
+  top: 9px;
+  cursor: pointer;
+}
+
+#logo-container a {
+  color: black;
+}
+
+#logo-container a:active {
+  color: black;
+}
+
+#logo-container p {
+  margin-left: 6px;
+  font-size: 22px;
+  display: inline-block;
+}
+
 #logo {
-  height: 85px;
+  position: relative;
+  top: 7px;
+  display: inline-block;
+  height: 60px;
   width: auto;
-  padding-bottom: 3px;
+}
+
+#header-buttons-container {
+
 }
 
 #main {
@@ -153,4 +180,108 @@
 .reset-button {
   display: inline-block;
   margin-right: 10px;
+}
+
+#about-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0,0,0,0.15);
+  transition: opacity 0.5s ease;
+}
+
+#about-overlay-button {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+#about-overlay-popup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  z-index: 20;
+  margin-left: auto;
+  margin-right: auto;
+  height: 500px;
+  font-weight: 500;
+  color: #777;
+  background-color: white;
+  border-radius: 30px;
+  padding: 40px 70px;
+  box-shadow: 0px 0px 100px rgba(0,0,0,0.5);
+  transition: transform 0.5s ease;
+}
+
+#about-overlay-popup p {
+  margin: 0px;
+}
+
+.about-overlay-supporters {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.about-overlay-center {
+  text-align: center;
+}
+
+#about-overlay-synbim-logo {
+  width: 300px;
+  margin: 0px 20px 40px 0px;
+}
+
+#about-overlay-epsrc-logo {
+  width: 270px;
+  margin: 10px 0px 50px 30px;
+}
+
+#about-overlay-uoe-logo {
+  width: 290px;
+  margin: 10px 0px 20px 10px;
+}
+
+#about-overlay-biofm-logo {
+  width: 180px;
+  margin: 10px 0px 20px 50px;
+}
+
+#about-overlay-source {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 330px;
+  height: 140px;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: box-shadow 0.5s ease;
+  background-color: #24292e;
+  margin-top: 20px;
+}
+
+#about-overlay-source:hover {
+  box-shadow: 0px 0px 50px rgba(0,0,0,0.5);
+}
+
+#about-overlay-source p {
+  margin-top: 15px;
+  color: #DDD;
+}
+
+#about-overlay-github-logo {
+  display: inline-block;
+  width: 220px;
 }

@@ -9,7 +9,12 @@ import SoluteSelector from "../solute-selector/solute-selector";
 import SliderHorizontal from "../slider-horizontal/slider-horizontal";
 import CursorPositon from "../cursor-position/cursor-position";
 import ToolOverlay from "../tool-overlay/tool-overlay";
-import SynBIMLogo from 'url:~/src/public/synbim-logo.jpg';
+import FluidSimulatorLogo from 'url:~/src/public/logo512.png';
+import SynBIMLogo from 'url:~/src/public/synbim-logo.png';
+import BiofmLogo from 'url:~/src/public/biofm-logo.png';
+import EPSRCLogo from 'url:~/src/public/epsrc-logo.png';
+import UoELogo from 'url:~/src/public/uoe-logo.png';
+import GitHubLogo from 'url:~/src/public/github-logo.png';
 import IconFluidSettingsBlack from 'url:~/src/public/icon-fluid-settings-black.png';
 import IconSoluteSettingsBlack from 'url:~/src/public/icon-solute-settings-black.png';
 import IconReactionSettingsBlack from 'url:~/src/public/icon-reaction-settings-black.png';
@@ -35,7 +40,8 @@ class App extends React.Component {
       diffusivities: [0.05, 0.18, 0.05],
       colors: [{r: 162, g: 255, b: 0}, {r: 255, g: 179, b: 13}, {r: 135, g: 0, b: 255}],
       reactionsEnabled: 1,
-      reactionRate: 0.03
+      reactionRate: 0.03,
+      aboutOverlay: false
     };
 
     this.setTool = this.setTool.bind(this);
@@ -52,6 +58,7 @@ class App extends React.Component {
     this.resetAllSolutes = this.resetAllSolutes.bind(this);
     this.resetFluid = this.resetFluid.bind(this);
     this.resetWalls = this.resetWalls.bind(this);
+    this.toggleAbout = this.toggleAbout.bind(this);
   }
 
   setActiveSettings(id) {
@@ -138,6 +145,10 @@ class App extends React.Component {
     this.program.resetWalls();
   }
 
+  toggleAbout() {
+    this.setState({aboutOverlay: !this.state.aboutOverlay});
+  }
+
   rgbToHex(rgb) {
     return "#" + ((1 << 24) + (rgb.r << 16) + (rgb.g << 8) + rgb.b).toString(16).slice(1);
   }
@@ -149,17 +160,25 @@ class App extends React.Component {
     return (
       <div id="app">
         <div id="header">
-          <img id="logo" src={SynBIMLogo} alt="SynBIM"/>
+          <div 
+            id="logo-container"
+            onClick={this.toggleAbout}
+          >
+            <img id="logo" src={FluidSimulatorLogo} alt="SynBIM"/>
+            <p>SYNBIM FLUID SIMULATION</p>
+          </div>
           <Toolbar 
             tool={this.state.tool} 
             setTool={this.setTool}
             toolSizes={this.state.toolSizes}
             setToolSize={this.setToolSize}
           />
-          <div className="header-buttons-container">
+          <div id="header-buttons-container">
             <HeaderButton
               image={IconAboutBlack}
               activeImage={IconAboutWhite}
+              onClick={this.toggleAbout}
+              isActive={this.state.aboutOverlay}
               altText="About"
             />
           </div>
@@ -384,6 +403,62 @@ class App extends React.Component {
                 </div>
               }
             </SettingsCard>
+          </div>
+        </div>
+        <div 
+          id="about-overlay"
+          style={{
+            opacity: this.state.aboutOverlay ? 1 : 0,
+            pointerEvents: this.state.aboutOverlay ? "all" : "none"
+          }}
+        >
+          <div
+            id="about-overlay-button" 
+            onClick={this.toggleAbout}
+            style={{
+              display: this.state.aboutOverlay ? "block" : "none"
+            }}
+          />
+          <div 
+            id="about-overlay-popup"
+            style={{
+              transform: this.state.aboutOverlay ? "none" : "translate(0px, 300px)",
+            }}
+          >
+            <div className="about-overlay-supporters">
+              <div className="about-overlay-center">
+                <p>DEVELOPED FOR</p>
+                <a href="http://www.synbim.co.uk/">
+                  <img id="about-overlay-synbim-logo" src={SynBIMLogo}/>
+                </a>
+              </div>
+              <div className="about-overlay-center">
+                <p>FUNDED BY</p>
+                <a href="https://epsrc.ukri.org/">
+                  <img id="about-overlay-epsrc-logo" src={EPSRCLogo}/>
+                </a>
+              </div>
+            </div>
+
+            <div className="about-overlay-center">
+              <p>PROUDLY SUPPORTED BY</p>
+              <div className="about-overlay-supporters">
+                <a href="https://www.ed.ac.uk/">
+                  <img id="about-overlay-uoe-logo" src={UoELogo}/>
+                </a>
+                <img id="about-overlay-biofm-logo" src={BiofmLogo}/>
+              </div>
+            </div>
+
+            <div 
+              id="about-overlay-source"
+              onClick={() => window.location="https://github.com/rafaelanderka/synbim-fluid-simulation"}
+            >
+              <p>SOURCE CODE</p>
+              <a href="https://github.com/rafaelanderka/synbim-fluid-simulation">
+                <img id="about-overlay-github-logo" src={GitHubLogo}/>
+              </a>
+            </div>
           </div>
         </div>
       </div>
