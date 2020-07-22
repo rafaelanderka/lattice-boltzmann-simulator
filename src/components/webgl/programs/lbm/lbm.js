@@ -73,6 +73,26 @@ class LBMProgram {
     const xFactor = this.overlay.width / this.props.velXCount;
     const yFactor = this.overlay.height / this.props.velYCount;
     this.overlayMagnitude = Math.min(xFactor, yFactor) / this.params.speedOfSound;
+
+    // Set indicator drawing function
+    this._setDrawIndicatorFct();
+  }
+
+  _setDrawIndicatorFct() {
+    let fct = null;
+    switch(this.props.overlayType) {
+      case 0:
+        fct = () => {};
+        break;
+      case 1:
+        fct = this._drawIndicatorLine;
+        break;
+      case 2:
+        fct = this._drawIndicatorArrow;
+        break;
+    } 
+
+    this.drawIndicatorFct = fct;
   }
 
   _initFBOs() {
@@ -687,7 +707,7 @@ class LBMProgram {
     }
   }
 
-  _drawIndicator(x, y, xOffset, yOffset) {
+  _drawIndicatorArrow(x, y, xOffset, yOffset) {
     this.overlayCtx.beginPath();
     this.overlayCtx.moveTo(x, y);
     this.overlayCtx.lineTo(x + xOffset * 0.7, y - yOffset * 0.7);
@@ -697,6 +717,13 @@ class LBMProgram {
     this.overlayCtx.lineTo(x + xOffset * 0.7, y - yOffset * 0.7);
     this.overlayCtx.lineTo(x, y);
     this.overlayCtx.fill();
+    this.overlayCtx.stroke();
+  }
+
+  _drawIndicatorLine(x, y, xOffset, yOffset) {
+    this.overlayCtx.beginPath();
+    this.overlayCtx.moveTo(x, y);
+    this.overlayCtx.lineTo(x + xOffset, y - yOffset);
     this.overlayCtx.stroke();
   }
 
@@ -722,7 +749,7 @@ class LBMProgram {
         const velY = this.overlayMagnitude * this.overlayBuffer[i + 1];
 
         // Draw indicator to screen
-        this._drawIndicator(x, y, velX, velY);
+        this.drawIndicatorFct(x, y, velX, velY);
        
         // Increment coordinates
         y -= this.overlayYOffset;

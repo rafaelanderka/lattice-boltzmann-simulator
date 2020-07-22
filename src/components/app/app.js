@@ -30,7 +30,7 @@ class App extends React.Component {
       resolution: 256,
       velXCount: 32,
       velYCount: 32,
-      activeSetttings: 1,
+      activeSetttings: 0,
       tool: 0,
       toolSizes: [0.1, 0.02, 0.05, 0.1, 0.12],
       solute: 0,
@@ -41,6 +41,7 @@ class App extends React.Component {
       colors: [{r: 0, g: 255, b: 255}, {r: 255, g: 255, b: 0}, {r: 255, g: 0, b: 255}],
       reactionsEnabled: 1,
       reactionRate: 0.001,
+      overlayType: 2,
       aboutOverlay: false
     };
 
@@ -55,6 +56,7 @@ class App extends React.Component {
     this.setActiveColorB = this.setActiveColorB.bind(this);
     this.setReactionsEnabled = this.setReactionsEnabled.bind(this);
     this.setReactionRate = this.setReactionRate.bind(this);
+    this.setOverlayType = this.setOverlayType.bind(this);
     this.resetAllSolutes = this.resetAllSolutes.bind(this);
     this.resetFluid = this.resetFluid.bind(this);
     this.resetWalls = this.resetWalls.bind(this);
@@ -127,6 +129,10 @@ class App extends React.Component {
 
   setReactionRate(value) {
     this.setState({reactionRate: value});
+  }
+
+  setOverlayType(id) {
+    this.setState({overlayType: id});
   }
 
   resetAllSolutes() {
@@ -204,6 +210,7 @@ class App extends React.Component {
                 exposeProgram={program => this.program = program}
                 reactionsEnabled={reactionsEnabledBool}
                 reactionRate={this.state.reactionRate}
+                overlayType={this.state.overlayType}
               />
               <ToolOverlay
                 toolSize={this.state.toolSizes[this.state.tool]}
@@ -237,6 +244,14 @@ class App extends React.Component {
                   values={["OFF", "HORIZONTAL", "VERTICAL", "ALL"]}
                   selection={this.state.boundaryWalls}
                   setSelection={this.setBoundaryWalls}
+                />
+              </div>
+              <div className="settings-subcontainer">
+                <div className="settings-subtitle">VELOCITY FIELD VISUALIZATION</div>
+                <Selector
+                  values={["OFF", "LINES", "ARROWS"]}
+                  selection={this.state.overlayType}
+                  setSelection={this.setOverlayType}
                 />
               </div>
               <div className="settings-subcontainer">
