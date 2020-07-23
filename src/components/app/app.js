@@ -186,6 +186,24 @@ class App extends React.Component {
             setToolSize={this.setToolSize}
             setDropdownActive={this.setToolbarDropdown}
           />
+          <div className="solute-selectors-container">
+            <p>SOLUTE</p>
+            <SoluteSelector
+              color={this.state.colors[0]}
+              setSolute={() => this.setSolute(0)}
+              isActive={this.state.solute == 0}
+            />
+            <SoluteSelector
+              color={this.state.colors[1]}
+              setSolute={() => this.setSolute(1)}
+              isActive={this.state.solute == 1}
+            />
+            <SoluteSelector
+              color={this.state.colors[2]}
+              setSolute={() => this.setSolute(2)}
+              isActive={this.state.solute == 2}
+            />
+          </div>
           <div id="header-buttons-container">
             <HeaderButton
               image={IconAboutBlack}
