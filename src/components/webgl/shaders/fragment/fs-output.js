@@ -1,7 +1,7 @@
 export default `
   // FRAGMENT SHADER
 
-  // Visualises the (scaled) magnitude of a given input texture
+  // Visualises the velocity field and solutes
 
   precision highp float;
   precision highp sampler2D;
@@ -18,7 +18,7 @@ export default `
   varying vec2 vUV; 
 
   const float baseBrightness = 1.0;
-  const vec3 velocityCol = vec3(0.95); 
+  const vec3 velocityCol = vec3(0.98); 
   const vec3 wallCol = vec3(0.0);
   
   void main(void) {
