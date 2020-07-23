@@ -1,5 +1,6 @@
 .settings-card-container {
   width: 100%;
+  min-width: 260px;
 }
 
 .settings-card-title {

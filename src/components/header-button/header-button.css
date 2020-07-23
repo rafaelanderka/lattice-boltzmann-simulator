@@ -1,4 +1,6 @@
 .header-button {
+  position: relative;
+  top: 2px;
   display: block;
   width: 55px;
   height: 55px;

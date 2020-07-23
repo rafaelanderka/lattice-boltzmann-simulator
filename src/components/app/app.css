@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   width: 92%;
-  min-width: 740px;
+  min-width: 500px;
   max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
@@ -24,9 +24,10 @@
 }
 
 #logo-container {
+  height: 55px;
+  justify-content: flex-start;
   font-weight: 500;
   position: relative;
-  top: 9px;
   cursor: pointer;
 }
 
@@ -39,20 +40,22 @@
 }
 
 #logo-container p {
+  position: relative;
   margin-left: 6px;
   font-size: 22px;
   display: inline-block;
+  top: -13px;
 }
 
 #logo {
   position: relative;
-  top: 7px;
+  top: -4px;
   display: inline-block;
-  height: 60px;
+  height: 65px;
   width: auto;
 }
 
-#main {
+#main-row {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -60,7 +63,15 @@
   width: 100%;
 }
 
-#webgl-container {
+#main-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+}
+
+#webgl-container-portrait {
   flex-shrink: 0;
   position: relative;
   width: 66%;
@@ -72,7 +83,17 @@
   overflow: hidden;
 }
 
-#settings-container {
+#webgl-container-landscape {
+  flex-shrink: 0;
+  position: relative;
+  width: 100%;
+  height: calc(85vh - 450px);
+  padding-bottom: 0;
+  border: 2px solid black;
+  overflow: hidden;
+}
+
+#settings-container-column {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -83,7 +104,21 @@
   margin-left: 3%;
   padding-right: 1%;
   height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+}
+
+#settings-container-row {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-top: 2%;
+  width: 100%;
+  height: 400px;
+}
+
+.settings-spacer {
+  height: 100%;
+  width: 10%;
 }
 
 .settings-subcontainer {
@@ -113,6 +148,7 @@
   height: 51px;
   top: 2px;
   padding: 0px 10px;
+  margin-right: 4px;
 }
 
 .solute-selectors-container {

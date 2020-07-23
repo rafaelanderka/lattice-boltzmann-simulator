@@ -27,6 +27,9 @@ class App extends React.Component {
     super(props);
 
     this.state = {
+      viewportWidth: 0,
+      viewportHeight: 0,
+      aspect: 1,
       resolution: 256,
       overlayXOffset: 30,
       overlayYOffset: 30,
@@ -47,6 +50,7 @@ class App extends React.Component {
       aboutOverlay: false
     };
 
+    this.updateViewportDimensions = this.updateViewportDimensions.bind(this);
     this.setTool = this.setTool.bind(this);
     this.setToolSize = this.setToolSize.bind(this);
     this.setIsToolActive = this.setIsToolActive.bind(this);
@@ -65,6 +69,16 @@ class App extends React.Component {
     this.resetAllSolutes = this.resetAllSolutes.bind(this);
     this.resetFluid = this.resetFluid.bind(this);
     this.resetWalls = this.resetWalls.bind(this);
+  }
+
+  updateViewportDimensions() {
+    const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+    const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+    this.setState({
+      viewportWidth: vw,
+      viewportHeight: vh,
+      aspect: vw / vh
+    });
   }
 
   setActiveSettings(id) {
@@ -179,7 +193,7 @@ class App extends React.Component {
             onClick={this.toggleAbout}
           >
             <img id="logo" src={FluidSimulatorLogo} alt="SynBIM"/>
-            <p>SYNBIM FLUID SIMULATION</p>
+            {this.state.viewportWidth > 1050 && <p>SYNBIM FLUID SIMULATION</p>}
           </div>
           <Toolbar 
             tool={this.state.tool} 
@@ -222,8 +236,10 @@ class App extends React.Component {
   }
 
   renderMain() {
+    const isRowLayout = this.state.viewportWidth > 1050 || this.state.aspect > 0.9;
+    const className = isRowLayout ? "main-row" : "main-column";
     return (
-      <div id="main">
+      <div id={className}>
         {this.renderWebGL()}
         {this.renderSettings()}
       </div>
@@ -231,11 +247,13 @@ class App extends React.Component {
   }
 
   renderWebGL() {
+    const isPortrait = this.state.viewportWidth > 1050 || this.state.aspect > 0.9;
+    const className = isPortrait ? "webgl-container-portrait" : "webgl-container-landscape";
     const leftRightWall = (this.state.boundaryWalls == 1 || this.state.boundaryWalls == 3) ? true : false;
     const topBottomWall = (this.state.boundaryWalls == 2 || this.state.boundaryWalls == 3) ? true : false;
     const reactionsEnabledBool = this.state.reactionsEnabled == 1;
     return (
-      <div id="webgl-container">
+      <div id={className}>
         <CursorPositon
           setIsCursorActive={this.setIsToolActive}
         >
@@ -269,21 +287,25 @@ class App extends React.Component {
   }
 
   renderSettings() {
+    const isColumnLayout = this.state.viewportWidth > 1050 || this.state.aspect > 0.9;
+    const className = isColumnLayout ? "settings-container-column" : "settings-container-row";
     return (
-      <div id="settings-container">
-        {this.renderFluidSettingsCard()}
-        {this.renderSoluteSettingsCard()}
-        {this.renderReactionSettingsCard()}
+      <div id={className}>
+        {this.renderFluidSettingsCard(!isColumnLayout)}
+        {!isColumnLayout && <div className="settings-spacer"/>}
+        {this.renderSoluteSettingsCard(!isColumnLayout)}
+        {!isColumnLayout && <div className="settings-spacer"/>}
+        {this.renderReactionSettingsCard(!isColumnLayout)}
       </div>
     );
   }
 
-  renderFluidSettingsCard() {
+  renderFluidSettingsCard(alwaysExpanded) {
     return (
       <SettingsCard
         title="FLUID SETTINGS"
         icon={IconFluidSettingsBlack}
-        isExpanded={this.state.activeSetttings == 0}
+        isExpanded={this.state.activeSetttings == 0 || alwaysExpanded}
         toggleExpansion={() => this.setActiveSettings(0)}
       >
         <div className="settings-subcontainer">
@@ -338,12 +360,12 @@ class App extends React.Component {
     );
   }
 
-  renderSoluteSettingsCard() {
+  renderSoluteSettingsCard(alwaysExpanded) {
     return (
       <SettingsCard
         title="SOLUTE SETTINGS"
         icon={IconSoluteSettingsBlack}
-        isExpanded={this.state.activeSetttings == 1}
+        isExpanded={this.state.activeSetttings == 1 || alwaysExpanded}
         toggleExpansion={() => this.setActiveSettings(1)}
       >
         <div className="settings-subcontainer">
@@ -457,13 +479,13 @@ class App extends React.Component {
     );
   }
 
-  renderReactionSettingsCard() {
+  renderReactionSettingsCard(alwaysExpanded) {
     const reactionsEnabledBool = this.state.reactionsEnabled == 1;
     return (
       <SettingsCard
         title="REACTION SETTINGS"
         icon={IconReactionSettingsBlack}
-        isExpanded={this.state.activeSetttings == 2}
+        isExpanded={this.state.activeSetttings == 2 || alwaysExpanded}
         toggleExpansion={() => this.setActiveSettings(2)}
       >
         <div className="settings-subcontainer">
@@ -554,6 +576,11 @@ class App extends React.Component {
         </div>
       </div>
     );
+  }
+
+  componentDidMount() {
+    this.updateViewportDimensions();
+    window.addEventListener('resize', this.updateViewportDimensions);
   }
 
   render() {
