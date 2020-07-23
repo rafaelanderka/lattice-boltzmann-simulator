@@ -33,6 +33,7 @@ class App extends React.Component {
       activeSetttings: 0,
       tool: 0,
       toolSizes: [0.1, 0.02, 0.05, 0.1, 0.12],
+      isToolActive: false,
       solute: 0,
       soluteCount: 3,
       viscosity: 0.1,
@@ -48,6 +49,7 @@ class App extends React.Component {
 
     this.setTool = this.setTool.bind(this);
     this.setToolSize = this.setToolSize.bind(this);
+    this.setIsToolActive = this.setIsToolActive.bind(this);
     this.setSolute = this.setSolute.bind(this);
     this.setViscosity = this.setViscosity.bind(this);
     this.setBoundaryWalls = this.setBoundaryWalls.bind(this);
@@ -77,6 +79,10 @@ class App extends React.Component {
     const toolSizes = [...this.state.toolSizes];
     toolSizes[id] = value;
     this.setState({toolSizes: toolSizes});
+  }
+
+  setIsToolActive(value) {
+    this.setState({isToolActive: value});
   }
 
   setSolute(id) {
@@ -185,6 +191,7 @@ class App extends React.Component {
             toolSizes={this.state.toolSizes}
             setToolSize={this.setToolSize}
             setDropdownActive={this.setToolbarDropdown}
+            isToolActive={this.state.isToolActive}
           />
           <div className="solute-selectors-container header-selectors">
             <SoluteSelector
@@ -217,7 +224,9 @@ class App extends React.Component {
         </div>
         <div id="main">
           <div id="webgl-container">
-            <CursorPositon>
+            <CursorPositon
+              setIsCursorActive={this.setIsToolActive}
+            >
               <WebGL 
                 id="webgl" 
                 program="lbm"
@@ -240,7 +249,7 @@ class App extends React.Component {
               />
               <ToolOverlay
                 toolSize={this.state.toolSizes[this.state.tool]}
-                isChangingSize={this.state.toolbarDropdown}
+                isChangingSize={this.state.toolbarDropdown && !this.state.isToolActive}
               />
             </CursorPositon>
           </div>

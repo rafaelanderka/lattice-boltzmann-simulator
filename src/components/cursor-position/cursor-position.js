@@ -98,10 +98,12 @@ export default class CursorPosition extends React.Component {
     this.container.addEventListener("mousedown", () => {
       this.isCursorActive = true;
       this.setState({isCursorActive: this.isCursorActive});
+      this.props.setIsCursorActive(true);
     });
     this.container.addEventListener("mouseup", () => {
       this.isCursorActive = false;
       this.setState({isCursorActive: this.isCursorActive});
+      this.props.setIsCursorActive(false);
     });
     this.container.addEventListener("mouseenter", () => {
       this.isCursorOver = true;
@@ -110,6 +112,7 @@ export default class CursorPosition extends React.Component {
     this.container.addEventListener("mouseleave", () => {
       this.isCursorActive = false;
       this.setState({isCursorActive: this.isCursorActive});
+      this.props.setIsCursorActive(false);
       this.isCursorOver = false;
       this.setState({isCursorOver: this.isCursorOver});
     });
@@ -117,16 +120,17 @@ export default class CursorPosition extends React.Component {
 
     // Handle touch input
     this.container.addEventListener("touchstart", e => { 
-      e.preventDefault();
       this._setCursorState(e.targetTouches[0]);
       this.isCursorActive = true;
       this.setState({isCursorActive: this.isCursorActive});
+      this.props.setIsCursorActive(true);
       this.isCursorOver = true;
       this.setState({isCursorOver: this.isCursorOver});
     });
     this.container.addEventListener("touchend", () => {
       this.isCursorActive = false;
       this.setState({isCursorActive: this.isCursorActive});
+      this.props.setIsCursorActive(false);
       this.isCursorOver = false;
       this.setState({isCursorOver: this.isCursorOver});
     });
