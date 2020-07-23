@@ -64,14 +64,16 @@ class LBMProgram {
     this.overlayCtx.lineWidth = this.params.overlayLineWidth * this.props.pixelRatio;
 
     // Set indicator offsets
-    this.overlayXOffset = this.overlay.width / this.props.velXCount;
-    this.overlayYOffset = this.overlay.height / this.props.velYCount;
-    this.overlayXSampleOffset = this.props.resolution / this.props.velXCount;
-    this.overlayYSampleOffset = this.props.resolution / this.props.velYCount;
+    this.overlayXCount = Math.round(this.overlay.width / (this.props.overlayXOffset * this.props.pixelRatio));
+    this.overlayYCount = Math.round(this.overlay.height / (this.props.overlayYOffset * this.props.pixelRatio));
+    this.correctedOverlayXOffset = this.overlay.width / this.overlayXCount;
+    this.correctedOverlayYOffset = this.overlay.height / this.overlayYCount;
+    this.overlayXSampleOffset = this.props.resolution / this.overlayXCount;
+    this.overlayYSampleOffset = this.props.resolution / this.overlayYCount;
 
     // Set indicator magnitude factor
-    const xFactor = this.overlay.width / this.props.velXCount;
-    const yFactor = this.overlay.height / this.props.velYCount;
+    const xFactor = this.overlay.width / this.overlayXCount;
+    const yFactor = this.overlay.height / this.overlayYCount;
     this.overlayMagnitude = Math.min(xFactor, yFactor) / this.params.speedOfSound;
 
     // Set indicator drawing function
@@ -735,14 +737,14 @@ class LBMProgram {
     this.wgli.readPixels(this.fluid.velocity.read, 0, 0, this.props.resolution, this.props.resolution, this.overlayBuffer);
 
     // Draw velocity indicators
-    let x = this.overlayXOffset / 2;
+    let x = this.correctedOverlayXOffset / 2;
     let sampleX = this.overlayXSampleOffset / 2;
-    for (let Xi = 0; Xi < this.props.velXCount; Xi++) {
-      let y = this.overlay.height - this.overlayYOffset / 2;
+    for (let Xi = 0; Xi < this.overlayXCount; Xi++) {
+      let y = this.overlay.height - this.correctedOverlayYOffset / 2;
       let sampleY = this.overlayYSampleOffset / 2;
-      for (let Yi = 0; Yi < this.props.velYCount; Yi++) {
+      for (let Yi = 0; Yi < this.overlayYCount; Yi++) {
         // Calculate texel index
-        const i = 4 * (sampleX + this.props.resolution * sampleY);
+        const i = 4 * (Math.round(sampleX) + this.props.resolution * Math.round(sampleY));
 
         // Get velocity values
         const velX = this.overlayMagnitude * this.overlayBuffer[i];
@@ -752,10 +754,10 @@ class LBMProgram {
         this.drawIndicatorFct(x, y, velX, velY);
        
         // Increment coordinates
-        y -= this.overlayYOffset;
+        y -= this.correctedOverlayYOffset;
         sampleY += this.overlayYSampleOffset;
       }
-      x += this.overlayXOffset;
+      x += this.correctedOverlayXOffset;
       sampleX += this.overlayXSampleOffset;
     }
   }

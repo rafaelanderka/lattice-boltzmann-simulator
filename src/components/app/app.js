@@ -28,8 +28,8 @@ class App extends React.Component {
 
     this.state = {
       resolution: 256,
-      velXCount: 32,
-      velYCount: 32,
+      overlayXOffset: 30,
+      overlayYOffset: 30,
       activeSetttings: 0,
       tool: 0,
       toolSizes: [0.1, 0.02, 0.05, 0.1, 0.12],
@@ -197,8 +197,8 @@ class App extends React.Component {
                 program="lbm"
                 hasOverlay={true}
                 resolution={this.state.resolution}
-                velXCount={this.state.velXCount}
-                velYCount={this.state.velYCount}
+                overlayXOffset={this.state.overlayXOffset}
+                overlayYOffset={this.state.overlayYOffset}
                 tool={this.state.tool} 
                 toolSize={this.state.toolSizes[this.state.tool]}
                 solute={this.state.solute}
