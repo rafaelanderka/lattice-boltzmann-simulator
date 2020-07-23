@@ -119,6 +119,12 @@
   margin: 0px 10px;
 }
 
+.reaction-symbol {
+  font-weight: 500;
+  font-size: 17px;
+  margin: 0px 3px;
+}
+
 .solute-color-settings-container {
   display: flex;
   flex-direction: row;

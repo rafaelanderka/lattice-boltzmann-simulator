@@ -187,17 +187,18 @@ class App extends React.Component {
             setDropdownActive={this.setToolbarDropdown}
           />
           <div className="solute-selectors-container">
-            <p>SOLUTE</p>
             <SoluteSelector
               color={this.state.colors[0]}
               setSolute={() => this.setSolute(0)}
               isActive={this.state.solute == 0}
             />
+            {this.state.reactionsEnabled == 1 && <div className="reaction-symbol" style={{marginBottom: 2}}>+</div>}
             <SoluteSelector
               color={this.state.colors[1]}
               setSolute={() => this.setSolute(1)}
               isActive={this.state.solute == 1}
             />
+            {this.state.reactionsEnabled == 1 && <div className="reaction-symbol">→</div>}
             <SoluteSelector
               color={this.state.colors[2]}
               setSolute={() => this.setSolute(2)}
