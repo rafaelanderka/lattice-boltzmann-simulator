@@ -30,6 +30,7 @@ class App extends React.Component {
       viewportWidth: 0,
       viewportHeight: 0,
       aspect: 1,
+      isMounted: false,
       resolution: 256,
       overlayXOffset: 30,
       overlayYOffset: 30,
@@ -581,16 +582,21 @@ class App extends React.Component {
   componentDidMount() {
     this.updateViewportDimensions();
     window.addEventListener('resize', this.updateViewportDimensions);
+    this.setState({isMounted: true});
   }
 
   render() {
-    return (
-      <div id="app">
-        {this.renderHeader()}
-        {this.renderMain()}
-        {this.renderAboutOverlay()}
-      </div>
-    );
+    if (this.state.isMounted) {
+      return (
+        <div id="app">
+          {this.renderHeader()}
+          {this.renderMain()}
+          {this.renderAboutOverlay()}
+        </div>
+      );
+    } else {
+      return null;
+    }
   }
 }
 
