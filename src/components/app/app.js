@@ -40,7 +40,7 @@ class App extends React.Component {
       diffusivities: [0.3, 0.18, 0.1],
       colors: [{r: 0, g: 255, b: 255}, {r: 255, g: 255, b: 0}, {r: 255, g: 0, b: 255}],
       reactionsEnabled: 1,
-      reactionRate: 0.001,
+      reactionRate: 0.01,
       overlayType: 2,
       toolbarDropdown: false,
       aboutOverlay: false

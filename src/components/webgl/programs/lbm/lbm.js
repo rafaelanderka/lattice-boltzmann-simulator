@@ -43,7 +43,7 @@ class LBMProgram {
     ];
 
     this.reactions = [
-      new Reaction(wgli, [0, 1, 2], [1, 1, 1], [-1, -1, 1], 0.1)
+      new Reaction(wgli, [0, 1, 2], [1, 1, 1], [-1, -1, 1], this.props.reactionRate)
     ];
   }
 
