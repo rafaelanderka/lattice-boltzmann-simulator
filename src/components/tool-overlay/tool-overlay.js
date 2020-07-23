@@ -11,15 +11,21 @@ export default class ToolOverlay extends React.Component {
   render() {
     const halfSize = this.props.toolSize * Math.min(this.props.containerWidth, this.props.containerHeight);
     const size = 2 * halfSize;
+    const left = this.props.isChangingSize 
+                 ? this.props.containerWidth * 0.5 - halfSize + this.xCorrection
+                 : this.props.cursorPos.x * this.props.containerWidth - halfSize + this.xCorrection;
+    const bottom = this.props.isChangingSize 
+                   ? this.props.containerHeight * 0.5 + halfSize + this.yCorrection
+                   : this.props.cursorPos.y * this.props.containerHeight + halfSize + this.yCorrection;
     return (
       <div 
         className="tool-overlay"
         style={{
-          display: this.props.isCursorOver ? "block" : "none",
+          display: this.props.isCursorOver || this.props.isChangingSize ? "block" : "none",
           width: size,
           height: size,
-          left: this.props.cursorPos.x * this.props.containerWidth - halfSize + this.xCorrection,
-          bottom: this.props.cursorPos.y * this.props.containerHeight + halfSize + this.yCorrection,
+          left: left,
+          bottom: bottom,
           borderRadius: halfSize
         }}
       />

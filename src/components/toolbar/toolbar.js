@@ -28,17 +28,24 @@ export default class Toolbar extends React.Component {
   useTool(id) {
     this.props.setTool(id);
     this.dropdowns[id] = true;
+    this.setDropdownActive();
     this.setState({dropdowns: this.dropdowns});
   }
 
   enableDropdown(id) {
     this.dropdowns[id] = this.props.tool == id;
+    this.setDropdownActive();
     this.setState({dropdowns: this.dropdowns});
   }
 
   disableDropdown(id) {
     this.dropdowns[id] = false;
+    this.setDropdownActive();
     this.setState({dropdowns: this.dropdowns});
+  }
+
+  setDropdownActive() {
+    this.props.setDropdownActive(this.dropdowns.some(val => val == true));
   }
 
   render() {

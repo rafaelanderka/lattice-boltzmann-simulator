@@ -42,6 +42,7 @@ class App extends React.Component {
       reactionsEnabled: 1,
       reactionRate: 0.001,
       overlayType: 2,
+      toolbarDropdown: false,
       aboutOverlay: false
     };
 
@@ -57,10 +58,11 @@ class App extends React.Component {
     this.setReactionsEnabled = this.setReactionsEnabled.bind(this);
     this.setReactionRate = this.setReactionRate.bind(this);
     this.setOverlayType = this.setOverlayType.bind(this);
+    this.setToolbarDropdown = this.setToolbarDropdown.bind(this);
+    this.toggleAbout = this.toggleAbout.bind(this);
     this.resetAllSolutes = this.resetAllSolutes.bind(this);
     this.resetFluid = this.resetFluid.bind(this);
     this.resetWalls = this.resetWalls.bind(this);
-    this.toggleAbout = this.toggleAbout.bind(this);
   }
 
   setActiveSettings(id) {
@@ -135,6 +137,14 @@ class App extends React.Component {
     this.setState({overlayType: id});
   }
 
+  setToolbarDropdown(value) {
+    this.setState({toolbarDropdown: value});
+  }
+
+  toggleAbout() {
+    this.setState({aboutOverlay: !this.state.aboutOverlay});
+  }
+
   resetAllSolutes() {
     for (let i = 0; i < this.state.soluteCount; i++) {
       this.program.resetSolute(i);
@@ -149,10 +159,6 @@ class App extends React.Component {
   resetWalls() {
     this.setState({boundaryWalls: 0});
     this.program.resetWalls();
-  }
-
-  toggleAbout() {
-    this.setState({aboutOverlay: !this.state.aboutOverlay});
   }
 
   rgbToHex(rgb) {
@@ -178,6 +184,7 @@ class App extends React.Component {
             setTool={this.setTool}
             toolSizes={this.state.toolSizes}
             setToolSize={this.setToolSize}
+            setDropdownActive={this.setToolbarDropdown}
           />
           <div id="header-buttons-container">
             <HeaderButton
@@ -214,6 +221,7 @@ class App extends React.Component {
               />
               <ToolOverlay
                 toolSize={this.state.toolSizes[this.state.tool]}
+                isChangingSize={this.state.toolbarDropdown}
               />
             </CursorPositon>
           </div>
