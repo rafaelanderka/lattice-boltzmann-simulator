@@ -186,7 +186,7 @@ class App extends React.Component {
             setToolSize={this.setToolSize}
             setDropdownActive={this.setToolbarDropdown}
           />
-          <div className="solute-selectors-container">
+          <div className="solute-selectors-container header-selectors">
             <SoluteSelector
               color={this.state.colors[0]}
               setSolute={() => this.setSolute(0)}

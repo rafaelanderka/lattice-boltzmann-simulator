@@ -106,6 +106,15 @@
   width: 100%;
 }
 
+.header-selectors {
+  position: relative;
+  border: 2px solid black;
+  border-radius: 10px;
+  height: 51px;
+  top: 2px;
+  padding: 0px 10px;
+}
+
 .solute-selectors-container {
   display: flex;
   flex-direction: row;
