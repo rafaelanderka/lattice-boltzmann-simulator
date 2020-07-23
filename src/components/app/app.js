@@ -473,6 +473,7 @@ class App extends React.Component {
               <a href="https://github.com/rafaelanderka/synbim-fluid-simulation">
                 <img id="about-overlay-github-logo" src={GitHubLogo}/>
               </a>
+              <div id="about-overlay-source-shine"/>
             </div>
           </div>
         </div>

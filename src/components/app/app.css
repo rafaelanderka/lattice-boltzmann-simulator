@@ -256,6 +256,7 @@
 }
 
 #about-overlay-source {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -267,6 +268,7 @@
   transition: box-shadow 0.5s ease;
   background-color: #24292e;
   margin-top: 20px;
+  overflow: hidden;
 }
 
 #about-overlay-source:hover {
@@ -281,4 +283,20 @@
 #about-overlay-github-logo {
   display: inline-block;
   width: 220px;
+}
+
+#about-overlay-source-shine {
+  position: absolute;
+  background-color: rgba(255,255,255,0.1);
+  width: 60px;
+  height: 200px;
+  top: 0px;
+  left:0px;
+  box-shadow: 0px 0px 50px rgba(255, 255, 255, 0.2);
+  transform: skewX(30deg) translate(-150px, 0px);
+  transition: transform 0.4s linear;
+}
+
+#about-overlay-source:hover #about-overlay-source-shine {
+  transform: skewX(30deg) translate(450px, -50px);
 }
