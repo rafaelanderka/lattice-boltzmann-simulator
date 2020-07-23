@@ -171,12 +171,8 @@ class App extends React.Component {
     return "#" + ((1 << 24) + (rgb.r << 16) + (rgb.g << 8) + rgb.b).toString(16).slice(1);
   }
 
-  render() {
-    const leftRightWall = (this.state.boundaryWalls == 1 || this.state.boundaryWalls == 3) ? true : false;
-    const topBottomWall = (this.state.boundaryWalls == 2 || this.state.boundaryWalls == 3) ? true : false;
-    const reactionsEnabledBool = this.state.reactionsEnabled == 1;
+  renderHeader() {
     return (
-      <div id="app">
         <div id="header">
           <div 
             id="logo-container"
@@ -222,297 +218,350 @@ class App extends React.Component {
             />
           </div>
         </div>
-        <div id="main">
-          <div id="webgl-container">
-            <CursorPositon
-              setIsCursorActive={this.setIsToolActive}
-            >
-              <WebGL 
-                id="webgl" 
-                program="lbm"
-                hasOverlay={true}
-                resolution={this.state.resolution}
-                overlayXOffset={this.state.overlayXOffset}
-                overlayYOffset={this.state.overlayYOffset}
-                tool={this.state.tool} 
-                toolSize={this.state.toolSizes[this.state.tool]}
-                solute={this.state.solute}
-                viscosity={this.state.viscosity}
-                diffusivities={this.state.diffusivities}
-                colors={this.state.colors}
-                leftRightWall={leftRightWall}
-                topBottomWall={topBottomWall}
-                exposeProgram={program => this.program = program}
-                reactionsEnabled={reactionsEnabledBool}
-                reactionRate={this.state.reactionRate}
-                overlayType={this.state.overlayType}
-              />
-              <ToolOverlay
-                toolSize={this.state.toolSizes[this.state.tool]}
-                isChangingSize={this.state.toolbarDropdown && !this.state.isToolActive}
-              />
-            </CursorPositon>
-          </div>
-          <div id="settings-container">
-            <SettingsCard
-              title="FLUID SETTINGS"
-              icon={IconFluidSettingsBlack}
-              isExpanded={this.state.activeSetttings == 0}
-              toggleExpansion={() => this.setActiveSettings(0)}
-            >
-              <div className="settings-subcontainer">
-                <div className="settings-subtitle">VISCOSITY</div>
-                <div className="slider-horizontal-container">
-                  <SliderHorizontal
-                    value={this.state.viscosity}
-                    min={0.05}
-                    max={1}
-                    step={0.01}
-                    decimals={2}
-                    setValue={this.setViscosity}
-                    labeled={true}
-                  />
-                </div>
-              </div>
-              <div className="settings-subcontainer">
-                <div className="settings-subtitle">BOUNDARY WALLS</div>
-                <Selector
-                  values={["OFF", "HORIZONTAL", "VERTICAL", "ALL"]}
-                  selection={this.state.boundaryWalls}
-                  setSelection={this.setBoundaryWalls}
-                />
-              </div>
-              <div className="settings-subcontainer">
-                <div className="settings-subtitle">VELOCITY FIELD VISUALIZATION</div>
-                <Selector
-                  values={["OFF", "LINES", "ARROWS"]}
-                  selection={this.state.overlayType}
-                  setSelection={this.setOverlayType}
-                />
-              </div>
-              <div className="settings-subcontainer">
-                <div className="reset-buttons-container">
-                  <div className="reset-button">
-                    <Button 
-                      text="RESET FLUID"
-                      onClick={this.resetFluid} 
-                      color="#000"
-                    />
-                  </div>
-                  <div className="reset-button">
-                    <Button 
-                      text="RESET WALLS"
-                      onClick={this.resetWalls} 
-                      color="#000"
-                    />
-                  </div>
-                </div>
-              </div>
-            </SettingsCard>
-            <SettingsCard
-              title="SOLUTE SETTINGS"
-              icon={IconSoluteSettingsBlack}
-              isExpanded={this.state.activeSetttings == 1}
-              toggleExpansion={() => this.setActiveSettings(1)}
-            >
-              <div className="settings-subcontainer">
-                <div className="settings-subtitle">ACTIVE SOLUTE</div>
-                <div className="solute-selectors-container">
-                  <SoluteSelector
-                    color={this.state.colors[0]}
-                    setSolute={() => this.setSolute(0)}
-                    isActive={this.state.solute == 0}
-                  />
-                  <SoluteSelector
-                    color={this.state.colors[1]}
-                    setSolute={() => this.setSolute(1)}
-                    isActive={this.state.solute == 1}
-                  />
-                  <SoluteSelector
-                    color={this.state.colors[2]}
-                    setSolute={() => this.setSolute(2)}
-                    isActive={this.state.solute == 2}
-                  />
-                </div>
-              </div>
-              <div className="settings-subcontainer">
-                <div className="settings-subtitle">COLOR</div>
-                <div className="solute-color-settings-container">
-                  <div className="solute-color-sliders-container">
-                    <div className="solute-color-slider">
-                      R
-                      <div className="slider-horizontal-unlabeled-container">
-                        <SliderHorizontal
-                          value={this.state.colors[this.state.solute].r}
-                          min={0}
-                          max={255}
-                          step={1}
-                          decimals={0}
-                          setValue={this.setActiveColorR}
-                          labeled={false}
-                    />
-                      </div>
-                    </div>
-                    <div className="solute-color-slider">
-                      G
-                      <div className="slider-horizontal-unlabeled-container">
-                        <SliderHorizontal
-                          value={this.state.colors[this.state.solute].g}
-                          min={0}
-                          max={255}
-                          step={1}
-                          decimals={0}
-                          setValue={this.setActiveColorG}
-                          labeled={false}
-                        />
-                      </div>
-                    </div>
-                    <div className="solute-color-slider">
-                      B
-                      <div className="slider-horizontal-unlabeled-container">
-                        <SliderHorizontal
-                          value={this.state.colors[this.state.solute].b}
-                          min={0}
-                          max={255}
-                          step={1}
-                          decimals={0}
-                          setValue={this.setActiveColorB}
-                          labeled={false}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="solute-color-preview-border">
-                    <div 
-                      className="solute-color-preview" 
-                      style={{backgroundColor: this.rgbToHex(this.state.colors[this.state.solute])}}
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="settings-subcontainer">
-                <div className="settings-subtitle">DIFFUSIVITY</div>
-                <div className="slider-horizontal-container">
-                  <SliderHorizontal
-                    value={this.state.diffusivities[this.state.solute]}
-                    min={0.05}
-                    max={1}
-                    step={0.01}
-                    decimals={2}
-                    setValue={this.setActiveDiffusivity}
-                    labeled={true}
-                    />
-                </div>
-              </div>
-              <div className="settings-subcontainer">
-                <div className="reset-buttons-container">
-                  <div className="reset-button">
-                    <Button 
-                      text="CLEAR SOLUTE"
-                      onClick={() => this.program.resetSolute(this.state.solute)} 
-                      color="#000"
-                    />
-                  </div>
-                  <div className="reset-button">
-                    <Button 
-                      text="CLEAR ALL SOLUTES"
-                      onClick={this.resetAllSolutes} 
-                      color="#D00"
-                    />
-                  </div>
-                </div>
-              </div>
-            </SettingsCard>
-            <SettingsCard
-              title="REACTION SETTINGS"
-              icon={IconReactionSettingsBlack}
-              isExpanded={this.state.activeSetttings == 2}
-              toggleExpansion={() => this.setActiveSettings(2)}
-            >
-              <div className="settings-subcontainer">
-                <div className="settings-subtitle">ENABLE REACTION</div>
-                <Selector
-                  values={["OFF", "ON"]}
-                  selection={this.state.reactionsEnabled}
-                  setSelection={this.setReactionsEnabled}
-                />
-              </div>
-              {reactionsEnabledBool &&
-                <div className="settings-subcontainer">
-                  <div className="settings-subtitle">REACTION RATE</div>
-                  <div className="slider-horizontal-container">
-                    <SliderHorizontal
-                      value={this.state.reactionRate}
-                      min={0.001}
-                      max={1}
-                      step={0.001}
-                      decimals={3}
-                      setValue={this.setReactionRate}
-                      labeled={true}
-                    />
-                  </div>
-                </div>
-              }
-            </SettingsCard>
+    );
+  }
+
+  renderMain() {
+    return (
+      <div id="main">
+        {this.renderWebGL()}
+        {this.renderSettings()}
+      </div>
+    );
+  }
+
+  renderWebGL() {
+    const leftRightWall = (this.state.boundaryWalls == 1 || this.state.boundaryWalls == 3) ? true : false;
+    const topBottomWall = (this.state.boundaryWalls == 2 || this.state.boundaryWalls == 3) ? true : false;
+    const reactionsEnabledBool = this.state.reactionsEnabled == 1;
+    return (
+      <div id="webgl-container">
+        <CursorPositon
+          setIsCursorActive={this.setIsToolActive}
+        >
+          <WebGL 
+            id="webgl" 
+            program="lbm"
+            hasOverlay={true}
+            resolution={this.state.resolution}
+            overlayXOffset={this.state.overlayXOffset}
+            overlayYOffset={this.state.overlayYOffset}
+            tool={this.state.tool} 
+            toolSize={this.state.toolSizes[this.state.tool]}
+            solute={this.state.solute}
+            viscosity={this.state.viscosity}
+            diffusivities={this.state.diffusivities}
+            colors={this.state.colors}
+            leftRightWall={leftRightWall}
+            topBottomWall={topBottomWall}
+            exposeProgram={program => this.program = program}
+            reactionsEnabled={reactionsEnabledBool}
+            reactionRate={this.state.reactionRate}
+            overlayType={this.state.overlayType}
+          />
+          <ToolOverlay
+            toolSize={this.state.toolSizes[this.state.tool]}
+            isChangingSize={this.state.toolbarDropdown && !this.state.isToolActive}
+          />
+        </CursorPositon>
+      </div>
+    );
+  }
+
+  renderSettings() {
+    return (
+      <div id="settings-container">
+        {this.renderFluidSettingsCard()}
+        {this.renderSoluteSettingsCard()}
+        {this.renderReactionSettingsCard()}
+      </div>
+    );
+  }
+
+  renderFluidSettingsCard() {
+    return (
+      <SettingsCard
+        title="FLUID SETTINGS"
+        icon={IconFluidSettingsBlack}
+        isExpanded={this.state.activeSetttings == 0}
+        toggleExpansion={() => this.setActiveSettings(0)}
+      >
+        <div className="settings-subcontainer">
+          <div className="settings-subtitle">VISCOSITY</div>
+          <div className="slider-horizontal-container">
+            <SliderHorizontal
+              value={this.state.viscosity}
+              min={0.05}
+              max={1}
+              step={0.01}
+              decimals={2}
+              setValue={this.setViscosity}
+              labeled={true}
+            />
           </div>
         </div>
-        <div 
-          id="about-overlay"
+        <div className="settings-subcontainer">
+          <div className="settings-subtitle">BOUNDARY WALLS</div>
+          <Selector
+            values={["OFF", "HORIZONTAL", "VERTICAL", "ALL"]}
+            selection={this.state.boundaryWalls}
+            setSelection={this.setBoundaryWalls}
+          />
+        </div>
+        <div className="settings-subcontainer">
+          <div className="settings-subtitle">VELOCITY FIELD VISUALIZATION</div>
+          <Selector
+            values={["OFF", "LINES", "ARROWS"]}
+            selection={this.state.overlayType}
+            setSelection={this.setOverlayType}
+          />
+        </div>
+        <div className="settings-subcontainer">
+          <div className="reset-buttons-container">
+            <div className="reset-button">
+              <Button 
+                text="RESET FLUID"
+                onClick={this.resetFluid} 
+                color="#000"
+              />
+            </div>
+            <div className="reset-button">
+              <Button 
+                text="RESET WALLS"
+                onClick={this.resetWalls} 
+                color="#000"
+              />
+            </div>
+          </div>
+        </div>
+      </SettingsCard>
+    );
+  }
+
+  renderSoluteSettingsCard() {
+    return (
+      <SettingsCard
+        title="SOLUTE SETTINGS"
+        icon={IconSoluteSettingsBlack}
+        isExpanded={this.state.activeSetttings == 1}
+        toggleExpansion={() => this.setActiveSettings(1)}
+      >
+        <div className="settings-subcontainer">
+          <div className="settings-subtitle">ACTIVE SOLUTE</div>
+          <div className="solute-selectors-container">
+            <SoluteSelector
+              color={this.state.colors[0]}
+              setSolute={() => this.setSolute(0)}
+              isActive={this.state.solute == 0}
+            />
+            <SoluteSelector
+              color={this.state.colors[1]}
+              setSolute={() => this.setSolute(1)}
+              isActive={this.state.solute == 1}
+            />
+            <SoluteSelector
+              color={this.state.colors[2]}
+              setSolute={() => this.setSolute(2)}
+              isActive={this.state.solute == 2}
+            />
+          </div>
+        </div>
+        <div className="settings-subcontainer">
+          <div className="settings-subtitle">COLOR</div>
+          <div className="solute-color-settings-container">
+            <div className="solute-color-sliders-container">
+              <div className="solute-color-slider">
+                R
+                <div className="slider-horizontal-unlabeled-container">
+                  <SliderHorizontal
+                    value={this.state.colors[this.state.solute].r}
+                    min={0}
+                    max={255}
+                    step={1}
+                    decimals={0}
+                    setValue={this.setActiveColorR}
+                    labeled={false}
+              />
+                </div>
+              </div>
+              <div className="solute-color-slider">
+                G
+                <div className="slider-horizontal-unlabeled-container">
+                  <SliderHorizontal
+                    value={this.state.colors[this.state.solute].g}
+                    min={0}
+                    max={255}
+                    step={1}
+                    decimals={0}
+                    setValue={this.setActiveColorG}
+                    labeled={false}
+                  />
+                </div>
+              </div>
+              <div className="solute-color-slider">
+                B
+                <div className="slider-horizontal-unlabeled-container">
+                  <SliderHorizontal
+                    value={this.state.colors[this.state.solute].b}
+                    min={0}
+                    max={255}
+                    step={1}
+                    decimals={0}
+                    setValue={this.setActiveColorB}
+                    labeled={false}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="solute-color-preview-border">
+              <div 
+                className="solute-color-preview" 
+                style={{backgroundColor: this.rgbToHex(this.state.colors[this.state.solute])}}
+              />
+            </div>
+          </div>
+        </div>
+        <div className="settings-subcontainer">
+          <div className="settings-subtitle">DIFFUSIVITY</div>
+          <div className="slider-horizontal-container">
+            <SliderHorizontal
+              value={this.state.diffusivities[this.state.solute]}
+              min={0.05}
+              max={1}
+              step={0.01}
+              decimals={2}
+              setValue={this.setActiveDiffusivity}
+              labeled={true}
+              />
+          </div>
+        </div>
+        <div className="settings-subcontainer">
+          <div className="reset-buttons-container">
+            <div className="reset-button">
+              <Button 
+                text="CLEAR SOLUTE"
+                onClick={() => this.program.resetSolute(this.state.solute)} 
+                color="#000"
+              />
+            </div>
+            <div className="reset-button">
+              <Button 
+                text="CLEAR ALL SOLUTES"
+                onClick={this.resetAllSolutes} 
+                color="#D00"
+              />
+            </div>
+          </div>
+        </div>
+      </SettingsCard>
+    );
+  }
+
+  renderReactionSettingsCard() {
+    const reactionsEnabledBool = this.state.reactionsEnabled == 1;
+    return (
+      <SettingsCard
+        title="REACTION SETTINGS"
+        icon={IconReactionSettingsBlack}
+        isExpanded={this.state.activeSetttings == 2}
+        toggleExpansion={() => this.setActiveSettings(2)}
+      >
+        <div className="settings-subcontainer">
+          <div className="settings-subtitle">ENABLE REACTION</div>
+          <Selector
+            values={["OFF", "ON"]}
+            selection={this.state.reactionsEnabled}
+            setSelection={this.setReactionsEnabled}
+          />
+        </div>
+        {reactionsEnabledBool &&
+          <div className="settings-subcontainer">
+            <div className="settings-subtitle">REACTION RATE</div>
+            <div className="slider-horizontal-container">
+              <SliderHorizontal
+                value={this.state.reactionRate}
+                min={0.001}
+                max={1}
+                step={0.001}
+                decimals={3}
+                setValue={this.setReactionRate}
+                labeled={true}
+              />
+            </div>
+          </div>
+        }
+      </SettingsCard>
+    );
+  }
+
+  renderAboutOverlay() {
+    return (
+      <div 
+        id="about-overlay"
+        style={{
+          opacity: this.state.aboutOverlay ? 1 : 0,
+          pointerEvents: this.state.aboutOverlay ? "all" : "none"
+        }}
+      >
+        <div
+          id="about-overlay-button" 
+          onClick={this.toggleAbout}
           style={{
-            opacity: this.state.aboutOverlay ? 1 : 0,
-            pointerEvents: this.state.aboutOverlay ? "all" : "none"
+            display: this.state.aboutOverlay ? "block" : "none"
+          }}
+        />
+        <div 
+          id="about-overlay-popup"
+          style={{
+            transform: this.state.aboutOverlay ? "none" : "translate(0px, 300px)",
           }}
         >
-          <div
-            id="about-overlay-button" 
-            onClick={this.toggleAbout}
-            style={{
-              display: this.state.aboutOverlay ? "block" : "none"
-            }}
-          />
-          <div 
-            id="about-overlay-popup"
-            style={{
-              transform: this.state.aboutOverlay ? "none" : "translate(0px, 300px)",
-            }}
-          >
-            <div className="about-overlay-supporters">
-              <div className="about-overlay-center">
-                <p>DEVELOPED FOR</p>
-                <a href="http://www.synbim.co.uk/">
-                  <img id="about-overlay-synbim-logo" src={SynBIMLogo}/>
-                </a>
-              </div>
-              <div className="about-overlay-center">
-                <p>FUNDED BY</p>
-                <a href="https://epsrc.ukri.org/">
-                  <img id="about-overlay-epsrc-logo" src={EPSRCLogo}/>
-                </a>
-              </div>
-            </div>
-
+          <div className="about-overlay-supporters">
             <div className="about-overlay-center">
-              <p>PROUDLY SUPPORTED BY</p>
-              <div className="about-overlay-supporters">
-                <a href="https://www.ed.ac.uk/">
-                  <img id="about-overlay-uoe-logo" src={UoELogo}/>
-                </a>
-                <img id="about-overlay-biofm-logo" src={BiofmLogo}/>
-              </div>
-            </div>
-
-            <div 
-              id="about-overlay-source"
-              onClick={() => window.location="https://github.com/rafaelanderka/synbim-fluid-simulation"}
-            >
-              <p>SOURCE CODE</p>
-              <a href="https://github.com/rafaelanderka/synbim-fluid-simulation">
-                <img id="about-overlay-github-logo" src={GitHubLogo}/>
+              <p>DEVELOPED FOR</p>
+              <a href="http://www.synbim.co.uk/">
+                <img id="about-overlay-synbim-logo" src={SynBIMLogo}/>
               </a>
-              <div id="about-overlay-source-shine"/>
+            </div>
+            <div className="about-overlay-center">
+              <p>FUNDED BY</p>
+              <a href="https://epsrc.ukri.org/">
+                <img id="about-overlay-epsrc-logo" src={EPSRCLogo}/>
+              </a>
             </div>
           </div>
+
+          <div className="about-overlay-center">
+            <p>PROUDLY SUPPORTED BY</p>
+            <div className="about-overlay-supporters">
+              <a href="https://www.ed.ac.uk/">
+                <img id="about-overlay-uoe-logo" src={UoELogo}/>
+              </a>
+              <img id="about-overlay-biofm-logo" src={BiofmLogo}/>
+            </div>
+          </div>
+
+          <div 
+            id="about-overlay-source"
+            onClick={() => window.location="https://github.com/rafaelanderka/synbim-fluid-simulation"}
+          >
+            <p>SOURCE CODE</p>
+            <a href="https://github.com/rafaelanderka/synbim-fluid-simulation">
+              <img id="about-overlay-github-logo" src={GitHubLogo}/>
+            </a>
+            <div id="about-overlay-source-shine"/>
+          </div>
         </div>
+      </div>
+    );
+  }
+
+  render() {
+    return (
+      <div id="app">
+        {this.renderHeader()}
+        {this.renderMain()}
+        {this.renderAboutOverlay()}
       </div>
     );
   }
