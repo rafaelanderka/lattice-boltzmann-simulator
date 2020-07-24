@@ -583,17 +583,23 @@ class App extends React.Component {
               <img id="about-overlay-biofm-logo" src={BiofmLogo}/>
             </div>
           </div>
-          <div 
-            id="about-overlay-source"
-            onClick={() => window.location="https://github.com/rafaelanderka/synbim-fluid-simulation"}
-          >
-            <p>SOURCE CODE</p>
-            <a href="https://github.com/rafaelanderka/synbim-fluid-simulation">
-              <img id="about-overlay-github-logo" src={GitHubLogo}/>
-            </a>
-            <div id="about-overlay-source-shine"/>
-          </div>
+          {this.renderSourceButton()}
         </div>
+      </div>
+    );
+  }
+
+  renderSourceButton() {
+    return (
+      <div 
+        id="about-overlay-source"
+        onClick={() => window.location="https://github.com/rafaelanderka/synbim-fluid-simulation"}
+      >
+        <p>SOURCE CODE</p>
+        <a href="https://github.com/rafaelanderka/synbim-fluid-simulation">
+          <img id="about-overlay-github-logo" src={GitHubLogo}/>
+        </a>
+        <div id="about-overlay-source-shine"/>
       </div>
     );
   }
@@ -606,13 +612,29 @@ class App extends React.Component {
 
   render() {
     if (this.state.isMounted) {
-      return (
-        <div id="app">
-          {this.renderHeader()}
-          {this.renderMain()}
-          {this.renderAboutOverlay()}
-        </div>
-      );
+      const deviceSupported = this.state.viewportWidth >= 685 && this.state.viewportHeight >= 300 && (this.state.viewportHeight >= 565 || this.state.aspect > 2.5);
+      if (deviceSupported) {
+        return (
+          <div id="app">
+            {this.renderHeader()}
+            {this.renderMain()}
+            {this.renderAboutOverlay()}
+          </div>
+        );
+      } else {
+        return (
+          <div id="app-not-supported">
+            <div id="app-not-supported-container">
+              <div id="app-not-supported-logo">
+                <img src={FluidSimulatorLogo}/> <p>SYNBIM  FLUID SIMULATION</p>
+              </div>
+              <h1>Device not supported</h1>
+              <p>Oh no! Your browser seems to be too small for this app. <br/> Please come back with a larger screen.</p>
+              <p>(Or have a look at the source code <a href="https://github.com/rafaelanderka/synbim-fluid-simulation">here</a>)</p>
+            </div>
+          </div>
+        );
+      }
     } else {
       return null;
     }

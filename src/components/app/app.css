@@ -238,6 +238,8 @@
   margin-right: 9px;
 }
 
+/* ----- ABOUT OVERLAY ----- */
+
 #about-overlay {
   display: flex;
   align-items: center;
@@ -371,4 +373,60 @@
 
 #about-overlay-source:hover #about-overlay-source-shine {
   transform: skewX(30deg) translate(450px, -50px);
+}
+
+/* ----- APP NOT SUPPORTED ----- */
+
+#app-not-supported {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 92vw;
+  height: 60vh;
+  background-color: #FFFFFF;
+  text-align: center;
+  padding: 20vh 4vw;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  color: #000;
+}
+
+#app-not-supported-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  margin-bottom: 5vh;
+}
+
+
+#app-not-supported h1 {
+  font-weight: 800;
+  font-size: 8vmin;
+}
+
+#app-not-supported p {
+  font-weight: 400;
+  font-size: 5vmin;
+  color: #555;
+}
+
+#app-not-supported-logo {
+  margin-bottom: 3vh;
+}
+
+#app-not-supported-logo img {
+  display: inline-block;
+  width: 10vmin;
+}
+
+#app-not-supported-logo p {
+  position: relative;
+  bottom: 1vmin;
+  display: inline-block;
+  font-weight: 500;
+  font-size: 3.8vmin;
+  color: #000;
 }
