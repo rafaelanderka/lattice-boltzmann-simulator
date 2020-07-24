@@ -574,7 +574,6 @@ class App extends React.Component {
               </a>
             </div>
           </div>
-
           <div className="about-overlay-center">
             <p>PROUDLY SUPPORTED BY</p>
             <div className="about-overlay-supporters">
@@ -584,7 +583,6 @@ class App extends React.Component {
               <img id="about-overlay-biofm-logo" src={BiofmLogo}/>
             </div>
           </div>
-
           <div 
             id="about-overlay-source"
             onClick={() => window.location="https://github.com/rafaelanderka/synbim-fluid-simulation"}

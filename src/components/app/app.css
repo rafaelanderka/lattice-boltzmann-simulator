@@ -74,23 +74,26 @@
 }
 
 #webgl-container-portrait {
+  z-index: 10;
   flex-shrink: 0;
-  position: relative;
   width: calc(66vw - 65px);
   height: calc(93vmin - 70px);
   padding-bottom: 0;
   max-width: 820px;
   max-height: 820px;
   border: 2px solid black;
+  border-radius: 20px;
   overflow: hidden;
+  background-color: transparent;
 }
 
 #webgl-container-landscape {
+  z-index: 10;
   flex-shrink: 0;
-  position: relative;
   width: 100%;
   height: calc(78vh - 350px);
   border: 2px solid black;
+  border-radius: 20px;
   overflow: hidden;
 }
 
@@ -239,7 +242,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10;
+  z-index: 30;
   position: fixed;
   left: 0;
   top: 0;
@@ -263,7 +266,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: space-evenly;
-  z-index: 20;
+  z-index: 40;
   margin-left: auto;
   margin-right: auto;
   width: 50vw;

@@ -5,7 +5,7 @@ export default class ToolOverlay extends React.Component {
   constructor(props) {
     super(props);
     this.xCorrection = -1;
-    this.yCorrection = 1;
+    this.yCorrection = -3;
   }
 
   render() {
@@ -13,10 +13,10 @@ export default class ToolOverlay extends React.Component {
     const size = 2 * halfSize;
     const left = this.props.isChangingSize 
                  ? this.props.containerWidth * 0.5 - halfSize + this.xCorrection
-                 : this.props.cursorPos.x * this.props.containerWidth - halfSize + this.xCorrection;
+                 : this.props.cursorPos.x * this.props.containerWidth * 1.005 - halfSize + this.xCorrection;
     const bottom = this.props.isChangingSize 
                    ? this.props.containerHeight * 0.5 + halfSize + this.yCorrection
-                   : this.props.cursorPos.y * this.props.containerHeight + halfSize + this.yCorrection;
+                   : this.props.cursorPos.y * this.props.containerHeight * 1.005 + halfSize + this.yCorrection;
     return (
       <div 
         className="tool-overlay"

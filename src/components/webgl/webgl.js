@@ -48,13 +48,15 @@ export default class WebGL extends React.Component {
       width: this.props.containerWidth, 
       height: this.props.containerHeight,
       left: 0,
-      top: 0,
+      top: 0
     };
 
     const canvasStyle = {
+      zIndex: 8,
       position: "absolute",
-      width: "100%", 
-      height: "100%",
+      width: "100.5%", 
+      height: "100.5%",
+      borderRadius: 20,
       left: 0,
       top: 0
     };
