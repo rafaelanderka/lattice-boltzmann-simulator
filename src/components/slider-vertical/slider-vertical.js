@@ -47,7 +47,7 @@ export default class SliderVertical extends React.Component {
               <div
                 ref={props.ref}
                 style={{
-                  width: '3px',
+                  width: '2.5px',
                   height: '100%',
                   borderRadius: '5px',
                   background: getTrackBackground({
@@ -90,7 +90,7 @@ export default class SliderVertical extends React.Component {
                   left: '25px',
                   color: '#fff',
                   fontWeight: 400,
-                  fontSize: '14px',
+                  fontSize: '11px',
                   fontFamily: 'Arial,Helvetica Neue,Helvetica,sans-serif',
                   padding: '4px',
                   borderRadius: '4px',
@@ -102,9 +102,9 @@ export default class SliderVertical extends React.Component {
               </div>
               <div
                 style={{
-                  height: '14px',
-                  width: '14px',
-                  borderRadius: '7px',
+                  height: '15px',
+                  width: '15px',
+                  borderRadius: '8px',
                   backgroundColor: isDragged ? '#000' : '#FFF',
                   outline: '0'
                 }}

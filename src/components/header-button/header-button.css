@@ -1,9 +1,7 @@
 .header-button {
-  position: relative;
-  top: 2px;
   display: block;
-  width: 55px;
-  height: 55px;
+  width: 49px;
+  height: 49px;
   border: none;
   background-color: #FFF;
   transition: all 0.2s ease;
@@ -23,7 +21,7 @@
   margin: 0px auto;
   padding: 0px;
   width: auto;
-  height: 60%;
+  height: 67%;
 }
 
 .header-button-active {
@@ -33,5 +31,4 @@
 .header-button-active:hover {
   background-color: #222;
   border: 2px solid #222;
-
 }

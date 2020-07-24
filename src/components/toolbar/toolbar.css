@@ -4,8 +4,8 @@
   flex-direction: row;
   justify-content: flex-start;
   align-content: center;
-  height: 51px;
-  width: 296px;
+  height: 49px;
+  width: 257px;
   overflow: visible;
   padding: 0px;
   margin: 0px;
@@ -15,8 +15,8 @@
   z-index: 1;
   position: relative;
   flex-shrink: 0;
-  height: 51px;
-  width: 56px;
+  height: 45px;
+  width: 49px;
   background-color: white;
   border: 2px solid black;
   overflow: hidden;
@@ -44,8 +44,8 @@
 }
 
 .toolbar-button-container-dropdown {
-  width: 56px;
-  height: 175px;
+  width: 49px;
+  height: 155px;
   transition: height 0.2s ease, border-radius 0.05s linear;
   background-color: #FFF;
 }
@@ -70,11 +70,11 @@
   position: relative;
   display: block;
   width: 100%;
-  height: 55px;
+  height: 49px;
   border: none;
   background-color: transparent;
   transition: all 0.2s ease;
-  padding:  10px 10px;
+  padding:  9px 10px;
   margin: 0px;
   cursor: pointer;
 }
@@ -84,7 +84,7 @@
   margin: 0px auto;
   padding: 0px;
   width: auto;
-  height: 90%;
+  height: 95%;
 }
 
 .toolbar-button-active {
@@ -98,14 +98,14 @@
 .toolbar-dropdown {
   position: relative;
   top: -2px;
-  width: 56px;
+  width: 49px;
   height: 149px;
 }
 
 .toolbar-dropdown-slider {
   position: relative;
-  top: 25px;
-  left: 26px;
+  top: 18px;
+  left: 23px;
   width: 30px;
   height: 70px;
 }

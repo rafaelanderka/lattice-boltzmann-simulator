@@ -1,22 +1,25 @@
 .settings-card-container {
+  position: relative;
+  top: -3px;
   width: 100%;
-  min-width: 220px;
+  min-width: 160px;
 }
 
 .settings-card-title {
   width: 100%;
   font-weight: 500;
-  font-size: 18px;
+  font-size: 16px;
   padding-bottom: 5px;
 }
 
 .settings-card-title button {
+
   width: 100%;
   border: none;
   background-color: #FFF;
   text-align: left;
   cursor: pointer;
-  padding: 5px 0px 5px 0px;
+  padding: 5px 0px 4px 0px;
   transition: all 0.3s ease;
 }
 
@@ -25,7 +28,7 @@
 }
 
 .settings-card-title img {
-  width: 20px;
+  width: 18px;
   margin-bottom: -3px;
 }
 
@@ -37,11 +40,11 @@
 }
 
 .settings-card-icon {
-  margin-right: 10px;
+  margin-right: 8px;
 }
 
 .settings-card-expander {
-  margin-right: 5px;
+  margin-right: 4px;
   transition: transform 0.2s ease;
 }
 

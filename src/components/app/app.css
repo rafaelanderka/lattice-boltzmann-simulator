@@ -4,11 +4,11 @@
   align-items: center;
   justify-content: center;
   width: 92%;
-  min-width: 690px;
+  min-width: 630px;
   max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
-  padding: 2.5vh 4vw;
+  padding: 2.3vh 4vw;
   background-color: #FFFFFF;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
 }
@@ -19,39 +19,41 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  height: 60px;
-  margin-bottom: 3%;
+  height: 50px;
+  margin-bottom: 2.5vh;
 }
 
-#logo-container {
-  height: 55px;
+.logo-container {
+  position: relative;
+  left: -5px;
+  height: 49px;
   justify-content: flex-start;
   font-weight: 500;
-  position: relative;
+  color: black;
   cursor: pointer;
 }
 
-#logo-container a {
+.logo-container a {
   color: black;
 }
 
-#logo-container a:active {
+.logo-container a:active {
   color: black;
 }
 
-#logo-container p {
+.logo-container p {
   position: relative;
   margin-left: 6px;
-  font-size: 22px;
+  font-size: 20px;
   display: inline-block;
-  top: -13px;
+  top: -11px;
 }
 
-#logo {
+.logo {
   position: relative;
   top: -4px;
   display: inline-block;
-  height: 65px;
+  height: 56px;
   width: auto;
 }
 
@@ -74,11 +76,11 @@
 #webgl-container-portrait {
   flex-shrink: 0;
   position: relative;
-  width: calc(85vw - 240px);
-  height: calc(93vmin - 100px);
+  width: calc(66vw - 65px);
+  height: calc(93vmin - 70px);
   padding-bottom: 0;
-  max-width: 800px;
-  max-height: 800px;
+  max-width: 820px;
+  max-height: 820px;
   border: 2px solid black;
   overflow: hidden;
 }
@@ -87,20 +89,20 @@
   flex-shrink: 0;
   position: relative;
   width: 100%;
-  height: calc(85vh - 450px);
-  padding-bottom: 0;
+  height: calc(78vh - 350px);
   border: 2px solid black;
   overflow: hidden;
 }
 
 #settings-container-column {
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
-  width: 28%;
-  min-width: 265px;
-  max-width: 330px;
+  width: 28vw;
+  min-width: 220px;
+  max-width: 320px;
   margin-left: 3%;
   padding-right: 1%;
   height: 100%;
@@ -111,9 +113,9 @@
   flex-direction: row;
   align-items: flex-start;
   justify-content: space-between;
-  margin-top: 2%;
+  margin-top: 1.9vh;
   width: 100%;
-  height: 400px;
+  height: 380px;
 }
 
 .settings-spacer {
@@ -123,12 +125,12 @@
 
 .settings-subcontainer {
   width: 100%;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 .settings-subtitle {
   font-weight: 500;
-  font-size: 14px;
+  font-size: 13px;
   padding-bottom: 10px;
 }
 
@@ -142,11 +144,9 @@
 }
 
 .header-selectors {
-  position: relative;
   border: 2px solid black;
   border-radius: 10px;
-  height: 51px;
-  top: 2px;
+  height: 45px;
   padding: 0px 10px;
   margin-right: 4px;
 }
@@ -160,13 +160,13 @@
 
 .solute-selectors-container p {
   font-weight: 500;
-  font-size: 14px;
+  font-size: 12px;
   margin: 0px 10px;
 }
 
 .reaction-symbol {
   font-weight: 500;
-  font-size: 17px;
+  font-size: 15px;
   margin: 0px 3px;
 }
 
@@ -194,28 +194,28 @@
   align-items: flex-end;
   width: 100%;
   font-weight: 500;
-  font-size: 12px;
+  font-size: 10px;
 }
 
 .solute-color-slider .slider-horizontal-unlabeled-container {
   margin-left: 20px;
-  margin-top: 10px;
+  margin-top: 8px;
   margin-bottom: -12px;
 }
 
 .solute-color-preview {
   position: relative;
-  left: 3px;
-  top: 3px;
-  width: 74px;
-  height: 74px;
+  left: 2px;
+  top: 2px;
+  width: 68px;
+  height: 68px;
   border-radius: 94px;
 }
 
 .solute-color-preview-border {
   flex-shrink: 0;
-  width: 80px;
-  height: 80px;
+  width: 72px;
+  height: 72px;
   border: 2px solid black;
   border-radius: 80px;
   margin-left: 25px;
@@ -232,7 +232,7 @@
 
 .reset-button {
   display: inline-block;
-  margin-right: 10px;
+  margin-right: 9px;
 }
 
 #about-overlay {
@@ -266,18 +266,28 @@
   z-index: 20;
   margin-left: auto;
   margin-right: auto;
-  height: 500px;
+  width: 50vw;
+  min-width: 550px;
+  max-width: 700px;
+  height: 65vh;
+  min-height: 470px;
+  max-height: 700px;
   font-weight: 500;
+  font-size: 15px;
   color: #777;
   background-color: white;
   border-radius: 30px;
-  padding: 40px 70px;
+  padding: 40px 50px;
   box-shadow: 0px 0px 100px rgba(0,0,0,0.5);
   transition: transform 0.5s ease;
 }
 
 #about-overlay-popup p {
   margin: 0px;
+}
+
+#about-overlay-logo {
+  margin-bottom: 44px;
 }
 
 .about-overlay-supporters {
@@ -292,33 +302,36 @@
 }
 
 #about-overlay-synbim-logo {
-  width: 300px;
+  width: 265px;
   margin: 0px 20px 40px 0px;
 }
 
 #about-overlay-epsrc-logo {
-  width: 270px;
+  width: 240px;
   margin: 10px 0px 50px 30px;
 }
 
 #about-overlay-uoe-logo {
-  width: 290px;
+  width: 265px;
   margin: 10px 0px 20px 10px;
 }
 
 #about-overlay-biofm-logo {
-  width: 180px;
+  width: 160px;
   margin: 10px 0px 20px 50px;
 }
 
 #about-overlay-source {
+  flex-shrink: 0;
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 330px;
-  height: 140px;
+  width: 50%;
+  max-width: 330px;
+  height: 20%;
+  min-height: 120px;
   border-radius: 30px;
   cursor: pointer;
   transition: box-shadow 0.5s ease;
@@ -338,7 +351,7 @@
 
 #about-overlay-github-logo {
   display: inline-block;
-  width: 190px;
+  width: 175px;
 }
 
 #about-overlay-source-shine {
@@ -350,7 +363,7 @@
   left:0px;
   box-shadow: 0px 0px 50px rgba(255, 255, 255, 0.2);
   transform: skewX(30deg) translate(-150px, 0px);
-  transition: transform 0.4s linear;
+  transition: transform 0.5s linear;
 }
 
 #about-overlay-source:hover #about-overlay-source-shine {

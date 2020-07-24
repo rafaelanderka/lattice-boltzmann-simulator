@@ -32,8 +32,8 @@ class App extends React.Component {
       aspect: 1,
       isMounted: false,
       resolution: 256,
-      overlayXOffset: 30,
-      overlayYOffset: 30,
+      overlayXOffset: 25,
+      overlayYOffset: 25,
       activeSetttings: 0,
       tool: 0,
       toolSizes: [0.1, 0.02, 0.05, 0.1, 0.12],
@@ -189,13 +189,7 @@ class App extends React.Component {
   renderHeader() {
     return (
         <div id="header">
-          <div 
-            id="logo-container"
-            onClick={this.toggleAbout}
-          >
-            <img id="logo" src={FluidSimulatorLogo} alt="SynBIM"/>
-            {this.state.viewportWidth > 1050 && <p>SYNBIM FLUID SIMULATION</p>}
-          </div>
+          {this.renderLogo(false)}
           <Toolbar 
             tool={this.state.tool} 
             setTool={this.setTool}
@@ -233,6 +227,19 @@ class App extends React.Component {
             />
           </div>
         </div>
+    );
+  }
+
+  renderLogo(alwaysFull) {
+    const isFullLogo = (this.state.viewportWidth > 1050) || alwaysFull;
+    return (
+      <div 
+        className="logo-container"
+        onClick={this.toggleAbout}
+      >
+        <img className="logo" src={FluidSimulatorLogo} alt="SynBIM"/>
+        {isFullLogo && <p> SYNBIM FLUID SIMULATION</p>}
+      </div>
     );
   }
 
@@ -305,7 +312,8 @@ class App extends React.Component {
     const isReducedCard = this.state.viewportWidth < 830;
     const title = isReducedCard ? "FLUID" : "FLUID SETTINGS"
     const velocityFieldLabel = isReducedCard ? "VELOCITY FIELD" : "VELOCITY FIELD VISUALIZATION";
-    const hasReducedBoundaryLabels = this.state.viewportWidth < 890;
+    const isColumnLayout = this.state.viewportWidth > 1050 || this.state.aspect > 0.9;
+    const hasReducedBoundaryLabels = (this.state.viewportWidth < 890 && !isColumnLayout) || (this.state.viewportWidth < 1000 && isColumnLayout);
     const boundaryHorizontalLabel = hasReducedBoundaryLabels ? "HORIZ." : "HORIZONTAL";
     const boundaryVerticalLabel = hasReducedBoundaryLabels ? "VERT." : "VERTICAL";
     return (
@@ -549,6 +557,9 @@ class App extends React.Component {
             transform: this.state.aboutOverlay ? "none" : "translate(0px, 300px)",
           }}
         >
+          <div id="about-overlay-logo">
+            {this.renderLogo(true)}
+          </div>
           <div className="about-overlay-supporters">
             <div className="about-overlay-center">
               <p>DEVELOPED FOR</p>

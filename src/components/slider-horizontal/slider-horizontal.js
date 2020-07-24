@@ -43,7 +43,7 @@ export default class SliderHorizontal extends React.Component {
               <div
                 ref={props.ref}
                 style={{
-                  height: '3px',
+                  height: '2.5px',
                   width: '100%',
                   borderRadius: '5px',
                   background: getTrackBackground({
@@ -97,9 +97,9 @@ export default class SliderHorizontal extends React.Component {
               </div>
               <div
                 style={{
-                  height: '14px',
-                  width: '14px',
-                  borderRadius: '7px',
+                  height: '15px',
+                  width: '15px',
+                  borderRadius: '8px',
                   backgroundColor: isDragged ? '#000' : '#FFF',
                   outline: '0'
                 }}
