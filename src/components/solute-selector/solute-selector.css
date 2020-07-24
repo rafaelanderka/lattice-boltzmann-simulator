@@ -4,8 +4,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   transition: all 0.2s ease;
   border: 2px solid white;
   border-radius: 34px;
