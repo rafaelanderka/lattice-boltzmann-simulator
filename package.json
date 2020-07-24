@@ -5,7 +5,9 @@
   "scripts": {
     "start": "rm -rf dist && rm -rf .parcel-cache && parcel ./src/index.html",
     "predeploy": "rm -rf dist && rm -rf .parcel-cache && parcel build ./src/index.html --public-url /synbim-fluid-simulation",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist",
+    "prebuild": "rm -rf dist && rm -rf .parcel-cache",
+    "build": "parcel build ./src/index.html"
   },
   "license": "MIT",
   "dependencies": {

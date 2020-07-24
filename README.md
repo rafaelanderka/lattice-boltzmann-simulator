@@ -11,6 +11,7 @@
 
 <p align="center">
   <a href="#getting-started">Getting Started</a> •
+  <a href="#building-for-release">Building for Release</a> •
   <a href="#coding-style">Coding Style</a> •
   <a href="#credits">Credits</a> •
   <a href="#related">Related</a> •
@@ -25,7 +26,7 @@ These instructions will help you set up a local development environment on your 
 
 You will need [Node.js](https://nodejs.org/) installed on your local machine in order to use [npm](https://www.npmjs.com).
 
-After cloning the repository, navigate to the top-level directory of the project and run
+After cloning the repository, navigate to the top-level directory of the project in your terminal and run
 
 ```
 npm install
@@ -43,19 +44,37 @@ npm run start
 
 to build the app and start a local server at [http://localhost:1234](http://localhost:1234). Any changes you make while the server is running will automatically be reflected in your browser.
 
-### Deploying to GitHub Pages
+## Building for Release
 
-To deploy your local changes to a static GitHub Pages site, simply run
+To build a version of the app that can be hosted on a static web server, run the command
 
 ```
-npm run deploy
+npm run build
 ```
 
-and [Parcel](https://parceljs.org) and [gh-pages](https://github.com/tschaub/gh-pages) will build and deploy the web app for you [here](https://rafaelanderka.com/synbim-fluid-simulation/).
+in the top-level directory of the repository. Once finished, the `/dist` directory will contain all the files of the web app necessary for release (including all folders). **However, note that this assumes that the simulator will be the home page of the website.**
+
+### Specifying a Custom Subdirectory
+
+To build a version of the app that is **not** the home page of a website, you must manually specify the intended subdirectory. To do this, simply add the following parameters to the build command
+
+```
+npm run build -- --public-url /SUBDIRECTORY_PATH
+```
+
+where `/SUBDIRECTORY_PATH` should be replaced with the path to the intended subfolder. 
+
+For example, if you wanted to host the web app at `http://www.example.com/synbim-fluid-simulation` then the above command would become
+
+```
+npm run build -- --public-url /synbim-fluid-simulation
+```
+
+After the script is finished, again the `/dist` directory will contain all necessary files for hosting.
 
 ## Coding Style
 
-This project follows the [Google Javascript Style Guide](https://google.github.io/styleguide/jsguide.html).
+This project follows the [Google JavaScript Style Guide](https://google.github.io/styleguide/jsguide.html).
 
 ## Credits
 
