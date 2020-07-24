@@ -302,9 +302,15 @@ class App extends React.Component {
   }
 
   renderFluidSettingsCard(alwaysExpanded) {
+    const isReducedCard = this.state.viewportWidth < 830;
+    const title = isReducedCard ? "FLUID" : "FLUID SETTINGS"
+    const velocityFieldLabel = isReducedCard ? "VELOCITY FIELD" : "VELOCITY FIELD VISUALIZATION";
+    const hasReducedBoundaryLabels = this.state.viewportWidth < 890;
+    const boundaryHorizontalLabel = hasReducedBoundaryLabels ? "HORIZ." : "HORIZONTAL";
+    const boundaryVerticalLabel = hasReducedBoundaryLabels ? "VERT." : "VERTICAL";
     return (
       <SettingsCard
-        title="FLUID SETTINGS"
+        title={title}
         icon={IconFluidSettingsBlack}
         isExpanded={this.state.activeSetttings == 0 || alwaysExpanded}
         toggleExpansion={() => this.setActiveSettings(0)}
@@ -326,13 +332,13 @@ class App extends React.Component {
         <div className="settings-subcontainer">
           <div className="settings-subtitle">BOUNDARY WALLS</div>
           <Selector
-            values={["OFF", "HORIZONTAL", "VERTICAL", "ALL"]}
+            values={["OFF", boundaryHorizontalLabel, boundaryVerticalLabel, "ALL"]}
             selection={this.state.boundaryWalls}
             setSelection={this.setBoundaryWalls}
           />
         </div>
         <div className="settings-subcontainer">
-          <div className="settings-subtitle">VELOCITY FIELD VISUALIZATION</div>
+          <div className="settings-subtitle">{velocityFieldLabel}</div>
           <Selector
             values={["OFF", "LINES", "ARROWS"]}
             selection={this.state.overlayType}
@@ -362,9 +368,11 @@ class App extends React.Component {
   }
 
   renderSoluteSettingsCard(alwaysExpanded) {
+    const isReducedCard = this.state.viewportWidth < 830;
+    const title = isReducedCard ? "SOLUTES" : "SOLUTE SETTINGS"
     return (
       <SettingsCard
-        title="SOLUTE SETTINGS"
+        title={title}
         icon={IconSoluteSettingsBlack}
         isExpanded={this.state.activeSetttings == 1 || alwaysExpanded}
         toggleExpansion={() => this.setActiveSettings(1)}
@@ -481,10 +489,12 @@ class App extends React.Component {
   }
 
   renderReactionSettingsCard(alwaysExpanded) {
+    const isReducedCard = this.state.viewportWidth < 830;
+    const title = isReducedCard ? "REACTIONS" : "REACTION SETTINGS"
     const reactionsEnabledBool = this.state.reactionsEnabled == 1;
     return (
       <SettingsCard
-        title="REACTION SETTINGS"
+        title={title}
         icon={IconReactionSettingsBlack}
         isExpanded={this.state.activeSetttings == 2 || alwaysExpanded}
         toggleExpansion={() => this.setActiveSettings(2)}

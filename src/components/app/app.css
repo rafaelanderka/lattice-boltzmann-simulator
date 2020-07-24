@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   width: 92%;
-  min-width: 500px;
+  min-width: 690px;
   max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
@@ -74,7 +74,7 @@
 #webgl-container-portrait {
   flex-shrink: 0;
   position: relative;
-  width: 66%;
+  width: calc(85vw - 240px);
   height: calc(93vmin - 100px);
   padding-bottom: 0;
   max-width: 800px;
