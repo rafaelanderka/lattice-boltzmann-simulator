@@ -75,7 +75,7 @@ export default class SliderVertical extends React.Component {
                 borderWidth: '3px',
                 borderStyle: 'solid',
                 borderColor: '#FFF',
-                borderRadius: '15px',
+                borderRadius: '23px',
                 backgroundColor: '#000',
                 display: 'flex',
                 justifyContent: 'center',
@@ -102,9 +102,12 @@ export default class SliderVertical extends React.Component {
               </div>
               <div
                 style={{
-                  height: '15px',
-                  width: '15px',
-                  borderRadius: '8px',
+                  position: 'absolute',
+                  top: 2,
+                  left: 2,
+                  height: '16px',
+                  width: '16px',
+                  borderRadius: '16px',
                   backgroundColor: isDragged ? '#000' : '#FFF',
                   outline: '0'
                 }}
