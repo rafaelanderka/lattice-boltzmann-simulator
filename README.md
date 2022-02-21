@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <a href="https://rafaelanderka.com/synbim-fluid-simulation/"><img src="http://www.synbim.co.uk/uploads/2/2/4/4/22449348/geetanjalipatwa-12072017-final.jpg" alt="Markdownify" width="400"></a>
+  <a href="https://rafaelanderka.com/synbim-fluid-simulation/"><img src="https://raw.githubusercontent.com/rafaelanderka/synbim-fluid-simulation/master/src/public/logo512.png" alt="Logo" width="300"></a>
   <br>
   <br>
   SynBIM Fluid Simulation
