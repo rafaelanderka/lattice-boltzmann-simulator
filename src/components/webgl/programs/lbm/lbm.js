@@ -1,4 +1,4 @@
-import requestAnimFrame from '../../helpers/request-anim-frame';
+import requestAnimationFrame from 'raf'
 import fsPassthroughSource from '../../shaders/fragment/fs-passthrough';
 import fsInitVelocitySource from '../../shaders/fragment/fs-init-velocity';
 import fsInitEqSource from '../../shaders/fragment/fs-init-eq';
@@ -783,13 +783,13 @@ class LBMProgram {
     this._initSolute(this.solutes[2], [this.aspect.xAspect * 0.5,       this.aspect.yAspect * 0.515 + 0.1 * Math.sin(Math.PI / 3)], 0.2);
 
     // Begin main update loop
-    requestAnimFrame(() => this._update());
+    requestAnimationFrame(() => this._update());
   }
 
   // Main update loop
   _update() {
     // Callback
-    requestAnimFrame(() => this._update());
+    requestAnimationFrame(() => this._update());
 
     // Pre-update: ensure WebGL interface state is up to date
     this.wgli.update();

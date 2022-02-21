@@ -1,4 +1,4 @@
-import requestAnimFrame from '../../helpers/request-anim-frame';
+import requestAnimationFrame from 'raf'
 
 class DefaultProgram {
   constructor(wgli, props) {
@@ -9,7 +9,7 @@ class DefaultProgram {
   // Entry point for the program
   run() {
     // Begin main update loop
-    requestAnimFrame(() => this._update());
+    requestAnimationFrame(() => this._update());
   }
 
   // Update props
@@ -19,7 +19,7 @@ class DefaultProgram {
 
   // Main update loop
   _update() {
-    requestAnimFrame(() => this._update());
+    requestAnimationFrame(() => this._update());
 
     // Pre-update: ensure WebGL interface state is up to date
     this.wgli.update();
