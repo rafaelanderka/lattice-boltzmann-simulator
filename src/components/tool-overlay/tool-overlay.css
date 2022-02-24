@@ -1,7 +1,7 @@
 .tool-overlay {
-  z-index: 9;
+  z-index: 12;
   position: relative;
-  border: 1px solid #CCC;
+  border: 1px solid black;
   margin: 0;
   padding: 0;
 }

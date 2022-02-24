@@ -17,22 +17,40 @@ export default `
 
   varying vec2 vUV; 
 
-  const float baseBrightness = 1.0;
-  const vec3 velocityCol = vec3(0.98); 
-  const vec3 wallCol = vec3(0.0);
-  
+  const float baseBrightness = 0.;
+  const vec3 velocityCol = vec3(1.); 
+  const vec3 wallCol = vec3(0.5);
+
+  vec4 screen(vec4 a, vec4 b) {
+    return a + b - (a * b);
+  }
+
+  float getToneMappedConcentration(sampler2D solute) {
+      return sqrt(min(1., texture2D(solute, vUV).x));
+  }
+
+  float getToneMappedVelocity() {
+      return 0.5 * length(texture2D(uVelocity, vUV).xy);
+  }
+
   void main(void) {
+    // Determine node type
     int nodeId = int(texture2D(uNodeId, vUV).x + 0.5);
     if (nodeId == 1) {
       // Wall node
-      gl_FragColor = vec4(wallCol, 1.0);
+      gl_FragColor = vec4(wallCol, 1.);
     } else {
       // Fluid node
-      vec2 velocity = texture2D(uVelocity, vUV).xy;
-      float concentration0 = min(1.0, texture2D(uSolute0, vUV).x);
-      float concentration1 = min(1.0, texture2D(uSolute1, vUV).x);
-      float concentration2 = min(1.0, texture2D(uSolute2, vUV).x);
-      gl_FragColor = vec4(baseBrightness - concentration0 * (baseBrightness - uSolute0Col) - concentration1 * (baseBrightness - uSolute1Col) - concentration2 * (baseBrightness - uSolute2Col) - 3.33333333334 * length(velocity) * (baseBrightness - velocityCol), 1.0);
+      float c0 = getToneMappedConcentration(uSolute0);
+      float c1 = getToneMappedConcentration(uSolute1);
+      float c2 = getToneMappedConcentration(uSolute2);
+      float v = getToneMappedVelocity();
+      vec4 solute0 = vec4(c0 * uSolute0Col, c0);
+      vec4 solute1 = vec4(c1 * uSolute1Col, c1);
+      vec4 solute2 = vec4(c2 * uSolute2Col, c2);
+      vec4 velocity = vec4(v * velocityCol, v);
+      vec4 blend = vec4(1.) - (vec4(1.) - solute0) * (vec4(1.) - solute1) * (vec4(1.) - solute2) * (vec4(1.) - velocity);
+      gl_FragColor = blend;
     }
   }
 `;

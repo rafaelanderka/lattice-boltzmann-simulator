@@ -9,6 +9,7 @@
   overflow: visible;
   padding: 0px;
   margin: 0px;
+  box-shadow: rgba(50, 50, 105, 0.45) 0px 2px 5px 0px, rgba(0, 0, 0, 0.05) 0px 1px 1px 0px;
 }
 
 .toolbar-button-container {
@@ -17,53 +18,29 @@
   flex-shrink: 0;
   height: 45px;
   width: 49px;
-  background-color: white;
-  border: 2px solid black;
+  background-color: #DDD;
+  border: 2px solid white;
   overflow: hidden;
-  transition: background-color 0.3s ease, height 0.2s ease, border-radius 0.05s linear 0.15s;
+  transition: background-color 0.1s ease, height 0.1s ease, border-radius 0.05s linear 0.15s;
 }
 
 .toolbar-button-container:hover {
-  background-color: #E7E7E7;
+  background-color: #BBB;
 }
 
 .toolbar-button-container button {
   top: -2px;
 }
 
-.toolbar-button-container-leftmost {
-  border-radius: 10px 0px 0px 10px;
-}
-
-.toolbar-button-container-inner {
-  border-radius: 0px;
-}
-
-.toolbar-button-container-rightmost {
-  border-radius: 0px 10px 10px 0px;
-}
-
 .toolbar-button-container-dropdown {
   width: 49px;
   height: 155px;
-  transition: height 0.2s ease, border-radius 0.05s linear;
-  background-color: #FFF;
+  transition: height 0.1s ease, border-radius 0.05s linear;
+  background-color: white;
 }
 
 .toolbar-button-container-dropdown:hover {
-  background-color: #FFF;
-}
-
-.toolbar-button-container-dropdown-leftmost {
-  border-radius: 10px 0px 10px 10px;
-}
-
-.toolbar-button-container-dropdown-inner {
-  border-radius: 0px 0px 10px 10px;
-}
-
-.toolbar-button-container-dropdown-rightmost {
-  border-radius: 0px 10px 10px 10px;
+  background-color: white;
 }
 
 .toolbar-button {
@@ -73,7 +50,7 @@
   height: 49px;
   border: none;
   background-color: transparent;
-  transition: all 0.2s ease;
+  transition: all 0.1s ease;
   padding:  9px 10px;
   margin: 0px;
   cursor: pointer;
@@ -88,11 +65,11 @@
 }
 
 .toolbar-button-active {
-  background-color: #000;
+  background-color: white;
 }
 
 .toolbar-button-active:hover {
-  background-color: #222;
+  background-color: #EEE;
 }
 
 .toolbar-dropdown {

@@ -48,7 +48,7 @@ export default class SliderHorizontal extends React.Component {
                   borderRadius: '5px',
                   background: getTrackBackground({
                     values: [this.props.value],
-                    colors: ['#000', '#ddd'],
+                    colors: ['black', '#BBB'],
                     min: this.props.min,
                     max: this.props.max
                   }),
@@ -69,9 +69,9 @@ export default class SliderHorizontal extends React.Component {
                 width: '20px',
                 borderWidth: '3px',
                 borderStyle: 'solid',
-                borderColor: '#FFF',
+                borderColor: '#DDD',
                 borderRadius: '23px',
-                backgroundColor: '#000',
+                backgroundColor: 'black',
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -83,13 +83,13 @@ export default class SliderHorizontal extends React.Component {
                   display: this.props.labeled ? 'block' : 'none',
                   position: 'absolute',
                   top: '-24px',
-                  color: '#fff',
+                  color: 'white',
                   fontWeight: 500,
                   fontSize: '11px',
                   fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji',
                   padding: '4px',
                   borderRadius: '4px',
-                  backgroundColor: '#000',
+                  backgroundColor: 'black',
                   outline: '0'
                 }}
               >
@@ -103,7 +103,7 @@ export default class SliderHorizontal extends React.Component {
                   height: '16px',
                   width: '16px',
                   borderRadius: '16px',
-                  backgroundColor: isDragged ? '#000' : '#FFF',
+                  backgroundColor: isDragged ? 'black' : '#DDD',
                   outline: '0'
                 }}
               />

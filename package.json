@@ -1,12 +1,12 @@
 {
-  "name": "synbim-fluid-simulation",
-  "version": "0.1.0",
-  "description": "A web-based fluid flow simulation tool for advection-diffusion problems.",
+  "name": "lattice-boltzmann-simulator",
+  "version": "0.2.0",
+  "description": "A WebGL fluid simulation tool implementing the lattice Boltzmann method (LBM) for advection-diffusion problems.",
   "scripts": {
     "clean": "rimraf dist && rimraf .parcel-cache",
     "prestart": "npm run clean",
     "start": "parcel ./src/index.html",
-    "predeploy": "npm run clean && parcel build ./src/index.html --public-url /synbim-fluid-simulation",
+    "predeploy": "npm run clean && parcel build ./src/index.html --public-url /lattice-boltzmann-simulator",
     "deploy": "gh-pages -d dist",
     "prebuild": "npm run clean",
     "build": "parcel build ./src/index.html"
@@ -24,7 +24,9 @@
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.16.7",
     "@parcel/packager-raw-url": "^2.3.2",
+    "@parcel/packager-xml": "^2.3.2",
     "@parcel/transformer-webmanifest": "^2.3.2",
+    "@parcel/transformer-xml": "^2.3.2",
     "gh-pages": "^3.2.3",
     "parcel": "^2.3.2",
     "process": "^0.11.10",

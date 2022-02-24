@@ -3,13 +3,13 @@
   width: 49px;
   height: 49px;
   border: none;
-  background-color: #FFF;
-  transition: all 0.2s ease;
+  background-color: #DDD;
+  transition: all 0.1s ease;
   padding: 0px;
   margin: 0px;
-  border: 2px solid black;
-  border-radius: 10px;
+  border: 2px solid white;
   cursor: pointer;
+  box-shadow: rgba(50, 50, 105, 0.45) 0px 2px 5px 0px, rgba(0, 0, 0, 0.05) 0px 1px 1px 0px;
 }
 
 .header-button:hover {
@@ -25,7 +25,7 @@
 }
 
 .header-button-active {
-  background-color: #000;
+  background-color: black;
 }
 
 .header-button-active:hover {

@@ -3,6 +3,26 @@
   top: -3px;
   width: 100%;
   min-width: 160px;
+  color: black;
+  border: 2px solid white;
+  margin-bottom: 20px;
+  background-color: #DDD;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px;
+  transition: background-color 0.1s ease;
+}
+
+.settings-card-container.inactive {
+  box-shadow: rgba(50, 50, 105, 0.45) 0px 2px 5px 0px, rgba(0, 0, 0, 0.05) 0px 1px 1px 0px;
+  background-color: #AAA;
+}
+
+.settings-card-container.inactive:hover {
+  background-color: #BBB;
+}
+
+.settings-card-subcontainer {
+  margin: 16px;
+  padding-bottom: 1px;
 }
 
 .settings-card-title {
@@ -13,18 +33,14 @@
 }
 
 .settings-card-title button {
-
   width: 100%;
   border: none;
-  background-color: #FFF;
+  background-color: transparent;
   text-align: left;
   cursor: pointer;
   padding: 5px 0px 4px 0px;
-  transition: all 0.3s ease;
-}
-
-.settings-card-title button:hover {
-  background-color: #E7E7E7; 
+  transition: all 0.1s ease;
+  color: black;
 }
 
 .settings-card-title img {
@@ -36,7 +52,7 @@
   height: 2px;
   margin-top: 0;
   border: none;
-  background-color: #000;
+  background-color: black;
 }
 
 .settings-card-icon {
@@ -45,7 +61,7 @@
 
 .settings-card-expander {
   margin-right: 4px;
-  transition: transform 0.2s ease;
+  transition: transform 0.1s ease;
 }
 
 .settings-card-expander-inactive {

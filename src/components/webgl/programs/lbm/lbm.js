@@ -45,6 +45,9 @@ class LBMProgram {
     this.reactions = [
       new Reaction(wgli, [0, 1, 2], [1, 1, 1], [-1, -1, 1], this.props.reactionRate)
     ];
+    
+    this._update = this._update.bind(this);
+    this._drawOverlay = this._drawOverlay.bind(this);
   }
 
   _initOverlay() {
@@ -60,8 +63,10 @@ class LBMProgram {
   }
 
   _setOverlayParameters() {
-    // Set overlay line width
+    // Set overlay draw properties
     this.overlayCtx.lineWidth = this.params.overlayLineWidth * this.props.pixelRatio;
+    this.overlayCtx.fillStyle = '#999';
+    this.overlayCtx.strokeStyle = '#999';
 
     // Set indicator offsets
     this.overlayXCount = Math.round(this.overlay.width / (this.props.overlayXOffset * this.props.pixelRatio));
@@ -710,16 +715,15 @@ class LBMProgram {
   }
 
   _drawIndicatorArrow(x, y, xOffset, yOffset) {
+    const p0 = [x + xOffset * 0.4 - yOffset * 0.1, y - yOffset * 0.4 - xOffset * 0.1];
+    const p1 = [x + xOffset, y - yOffset];
+    const p2 = [x + xOffset * 0.4 + yOffset * 0.1, y - yOffset * 0.4 + xOffset * 0.1];
     this.overlayCtx.beginPath();
-    this.overlayCtx.moveTo(x, y);
-    this.overlayCtx.lineTo(x + xOffset * 0.7, y - yOffset * 0.7);
-    this.overlayCtx.lineTo(x + xOffset * 0.7 - yOffset * 0.08, y - yOffset * 0.7 - xOffset * 0.08);
-    this.overlayCtx.lineTo(x + xOffset, y - yOffset);
-    this.overlayCtx.lineTo(x + xOffset * 0.7 + yOffset * 0.08, y - yOffset * 0.7 + xOffset * 0.08);
-    this.overlayCtx.lineTo(x + xOffset * 0.7, y - yOffset * 0.7);
-    this.overlayCtx.lineTo(x, y);
+    this.overlayCtx.moveTo(p0[0], p0[1]);
+    this.overlayCtx.lineTo(p1[0], p1[1]);
+    this.overlayCtx.lineTo(p2[0], p2[1]);
+    this.overlayCtx.lineTo(p0[0], p0[1]);
     this.overlayCtx.fill();
-    this.overlayCtx.stroke();
   }
 
   _drawIndicatorLine(x, y, xOffset, yOffset) {
@@ -783,13 +787,13 @@ class LBMProgram {
     this._initSolute(this.solutes[2], [this.aspect.xAspect * 0.5,       this.aspect.yAspect * 0.515 + 0.1 * Math.sin(Math.PI / 3)], 0.2);
 
     // Begin main update loop
-    requestAnimationFrame(() => this._update());
+    requestAnimationFrame(this._update);
   }
 
   // Main update loop
   _update() {
     // Callback
-    requestAnimationFrame(() => this._update());
+    requestAnimationFrame(this._update);
 
     // Pre-update: ensure WebGL interface state is up to date
     this.wgli.update();
@@ -797,6 +801,26 @@ class LBMProgram {
     // Get aspect ratios
     this.aspect = this.wgli.getAspect();
     
+    // Run simulation
+    this._runSimStep();
+
+    // Draw fluid velocity, solutes and node Id
+    this.wgli.useProgram(this.outputProgram);
+    this.wgli.uniform1i(this.outputProgram.velocityUniform, this.fluid.velocity.read.attach(0));
+    this.wgli.uniform3f(this.outputProgram.solute0ColUniform, this.normalizedColors[0].r, this.normalizedColors[0].g, this.normalizedColors[0].b);
+    this.wgli.uniform3f(this.outputProgram.solute1ColUniform, this.normalizedColors[1].r, this.normalizedColors[1].g, this.normalizedColors[1].b);
+    this.wgli.uniform3f(this.outputProgram.solute2ColUniform, this.normalizedColors[2].r, this.normalizedColors[2].g, this.normalizedColors[2].b);
+    this.wgli.uniform1i(this.outputProgram.solute0Uniform, this.solutes[0].concentration.read.attach(1));
+    this.wgli.uniform1i(this.outputProgram.solute1Uniform, this.solutes[1].concentration.read.attach(2));
+    this.wgli.uniform1i(this.outputProgram.solute2Uniform, this.solutes[2].concentration.read.attach(3));
+    this.wgli.uniform1i(this.outputProgram.nodeIdUniform, this.nodeId.read.attach(4));
+    this.wgli.blit(null);
+
+    // Draw velocity field overlay
+    setTimeout(this._drawOverlay, 1);
+  }
+
+  _runSimStep() {
     // Update walls
     const isAddingWalls = this.props.isCursorOver && this.props.isCursorActive && this.props.tool == 1;
     const isRemovingWalls = this.props.isCursorOver && this.props.isCursorActive && this.props.tool == 2;
@@ -824,18 +848,20 @@ class LBMProgram {
     // Add user imposed concentration source
     const isAddingConcentration = this.props.isCursorOver && this.props.isCursorActive && this.props.tool == 3;
     const isRemovingConcentration = this.props.isCursorOver && this.props.isCursorActive && this.props.tool == 4;
-    const activeSolute = this.props.solute;
-    this.wgli.useProgram(this.concentrateSourceProgram);
-    this.wgli.uniform1i(this.concentrateSourceProgram.isAddingUniform, isAddingConcentration);
-    this.wgli.uniform1i(this.concentrateSourceProgram.isRemovingUniform, isRemovingConcentration);
-    this.wgli.uniform1f(this.concentrateSourceProgram.toolSizeUniform, this.props.toolSize);
-    this.wgli.uniform1f(this.concentrateSourceProgram.xAspectUniform, this.aspect.xAspect);
-    this.wgli.uniform1f(this.concentrateSourceProgram.yAspectUniform, this.aspect.yAspect);
-    this.wgli.uniform2f(this.concentrateSourceProgram.cursorPosUniform, this.props.cursorPos.x, this.props.cursorPos.y);
-    this.wgli.uniform1i(this.concentrateSourceProgram.concentrateSourceUniform, this.solutes[activeSolute].concentrateSource.read.attach(0));
-    this.wgli.uniform1i(this.concentrateSourceProgram.nodeIdUniform, this.nodeId.read.attach(1));
-    this.wgli.blit(this.solutes[activeSolute].concentrateSource.write.fbo);
-    this.solutes[activeSolute].concentrateSource.swap();
+    if (isAddingConcentration || isRemovingConcentration) {
+      const activeSolute = this.props.solute;
+      this.wgli.useProgram(this.concentrateSourceProgram);
+      this.wgli.uniform1i(this.concentrateSourceProgram.isAddingUniform, isAddingConcentration);
+      this.wgli.uniform1i(this.concentrateSourceProgram.isRemovingUniform, isRemovingConcentration);
+      this.wgli.uniform1f(this.concentrateSourceProgram.toolSizeUniform, this.props.toolSize);
+      this.wgli.uniform1f(this.concentrateSourceProgram.xAspectUniform, this.aspect.xAspect);
+      this.wgli.uniform1f(this.concentrateSourceProgram.yAspectUniform, this.aspect.yAspect);
+      this.wgli.uniform2f(this.concentrateSourceProgram.cursorPosUniform, this.props.cursorPos.x, this.props.cursorPos.y);
+      this.wgli.uniform1i(this.concentrateSourceProgram.concentrateSourceUniform, this.solutes[activeSolute].concentrateSource.read.attach(0));
+      this.wgli.uniform1i(this.concentrateSourceProgram.nodeIdUniform, this.nodeId.read.attach(1));
+      this.wgli.blit(this.solutes[activeSolute].concentrateSource.write.fbo);
+      this.solutes[activeSolute].concentrateSource.swap();
+    }
 
     // Get imposed forces
     const isAddingForce = this.props.isCursorOver && this.props.isCursorActive && this.props.tool == 0;
@@ -878,21 +904,6 @@ class LBMProgram {
     for (let solute of this.solutes) {
       this._computeConcentration(solute);
     }
-
-    // Draw fluid velocity, solutes and node Id
-    this.wgli.useProgram(this.outputProgram);
-    this.wgli.uniform1i(this.outputProgram.velocityUniform, this.fluid.velocity.read.attach(0));
-    this.wgli.uniform3f(this.outputProgram.solute0ColUniform, this.normalizedColors[0].r, this.normalizedColors[0].g, this.normalizedColors[0].b);
-    this.wgli.uniform3f(this.outputProgram.solute1ColUniform, this.normalizedColors[1].r, this.normalizedColors[1].g, this.normalizedColors[1].b);
-    this.wgli.uniform3f(this.outputProgram.solute2ColUniform, this.normalizedColors[2].r, this.normalizedColors[2].g, this.normalizedColors[2].b);
-    this.wgli.uniform1i(this.outputProgram.solute0Uniform, this.solutes[0].concentration.read.attach(1));
-    this.wgli.uniform1i(this.outputProgram.solute1Uniform, this.solutes[1].concentration.read.attach(2));
-    this.wgli.uniform1i(this.outputProgram.solute2Uniform, this.solutes[2].concentration.read.attach(3));
-    this.wgli.uniform1i(this.outputProgram.nodeIdUniform, this.nodeId.read.attach(4));
-    this.wgli.blit(null);
-
-    // Draw velocity field overlay
-    this._drawOverlay();
   }
 
   setNormalizedColors() {

@@ -3,7 +3,6 @@ import WebGLInterface from './helpers/webgl-interface'
 import DefaultProgram from './programs/default/default';
 import LBMProgram from './programs/lbm/lbm';
 import CursorFollowProgram from './programs/cursor-follow/cursor-follow';
-import { relativeValue } from 'react-range';
 
 export default class WebGL extends React.Component {
   constructor(props) {
@@ -52,11 +51,10 @@ export default class WebGL extends React.Component {
     };
 
     const canvasStyle = {
-      zIndex: 8,
+      zIndex: 11,
       position: "absolute",
       width: "100.5%", 
       height: "100.5%",
-      borderRadius: 20,
       left: 0,
       top: 0
     };

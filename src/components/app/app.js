@@ -9,15 +9,16 @@ import SoluteSelector from "../solute-selector/solute-selector";
 import SliderHorizontal from "../slider-horizontal/slider-horizontal";
 import CursorPositon from "../cursor-position/cursor-position";
 import ToolOverlay from "../tool-overlay/tool-overlay";
-import FluidSimulatorLogo from 'url:~/src/public/logo512.png';
+import FluidSimulatorLogo from 'url:~/src/public/logo192.png';
 import SynBIMLogo from 'url:~/src/public/synbim-logo.png';
 import BiofmLogo from 'url:~/src/public/biofm-logo.png';
 import EPSRCLogo from 'url:~/src/public/epsrc-logo.png';
 import UoELogo from 'url:~/src/public/uoe-logo.png';
+import RALogo from 'url:~/src/public/ra-logo.png';
 import GitHubLogo from 'url:~/src/public/github-logo.png';
-import IconFluidSettingsBlack from 'url:~/src/public/icon-fluid-settings-black.png';
-import IconSoluteSettingsBlack from 'url:~/src/public/icon-solute-settings-black.png';
-import IconReactionSettingsBlack from 'url:~/src/public/icon-reaction-settings-black.png';
+import IconFluidSettingsWhite from 'url:~/src/public/icon-fluid-settings-black.png';
+import IconSoluteSettingsWhite from 'url:~/src/public/icon-solute-settings-black.png';
+import IconReactionSettingsWhite from 'url:~/src/public/icon-reaction-settings-black.png';
 import IconAboutBlack from 'url:~/src/public/icon-about-black.png';
 import IconAboutWhite from 'url:~/src/public/icon-about-white.png';
 import './app.css';
@@ -42,11 +43,11 @@ class App extends React.Component {
       soluteCount: 3,
       viscosity: 0.1,
       boundaryWalls: 0,
-      diffusivities: [0.3, 0.18, 0.1],
-      colors: [{r: 0, g: 255, b: 255}, {r: 255, g: 255, b: 0}, {r: 255, g: 0, b: 255}],
+      diffusivities: [0.1, 0.1, 0.1],
+      colors: [{r: 255, g: 200, b: 0}, {r: 100, g: 0, b: 255}, {r: 100, g: 255, b: 200}],
       reactionsEnabled: 1,
       reactionRate: 0.01,
-      overlayType: 2,
+      overlayType: 0,
       toolbarDropdown: false,
       aboutOverlay: false
     };
@@ -189,33 +190,35 @@ class App extends React.Component {
   renderHeader() {
     return (
         <div id="header">
-          {this.renderLogo(false)}
-          <Toolbar 
-            tool={this.state.tool} 
-            setTool={this.setTool}
-            toolSizes={this.state.toolSizes}
-            setToolSize={this.setToolSize}
-            setDropdownActive={this.setToolbarDropdown}
-            isToolActive={this.state.isToolActive}
-          />
-          <div className="solute-selectors-container header-selectors">
-            <SoluteSelector
-              color={this.state.colors[0]}
-              setSolute={() => this.setSolute(0)}
-              isActive={this.state.solute == 0}
+          <div id="header-tools-container">
+            {this.renderLogo()}
+            <Toolbar 
+              tool={this.state.tool} 
+              setTool={this.setTool}
+              toolSizes={this.state.toolSizes}
+              setToolSize={this.setToolSize}
+              setDropdownActive={this.setToolbarDropdown}
+              isToolActive={this.state.isToolActive}
             />
-            {this.state.reactionsEnabled == 1 && <div className="reaction-symbol" style={{marginBottom: 2}}>+</div>}
-            <SoluteSelector
-              color={this.state.colors[1]}
-              setSolute={() => this.setSolute(1)}
-              isActive={this.state.solute == 1}
-            />
-            {this.state.reactionsEnabled == 1 && <div className="reaction-symbol">→</div>}
-            <SoluteSelector
-              color={this.state.colors[2]}
-              setSolute={() => this.setSolute(2)}
-              isActive={this.state.solute == 2}
-            />
+            <div className="solute-selectors-container header-selectors">
+              <SoluteSelector
+                color={this.state.colors[0]}
+                setSolute={() => this.setSolute(0)}
+                isActive={this.state.solute == 0}
+              />
+              {this.state.reactionsEnabled == 1 && <div className="reaction-symbol" style={{marginBottom: 2}}>+</div>}
+              <SoluteSelector
+                color={this.state.colors[1]}
+                setSolute={() => this.setSolute(1)}
+                isActive={this.state.solute == 1}
+              />
+              {this.state.reactionsEnabled == 1 && <div className="reaction-symbol">→</div>}
+              <SoluteSelector
+                color={this.state.colors[2]}
+                setSolute={() => this.setSolute(2)}
+                isActive={this.state.solute == 2}
+              />
+            </div>
           </div>
           <div id="header-buttons-container">
             <HeaderButton
@@ -230,15 +233,13 @@ class App extends React.Component {
     );
   }
 
-  renderLogo(alwaysFull) {
-    const isFullLogo = (this.state.viewportWidth > 1050) || alwaysFull;
+  renderLogo() {
     return (
       <div 
         className="logo-container"
         onClick={this.toggleAbout}
       >
         <img className="logo" src={FluidSimulatorLogo} alt="SynBIM"/>
-        {isFullLogo && <p> SYNBIM FLUID SIMULATION</p>}
       </div>
     );
   }
@@ -313,13 +314,13 @@ class App extends React.Component {
     const title = isReducedCard ? "FLUID" : "FLUID SETTINGS"
     const velocityFieldLabel = isReducedCard ? "VELOCITY FIELD" : "VELOCITY FIELD VISUALIZATION";
     const isColumnLayout = this.state.viewportWidth > 1050 || this.state.aspect > 0.9;
-    const hasReducedBoundaryLabels = (this.state.viewportWidth < 890 && !isColumnLayout) || (this.state.viewportWidth < 1000 && isColumnLayout);
-    const boundaryHorizontalLabel = hasReducedBoundaryLabels ? "HORIZ." : "HORIZONTAL";
-    const boundaryVerticalLabel = hasReducedBoundaryLabels ? "VERT." : "VERTICAL";
+    const hasReducedBoundaryLabels = (this.state.viewportWidth < 990 && !isColumnLayout) || (this.state.viewportWidth < 1030 && isColumnLayout);
+    const boundaryHorizontalLabel = hasReducedBoundaryLabels ? "|" : "VERTICAL";
+    const boundaryVerticalLabel = hasReducedBoundaryLabels ? "—" : "HORIZONTAL";
     return (
       <SettingsCard
         title={title}
-        icon={IconFluidSettingsBlack}
+        icon={IconFluidSettingsWhite}
         isExpanded={this.state.activeSetttings == 0 || alwaysExpanded}
         toggleExpansion={() => this.setActiveSettings(0)}
       >
@@ -354,19 +355,20 @@ class App extends React.Component {
           />
         </div>
         <div className="settings-subcontainer">
+          <div className="settings-subtitle">RESET</div>
           <div className="reset-buttons-container">
             <div className="reset-button">
               <Button 
                 text="RESET FLUID"
                 onClick={this.resetFluid} 
-                color="#000"
+                color="black"
               />
             </div>
             <div className="reset-button">
               <Button 
                 text="RESET WALLS"
                 onClick={this.resetWalls} 
-                color="#000"
+                color="black"
               />
             </div>
           </div>
@@ -381,7 +383,7 @@ class App extends React.Component {
     return (
       <SettingsCard
         title={title}
-        icon={IconSoluteSettingsBlack}
+        icon={IconSoluteSettingsWhite}
         isExpanded={this.state.activeSetttings == 1 || alwaysExpanded}
         toggleExpansion={() => this.setActiveSettings(1)}
       >
@@ -475,19 +477,20 @@ class App extends React.Component {
           </div>
         </div>
         <div className="settings-subcontainer">
+          <div className="settings-subtitle">RESET</div>
           <div className="reset-buttons-container">
             <div className="reset-button">
               <Button 
                 text="CLEAR SOLUTE"
                 onClick={() => this.program.resetSolute(this.state.solute)} 
-                color="#000"
+                color="black"
               />
             </div>
             <div className="reset-button">
               <Button 
                 text="CLEAR ALL SOLUTES"
                 onClick={this.resetAllSolutes} 
-                color="#D00"
+                color="rgb(100,0,255)"
               />
             </div>
           </div>
@@ -503,7 +506,7 @@ class App extends React.Component {
     return (
       <SettingsCard
         title={title}
-        icon={IconReactionSettingsBlack}
+        icon={IconReactionSettingsWhite}
         isExpanded={this.state.activeSetttings == 2 || alwaysExpanded}
         toggleExpansion={() => this.setActiveSettings(2)}
       >
@@ -521,10 +524,10 @@ class App extends React.Component {
             <div className="slider-horizontal-container">
               <SliderHorizontal
                 value={this.state.reactionRate}
-                min={0.001}
+                min={0.}
                 max={1}
                 step={0.001}
-                decimals={3}
+                decimals={2}
                 setValue={this.setReactionRate}
                 labeled={true}
               />
@@ -557,15 +560,10 @@ class App extends React.Component {
             transform: this.state.aboutOverlay ? "none" : "translate(0px, 300px)",
           }}
         >
-          <div id="about-overlay-logo">
-            {this.renderLogo(true)}
-          </div>
           <div className="about-overlay-supporters">
             <div className="about-overlay-center">
               <p>DEVELOPED FOR</p>
-              <a href="http://www.synbim.co.uk/">
-                <img id="about-overlay-synbim-logo" src={SynBIMLogo}/>
-              </a>
+              <img id="about-overlay-synbim-logo" src={SynBIMLogo}/>
             </div>
             <div className="about-overlay-center">
               <p>FUNDED BY</p>
@@ -575,7 +573,7 @@ class App extends React.Component {
             </div>
           </div>
           <div className="about-overlay-center">
-            <p>PROUDLY SUPPORTED BY</p>
+            <p>SUPPORTED BY</p>
             <div className="about-overlay-supporters">
               <a href="https://www.ed.ac.uk/">
                 <img id="about-overlay-uoe-logo" src={UoELogo}/>
@@ -583,7 +581,15 @@ class App extends React.Component {
               <img id="about-overlay-biofm-logo" src={BiofmLogo}/>
             </div>
           </div>
+          <div className="about-overlay-supporters">
+            <div className="about-overlay-center">
+              <p>CODE BY</p>
+              <a href="https://rafaelanderka.com/">
+                <img id="about-overlay-ra-logo" src={RALogo}/>
+              </a>
+            </div>
           {this.renderSourceButton()}
+          </div>
         </div>
       </div>
     );
@@ -593,10 +599,10 @@ class App extends React.Component {
     return (
       <div 
         id="about-overlay-source"
-        onClick={() => window.location="https://github.com/rafaelanderka/synbim-fluid-simulation"}
+        onClick={() => window.location="https://github.com/rafaelanderka/lattice-boltzmann-simulator"}
       >
-        <p>SOURCE CODE</p>
-        <a href="https://github.com/rafaelanderka/synbim-fluid-simulation">
+        <p>OPEN SOURCE</p>
+        <a href="https://github.com/rafaelanderka/lattice-boltzmann-simulator">
           <img id="about-overlay-github-logo" src={GitHubLogo}/>
         </a>
         <div id="about-overlay-source-shine"/>
@@ -615,7 +621,7 @@ class App extends React.Component {
       const deviceSupported = this.state.viewportWidth >= 685 && this.state.viewportHeight >= 300 && (this.state.viewportHeight >= 565 || this.state.aspect > 2.5);
       if (deviceSupported) {
         return (
-          <div id="app">
+          <div id="app" className="noselect">
             {this.renderHeader()}
             {this.renderMain()}
             {this.renderAboutOverlay()}
@@ -623,14 +629,10 @@ class App extends React.Component {
         );
       } else {
         return (
-          <div id="app-not-supported">
+          <div id="app-not-supported" className="gradient-background">
             <div id="app-not-supported-container">
-              <div id="app-not-supported-logo">
-                <img src={FluidSimulatorLogo}/> <p>SYNBIM  FLUID SIMULATION</p>
-              </div>
-              <h1>Device not supported</h1>
-              <p>Oh no! Your browser seems to be too small for this app. <br/> Please come back with a larger screen.</p>
-              <p>(Or have a look at the source code <a href="https://github.com/rafaelanderka/synbim-fluid-simulation">here</a>)</p>
+              <h1>DEVICE NOT SUPPORTED</h1>
+              <p>PLEASE COME BACK WITH A LARGER SCREEN.</p>
             </div>
           </div>
         );

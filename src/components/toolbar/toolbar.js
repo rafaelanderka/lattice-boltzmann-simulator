@@ -22,7 +22,7 @@ export default class Toolbar extends React.Component {
     // Asynchronous React state
     this.state = {
       dropdowns: this.dropdowns
-    }
+    };
   }
 
   useTool(id) {
@@ -50,24 +50,16 @@ export default class Toolbar extends React.Component {
 
   render() {
     const tool0ContainerClassName = "toolbar-button-container toolbar-button-container-leftmost" + (this.state.dropdowns[0] ? " toolbar-button-container-dropdown toolbar-button-container-dropdown-leftmost" : "");
-    const tool0ButtonClassName = "toolbar-button" + (this.props.tool == 0 ? " toolbar-button-active" : "");
-    const tool0Img = this.props.tool == 0 ? IconForceToolWhite : IconForceToolBlack;
-
     const tool1ContainerClassName = "toolbar-button-container toolbar-button-container-inner" + (this.state.dropdowns[1] ? " toolbar-button-container-dropdown toolbar-button-container-dropdown-inner" : "");
-    const tool1ButtonClassName = "toolbar-button" + (this.props.tool == 1 ? " toolbar-button-active" : "");
-    const tool1Img = this.props.tool == 1 ? IconWallToolWhite : IconWallToolBlack;
-
     const tool2ContainerClassName = "toolbar-button-container toolbar-button-container-inner" + (this.state.dropdowns[2] ? " toolbar-button-container-dropdown toolbar-button-container-dropdown-inner" : "");
-    const tool2ButtonClassName = "toolbar-button" + (this.props.tool == 2 ? " toolbar-button-active" : "");
-    const tool2Img = this.props.tool == 2 ? IconWallEraserToolWhite : IconWallEraserToolBlack;
-
     const tool3ContainerClassName = "toolbar-button-container toolbar-button-container-inner" + (this.state.dropdowns[3] ? " toolbar-button-container-dropdown toolbar-button-container-dropdown-inner" : "");
-    const tool3ButtonClassName = "toolbar-button" + (this.props.tool == 3 ? " toolbar-button-active" : "");
-    const tool3Img = this.props.tool == 3 ? IconConcentrationToolWhite : IconConcentrationToolBlack;
-    
     const tool4ContainerClassName = "toolbar-button-container toolbar-button-container-rightmost" + (this.state.dropdowns[4] ? " toolbar-button-container-dropdown toolbar-button-container-dropdown-rightmost" : "");
-    const tool4ButtonClassName = "toolbar-button" + (this.props.tool == 4 ? " toolbar-button-active" : "");
-    const tool4Img = this.props.tool == 4 ? IconConcentrationEraserToolWhite : IconConcentrationEraserToolBlack;
+    const activeButtonClasses = " toolbar-button-active";
+    const tool0ButtonClassName = "toolbar-button" + ((this.props.tool == 0) ? activeButtonClasses : "");
+    const tool1ButtonClassName = "toolbar-button" + ((this.props.tool == 1) ? activeButtonClasses : "");
+    const tool2ButtonClassName = "toolbar-button" + ((this.props.tool == 2) ? activeButtonClasses : "");
+    const tool3ButtonClassName = "toolbar-button" + ((this.props.tool == 3) ? activeButtonClasses : "");
+    const tool4ButtonClassName = "toolbar-button" + ((this.props.tool == 4) ? activeButtonClasses : "");
     
     return (
       <div className="toolbar">
@@ -80,7 +72,7 @@ export default class Toolbar extends React.Component {
           }}
         >
           <button className={tool0ButtonClassName} onClick={() => this.useTool(0)}>
-            <img src={tool0Img} alt="Force Tool"/>
+            <img src={IconForceToolBlack} alt="Force Tool"/>
           </button>
           <div className="toolbar-dropdown">
             <div className="toolbar-dropdown-slider">
@@ -105,7 +97,7 @@ export default class Toolbar extends React.Component {
           }}
         >
           <button className={tool1ButtonClassName} onClick={() => this.useTool(1)}>
-            <img src={tool1Img} alt="Wall Tool"/>
+            <img src={IconWallToolBlack} alt="Wall Tool"/>
           </button>
           <div className="toolbar-dropdown">
             <div className="toolbar-dropdown-slider">
@@ -130,7 +122,7 @@ export default class Toolbar extends React.Component {
           }}
         >
           <button className={tool2ButtonClassName} onClick={() => this.useTool(2)}>
-            <img src={tool2Img} alt="Wall Eraser Tool"/>
+            <img src={IconWallEraserToolBlack} alt="Wall Eraser Tool"/>
           </button>
           <div className="toolbar-dropdown">
             <div className="toolbar-dropdown-slider">
@@ -155,7 +147,7 @@ export default class Toolbar extends React.Component {
           }}
         >
           <button className={tool3ButtonClassName} onClick={() => this.useTool(3)}>
-            <img src={tool3Img} alt="Concentration Tool"/>
+            <img src={IconConcentrationToolBlack} alt="Concentration Tool"/>
           </button>
           <div className="toolbar-dropdown">
             <div className="toolbar-dropdown-slider">
@@ -180,7 +172,7 @@ export default class Toolbar extends React.Component {
           }}
         >
           <button className={tool4ButtonClassName} onClick={() => this.useTool(4)}>
-            <img src={tool4Img} alt="Concentration Eraser Tool"/>
+            <img src={IconConcentrationEraserToolBlack} alt="Concentration Eraser Tool"/>
           </button>
           <div className="toolbar-dropdown">
             <div className="toolbar-dropdown-slider">
