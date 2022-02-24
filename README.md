@@ -7,7 +7,7 @@
   <br>
 </h1>
 
-<h4 align="center">A WebGL fluid simulation tool implementing the lattice Boltzmann method (LBM) for advection-diffusion problems.</h4>
+<h4 align="center">A WebGL2 fluid simulation tool implementing the lattice Boltzmann method (LBM) for advection-diffusion problems.</h4>
 
 <p align="center">
   <a href="#contributing">Contributing</a> •

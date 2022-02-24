@@ -9,22 +9,26 @@ export default class CursorPosition extends React.Component {
     this.container = null;
     this.containerWidth = 0;
     this.containerHeight = 0;
-    this.containerPos = {x: 0, y: 0};
-    this.cursorPos = {x: 0, y: 0};
-    this.lastCursorPos = {x: 0, y: 0};
-    this.cursorVel = {x: 0, y: 0};
+    this.containerPos = [0, 0];
+    this.cursorPos = [0, 0];
+    this.lastCursorPos = [0, 0];
+    this.cursorVel = [0, 0];
     this.isCursorActive = false;
     this.isCursorOver = false;
+    this.pixelRatio = window.devicePixelRatio || 1.0;
 
     // React state for asynchronous updates
     this.state = {
       isInitialised: false,
       containerWidth: 0,
       containerHeight: 0,
-      cursorPos: {x: 0, y: 0},
-      cursorVel: {x: 0, y:0},
+      cursorPos: [0, 0],
+      cursorVel: [0, 0],
       isCursorActive: false,
-      isCursorOver: false
+      isCursorOver: false,
+      pixelRatio: this.pixelRatio,
+      renderWidth: 0,
+      renderHeight: 0
     };
   }
 
@@ -47,21 +51,22 @@ export default class CursorPosition extends React.Component {
       }
       el = el.offsetParent;
     }
-    return {
-      x: xPos,
-      y: yPos
-    };
+    return [xPos, yPos];
   }
 
   _setContainerState() {
     this.containerPos = this._getPosition(this.container);
     this.containerWidth = this.container.clientWidth;
     this.containerHeight = this.container.clientHeight;
-
+    this.pixelRatio = window.devicePixelRatio || 1.0;
+  
     this.setState({
       containerWidth: this.containerWidth,
-      containerHeight: this.containerHeight
-    });
+      containerHeight: this.containerHeight,
+      pixelRatio: this.pixelRatio,
+      renderWidth: this.containerWidth * this.pixelRatio,
+      renderHeight: this.containerHeight * this.pixelRatio
+  });
   }
 
   _setCursorState(e) {
@@ -70,14 +75,11 @@ export default class CursorPosition extends React.Component {
 
     // Calculate updated cursor state
     this.lastCursorPos = this.cursorPos;
-    this.cursorPos = {
-      x: (e.clientX - this.containerPos.x) / this.container.clientWidth,
-      y: 1.0 - ((e.clientY - this.containerPos.y)) / this.container.clientHeight
-    };
-    this.cursorVel = {
-      x: this.cursorPos.x - this.lastCursorPos.x,
-      y: this.cursorPos.y - this.lastCursorPos.y
-    };
+    this.cursorPos = [(e.clientX - this.containerPos[0]) / this.container.clientWidth,
+                      1.0 - ((e.clientY - this.containerPos[1])) / this.container.clientHeight];
+
+    this.cursorVel = [this.cursorPos[0] - this.lastCursorPos[0],
+                      this.cursorPos[1] - this.lastCursorPos[1]];
 
     // Update cursor state
     this.setState({
@@ -152,11 +154,13 @@ export default class CursorPosition extends React.Component {
         return React.cloneElement(child, {
           containerWidth: this.state.containerWidth,
           containerHeight: this.state.containerHeight,
-          pixelRatio: window.devicePixelRatio || 1.0,
           cursorPos: this.state.cursorPos,
           cursorVel: this.state.cursorVel,
           isCursorActive: this.state.isCursorActive,
-          isCursorOver: this.state.isCursorOver
+          isCursorOver: this.state.isCursorOver,
+          pixelRatio: this.state.pixelRatio,
+          renderWidth: this.state.renderWidth,
+          renderHeight: this.state.renderHeight
         });
       });
 

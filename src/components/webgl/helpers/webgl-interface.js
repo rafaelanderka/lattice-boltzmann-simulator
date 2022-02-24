@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 Rafael Anderka
+* Copyright (c) 2022 Rafael Anderka
 * Copyright (c) 2017 Pavel Dobryakov
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,7 +21,8 @@
 * SOFTWARE.
 */
 
-import vsBaseSource from '../shaders/vertex/vs-base';
+import vsBaseSource from '../shaders/vs-base';
+import * as twgl from 'twgl.js';
 
 class WebGLInterface {
   constructor(props) {
@@ -33,11 +34,10 @@ class WebGLInterface {
       this._initHalfFloatRendering();
     }
     this._initVertexBuffer();
-    this._initBaseVertexShader();
   }
 
   // Initialises the canvas and WebGL 1 or 2 context
-  // Note: Originally taken from Pavel Dobryakov's WebGL Fluid Simulation
+  // Note: Adapted from Pavel Dobryakov's WebGL Fluid Simulation
   // https://github.com/PavelDoGreat/WebGL-Fluid-Simulation
   _initWebGLContext() {
     // Get canvas
@@ -52,80 +52,59 @@ class WebGLInterface {
       preserveDrawingBuffer: false
     };
     this.gl = this.canvas.getContext('webgl2', params);
-    this.isWebGL2 = !!this.gl;
-    if (!this.isWebGL2) {
-      this.gl = this.canvas.getContext('webgl', params) || canvas.getContext('experimental-webgl', params);
+    this.supportsWebGL2 = !!this.gl;
+    if (!this.supportsWebGL2) {
+      alert('WebGL2 is required from v0.3.0.')
+      throw new Error('WebGL2 is required from v0.3.0.') 
     }
-
+    
     // Set default clear color to black
     this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
   }
 
   // Initialises float rendering (textures and framebuffers)
-  // Note: Originally taken from Pavel Dobryakov's WebGL Fluid Simulation
+  // Note: Adapted from Pavel Dobryakov's WebGL Fluid Simulation
   // https://github.com/PavelDoGreat/WebGL-Fluid-Simulation
   _initFloatRendering() {
     // Enable WebGL extensions
-    if (this.isWebGL2) {
-      this.gl.getExtension('EXT_color_buffer_float');
-    } else {
-      this.gl.getExtension('OES_texture_float');
-    }
+    this.gl.getExtension('EXT_color_buffer_float');
     this.supportsLinearFiltering = this.gl.getExtension('OES_texture_float_linear');
 
     // Set supported texture formats
+    this.formatRGBA = this._getSupportedFormat(this.gl.RGBA32F, this.gl.RGBA, this.gl.FLOAT);
+    this.formatRG = this._getSupportedFormat(this.gl.RG32F, this.gl.RG, this.gl.FLOAT);
+    this.formatR = this._getSupportedFormat(this.gl.R32F, this.gl.RED, this.gl.FLOAT);
     this.floatTexType = this.gl.FLOAT;
-    if (this.isWebGL2) {  
-      this.formatRGBA = this.getSupportedFormat(this.gl.RGBA32F, this.gl.RGBA, this.floatTexType);
-      this.formatRG = this.getSupportedFormat(this.gl.RG32F, this.gl.RG, this.floatTexType);
-      this.formatR = this.getSupportedFormat(this.gl.R32F, this.gl.RED, this.floatTexType);
-    } else {
-      this.formatRGBA = this.getSupportedFormat(this.gl.RGBA, this.gl.RGBA, this.floatTexType);
-      this.formatRG = this.getSupportedFormat(this.gl.RGBA, this.gl.RGBA, this.floatTexType);
-      this.formatR = this.getSupportedFormat(this.gl.RGBA, this.gl.RGBA, this.floatTexType);
-    }
 
     // Store whether GPU supports float rendering
     this.supportsFloatRendering = (this.formatR != null) && (this.formatRG != null) && (this.formatRGBA != null);
   }
 
   // Initialises half float rendering (textures and framebuffers)
-  // Note: Originally taken from Pavel Dobryakov's WebGL Fluid Simulation
+  // Note: Adapted from Pavel Dobryakov's WebGL Fluid Simulation
   // https://github.com/PavelDoGreat/WebGL-Fluid-Simulation
   _initHalfFloatRendering() {
     // Enable WebGL extensions
-    let halfFloat;
-    if (this.isWebGL2) {
-      this.gl.getExtension('EXT_color_buffer_float');
-      this.supportsLinearFiltering = this.gl.getExtension('OES_texture_float_linear');
-    } else {
-      halfFloat = this.gl.getExtension('OES_texture_half_float');
-      this.supportsLinearFiltering = this.gl.getExtension('OES_texture_half_float_linear');
-    }
+    this.gl.getExtension('EXT_color_buffer_float');
+    this.supportsLinearFiltering = this.gl.getExtension('OES_texture_float_linear');
 
     // Set supported texture formats
-    this.floatTexType = this.isWebGL2 ? this.gl.HALF_FLOAT : halfFloat.HALF_FLOAT_OES;
-    if (this.isWebGL2) {
-      this.formatRGBA = this.getSupportedFormat(this.gl.RGBA16F, this.gl.RGBA, this.floatTexType);
-      this.formatRG = this.getSupportedFormat(this.gl.RG16F, this.gl.RG, this.floatTexType);
-      this.formatR = this.getSupportedFormat(this.gl.R16F, this.gl.RED, this.floatTexType);
-    } else {
-      this.formatRGBA = this.getSupportedFormat(this.gl.RGBA, this.gl.RGBA, this.floatTexType);
-      this.formatRG = this.getSupportedFormat(this.gl.RGBA, this.gl.RGBA, this.floatTexType);
-      this.formatR = this.getSupportedFormat(this.gl.RGBA, this.gl.RGBA, this.floatTexType);
-    }
+    this.formatRGBA = this._getSupportedFormat(this.gl.RGBA16F, this.gl.RGBA, this.gl.HALF_FLOAT);
+    this.formatRG = this._getSupportedFormat(this.gl.RG16F, this.gl.RG, this.gl.HALF_FLOAT);
+    this.formatR = this._getSupportedFormat(this.gl.R16F, this.gl.RED, this.gl.HALF_FLOAT);
+    this.floatTexType = this.gl.HALF_FLOAT;
   }
 
   // Returns the most closely matching supported render texture format
-  // Note: Originally taken from Pavel Dobryakov's WebGL Fluid Simulation
+  // Note: Adapted from Pavel Dobryakov's WebGL Fluid Simulation
   // https://github.com/PavelDoGreat/WebGL-Fluid-Simulation
-  getSupportedFormat (internalFormat, format, type) {
-    if (!this.supportsRenderTextureFormat(internalFormat, format, type)) {
+  _getSupportedFormat (internalFormat, format, type) {
+    if (!this._supportsRenderTextureFormat(internalFormat, format, type)) {
       switch (internalFormat) {
         case this.gl.R16F:
-          return this.getSupportedFormat(this.gl.RG16F, this.gl.RG, type);
+          return this._getSupportedFormat(this.gl.RG16F, this.gl.RG, type);
         case this.gl.RG16F:
-          return this.getSupportedFormat(this.gl.RGBA16F, this.gl.RGBA, type);
+          return this._getSupportedFormat(this.gl.RGBA16F, this.gl.RGBA, type);
         default:
           return null;
       }
@@ -138,9 +117,9 @@ class WebGLInterface {
   }
 
   // Determines whether a given render texture format is supported by the browser
-  // Note: Originally taken from Pavel Dobryakov's WebGL Fluid Simulation
+  // Note: Adapted from Pavel Dobryakov's WebGL Fluid Simulation
   // https://github.com/PavelDoGreat/WebGL-Fluid-Simulation
-  supportsRenderTextureFormat(internalFormat, format, type) {
+  _supportsRenderTextureFormat(internalFormat, format, type) {
     const texture = this.gl.createTexture();
     this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
@@ -157,30 +136,22 @@ class WebGLInterface {
     return status == this.gl.FRAMEBUFFER_COMPLETE;
   }
 
-  // Initializes a vertex and element buffer for drawing full screen quads
-  // Note: Originally taken from Pavel Dobryakov's WebGL Fluid Simulation
-  // https://github.com/PavelDoGreat/WebGL-Fluid-Simulation
+  // Initializes a vertex and element buffer for drawing a single full screen triangle. A single
+  // triangle is chosen over a full-screen quad to minimize the number of draw calls (along the diagonal).
   _initVertexBuffer() {
     this.vertexBuffer = this.gl.createBuffer();
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array([-1, -1, -1, 1, 1, 1, 1, -1]), this.gl.STATIC_DRAW);
+    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array([-1, -1, -1, 3, 3, -1]), this.gl.STATIC_DRAW);
     this.elementBuffer = this.gl.createBuffer();
     this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.elementBuffer);
-    this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array([0, 1, 2, 0, 2, 3]), this.gl.STATIC_DRAW);
+    this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array([0, 1, 2]), this.gl.STATIC_DRAW);
   }
 
-  _initBaseVertexShader() {
-    this.vertexShader = this._createShader(vsBaseSource, 'vertex');
-  }
-
-  // Creates a framebuffer to use as a render target
-  // Note: Originally taken from Pavel Dobryakov's WebGL Fluid Simulation
-  // https://github.com/PavelDoGreat/WebGL-Fluid-Simulation
-  createFBO(formatParam, filteringParam) {
+  createFBO(formatType, filteringType, width, height, numTextures) {
     // Parse input
     let internalFormat;
     let format;
-    switch (formatParam) {
+    switch (formatType) {
       case "RGBA":
         internalFormat = this.formatRGBA.internalFormat;
         format = this.formatRGBA.format;
@@ -200,7 +171,7 @@ class WebGLInterface {
     }
 
     let filtering;
-    switch (filteringParam) {
+    switch (filteringType) {
       case "LINEAR":
         filtering = this.supportsLinearFiltering ? this.gl.LINEAR : this.gl.NEAREST;
         break;
@@ -209,52 +180,53 @@ class WebGLInterface {
     }
 
     // Create FBO
-    this.gl.activeTexture(this.gl.TEXTURE0);
-    const texture = this.gl.createTexture();
-    this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, filtering);
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, filtering);
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
-    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, internalFormat, this.canvas.width, this.canvas.height, 0, format, this.floatTexType, null);
-
     const fbo = this.gl.createFramebuffer();
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, fbo);
-    this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.COLOR_ATTACHMENT0, this.gl.TEXTURE_2D, texture, 0);
-    this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
-    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+    this.gl.viewport(0, 0, width, height);
 
-    const texelSizeX = 1.0 / this.canvas.width;
-    const texelSizeY = 1.0 / this.canvas.height;
-    const gl = this.gl;
+    // Attach textures to FBO
+    const textures = []
+    const drawBuffers = [];
+    for (let i = 0; i < numTextures; i++) {
+      this.gl.activeTexture(this.gl.TEXTURE0 + i);
+      const texture = this.gl.createTexture();
+      textures.push(texture);
+      this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
+      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, filtering);
+      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, filtering);
+      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
+      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
+      this.gl.texImage2D(this.gl.TEXTURE_2D, 0, internalFormat, width, height, 0, format, this.floatTexType, null);
+      this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.COLOR_ATTACHMENT0 + i, this.gl.TEXTURE_2D, texture, 0);
+      this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+      drawBuffers.push(this.gl.COLOR_ATTACHMENT0 + i)
+    }
+
+    const texelSize = [1.0 / width, 1.0 / height];
     return {
-      texture,
+      textures,
       fbo,
-      width: this.canvas.width,
-      height: this.canvas.height,
+      width: width,
+      height: height,
       format,
-      texelSizeX,
-      texelSizeY,
-      attach(id) {
-        gl.activeTexture(gl.TEXTURE0 + id);
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-        return id;
-      }
+      texelSize,
+      drawBuffers,
     };
   }
 
   // Creates a "double" framebuffer with separate read and write targets
-  // Note: Originally taken from Pavel Dobryakov's WebGL Fluid Simulation
+  // Note: Adapted from Pavel Dobryakov's WebGL Fluid Simulation
   // https://github.com/PavelDoGreat/WebGL-Fluid-Simulation
-  createDoubleFBO(formatParam, filteringParam) {
-    let fbo1 = this.createFBO(formatParam, filteringParam);
-    let fbo2 = this.createFBO(formatParam, filteringParam);
+  createReadWriteFBO(formatType, filteringType, width, height, numTextures) {
+    let fbo2 = this.createFBO(formatType, filteringType, width, height, numTextures);
+    let fbo1 = this.createFBO(formatType, filteringType, width, height, numTextures);
 
     return {
-      width: this.canvas.width,
-      height: this.canvas.height,
-      texelSizeX: fbo1.texelSizeX,
-      texelSizeY: fbo1.texelSizeY,
+      width: width,
+      height: height,
+      format: fbo1.format,
+      texelSize: fbo1.texelSize,
+      drawBuffers: fbo1.drawBuffers,
       get read() {
         return fbo1;
       },
@@ -275,49 +247,16 @@ class WebGLInterface {
     }
   }
 
-  // Creates and compiles a fragment shader
-  createFragmentShader(shaderSource) {
-    return this._createShader(shaderSource, 'fragment');
-  }
-
-  // Creates and compiles vertex and fragment shaders
-  _createShader(shaderSource, shaderType) {
-    if (!shaderSource) {
-      return null;
-    }
-
-    let shader;
-    if (shaderType === 'fragment') {
-      shader = this.gl.createShader(this.gl.FRAGMENT_SHADER);
-    } else if (shaderType === 'vertex') {
-      shader = this.gl.createShader(this.gl.VERTEX_SHADER);
-    } else {
-      return null;
-    }
-
-    this.gl.shaderSource(shader, shaderSource);
-    this.gl.compileShader(shader);
-    if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
-      console.log(this.gl.getShaderInfoLog(shader));
-      this.gl.deleteShader(shader);
-      return null;
-    }
-
-    return shader;
-  }
-
-  // Creates and links a pixel shader program
+  // Creates and links a shader program
   createProgram(fragmentShader) {
-    const program = this.gl.createProgram();
-    this.gl.attachShader(program, this.vertexShader);
-    this.gl.attachShader(program, fragmentShader);
-    this.gl.linkProgram(program);
-    if (!this.gl.getProgramParameter(program, this.gl.LINK_STATUS)) {
-      console.log(this.gl.getProgramInfoLog(program));
-      this.gl.deleteProgram(program);
-      return null;
-    }
-    return program;
+    const p = twgl.createProgram(this.gl, [vsBaseSource, fragmentShader]);
+    return p;
+  }
+
+  // Creates and links a shader program, stores uniform locations
+  createProgramInfo(fragmentShader) {
+    const p = twgl.createProgramInfo(this.gl, [vsBaseSource, fragmentShader]);
+    return p;
   }
 
   // Sets active program
@@ -325,50 +264,69 @@ class WebGLInterface {
     this.gl.useProgram(program);
   }
 
-  // Gets uniform location
-  getUniformLocation(program, uniform) {
-    return this.gl.getUniformLocation(program, uniform);
+  // Sets uniforms
+  setUniforms(setters, values) {
+    twgl.setUniforms(setters, values);
   }
 
-  uniform1f(location, v0) {
-    this.gl.uniform1f(location, v0);
-  }
-
-  uniform2f(location, v0, v1) {
-    this.gl.uniform2f(location, v0, v1);
-  }
-
-  uniform3f(location, v0, v1, v2) {
-    this.gl.uniform3f(location, v0, v1, v2);
-  }
-
-  uniform1i(location, v0) {
-    this.gl.uniform1i(location, v0);
-  }
-
-  // Clears the viewport
+  // Clears the current viewport
   clear(destination, r, g, b, a) {
     this.gl.clearColor(r, g, b, a);
-    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, destination);
+    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, destination.fbo);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
     this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
   }
 
   // Draw to destination frame buffer
-  blit(destination) {
-    this.gl.viewport(0, 0, this.canvas.width, this.canvas.height)
+  blit(destination, width, height) {
+    this.gl.viewport(0, 0, width, height)
+
+    const fbo = destination ? destination.fbo : null;
+    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, fbo);
+
+    if (destination != null) {
+      this.gl.drawBuffers(destination.drawBuffers);
+    }
+
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
     this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.elementBuffer);
     this.gl.enableVertexAttribArray(0);
     this.gl.vertexAttribPointer(0, 2, this.gl.FLOAT, false, 0, 0);
-    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, destination);
-    this.gl.drawElements(this.gl.TRIANGLES, 6, this.gl.UNSIGNED_SHORT, 0);
+    this.gl.drawElements(this.gl.TRIANGLES, 3, this.gl.UNSIGNED_SHORT, 0);
+  }
+
+  logError() {
+    const err = this.gl.getError();
+    console.log(err);
+    switch (err) {
+      case this.gl.NO_ERROR:
+        console.log('NO_ERROR');
+        return false;
+      case this.gl.INVALID_ENUM:
+        console.log('INVALID_ENUM');
+        return true;
+      case this.gl.INVALID_VALUE:
+        console.log('INVALID_VALUE');
+        return true;
+      case this.gl.INVALID_OPERATION:
+        console.log('INVALID_OPERATION');
+        return true;
+      case this.gl.INVALID_FRAMEBUFFER_OPERATION:
+        console.log('INVALID_FRAMEBUFFER_OPERATION');
+        return true;
+      case this.gl.OUT_OF_MEMORY:
+        console.log('OUT_OF_MEMORY');
+        return true;
+      case this.gl.CONTEXT_LOST_WEBG:
+        console.log('CONTEXT_LOST_WEBG');
+        return true;
+    }
   }
 
   // Read pixels from specified frame buffer
   readPixels(source, x, y, width, height, target) {
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, source.fbo);
-    this.gl.readPixels(x, y, width, height, source.format, this.gl.FLOAT, target);
+    this.gl.readPixels(x, y, width, height, source.format, this.floatTexType, target);
   }
 
   setProps(props) {
@@ -381,16 +339,12 @@ class WebGLInterface {
 
   // Gets canvas aspect ratio
   getAspect() {
-    return {
-      xAspect: this.aspect > 1.0 ? this.aspect : 1.0,
-      yAspect: this.aspect < 1.0 ? 1 / this.aspect : 1.0
-    };
+    return [this.aspect > 1.0 ? this.aspect : 1.0, this.aspect < 1.0 ? 1 / this.aspect : 1.0];
   }
 
   // Update WebGL state
   update() {
     this._setAspect();
-    this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
   }
 }
 

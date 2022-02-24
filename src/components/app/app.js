@@ -33,19 +33,18 @@ class App extends React.Component {
       aspect: 1,
       isMounted: false,
       resolution: 256,
-      overlayXOffset: 25,
-      overlayYOffset: 25,
+      stepsPerUpdate: 4,
       activeSetttings: 0,
       tool: 0,
-      toolSizes: [0.1, 0.02, 0.05, 0.1, 0.12],
+      toolSizes: [0.1, 0.04, 0.05, 0.1, 0.12],
       isToolActive: false,
       solute: 0,
       soluteCount: 3,
       viscosity: 0.1,
       boundaryWalls: 0,
-      diffusivities: [0.1, 0.1, 0.1],
+      diffusivities: [0.02, 0.02, 0.02],
       colors: [{r: 255, g: 200, b: 0}, {r: 100, g: 0, b: 255}, {r: 100, g: 255, b: 200}],
-      reactionsEnabled: 1,
+      areReactionsEnabled: true,
       reactionRate: 0.01,
       overlayType: 0,
       toolbarDropdown: false,
@@ -70,7 +69,7 @@ class App extends React.Component {
     this.toggleAbout = this.toggleAbout.bind(this);
     this.resetAllSolutes = this.resetAllSolutes.bind(this);
     this.resetFluid = this.resetFluid.bind(this);
-    this.resetWalls = this.resetWalls.bind(this);
+    this.resetNodeIds = this.resetNodeIds.bind(this);
   }
 
   updateViewportDimensions() {
@@ -148,7 +147,7 @@ class App extends React.Component {
   }
 
   setReactionsEnabled(id) {
-    this.setState({reactionsEnabled: id});
+    this.setState({areReactionsEnabled: id == 1});
   }
 
   setReactionRate(value) {
@@ -178,9 +177,9 @@ class App extends React.Component {
     this.program.resetFluid();
   }
 
-  resetWalls() {
+  resetNodeIds() {
     this.setState({boundaryWalls: 0});
-    this.program.resetWalls();
+    this.program.resetNodeIds();
   }
 
   rgbToHex(rgb) {
@@ -206,13 +205,13 @@ class App extends React.Component {
                 setSolute={() => this.setSolute(0)}
                 isActive={this.state.solute == 0}
               />
-              {this.state.reactionsEnabled == 1 && <div className="reaction-symbol" style={{marginBottom: 2}}>+</div>}
+              {this.state.areReactionsEnabled && <div className="reaction-symbol" style={{marginBottom: 2}}>+</div>}
               <SoluteSelector
                 color={this.state.colors[1]}
                 setSolute={() => this.setSolute(1)}
                 isActive={this.state.solute == 1}
               />
-              {this.state.reactionsEnabled == 1 && <div className="reaction-symbol">→</div>}
+              {this.state.areReactionsEnabled && <div className="reaction-symbol">→</div>}
               <SoluteSelector
                 color={this.state.colors[2]}
                 setSolute={() => this.setSolute(2)}
@@ -258,9 +257,8 @@ class App extends React.Component {
   renderWebGL() {
     const isPortrait = this.state.viewportWidth > 1050 || this.state.aspect > 0.9;
     const className = isPortrait ? "webgl-container-portrait" : "webgl-container-landscape";
-    const leftRightWall = (this.state.boundaryWalls == 1 || this.state.boundaryWalls == 3) ? true : false;
-    const topBottomWall = (this.state.boundaryWalls == 2 || this.state.boundaryWalls == 3) ? true : false;
-    const reactionsEnabledBool = this.state.reactionsEnabled == 1;
+    const hasVerticalWalls = (this.state.boundaryWalls == 1 || this.state.boundaryWalls == 3) ? true : false;
+    const hasHorizontalWalls = (this.state.boundaryWalls == 2 || this.state.boundaryWalls == 3) ? true : false;
     return (
       <div id={className}>
         <CursorPositon
@@ -271,18 +269,17 @@ class App extends React.Component {
             program="lbm"
             hasOverlay={true}
             resolution={this.state.resolution}
-            overlayXOffset={this.state.overlayXOffset}
-            overlayYOffset={this.state.overlayYOffset}
+            stepsPerUpdate={this.state.stepsPerUpdate}
             tool={this.state.tool} 
             toolSize={this.state.toolSizes[this.state.tool]}
             solute={this.state.solute}
             viscosity={this.state.viscosity}
             diffusivities={this.state.diffusivities}
             colors={this.state.colors}
-            leftRightWall={leftRightWall}
-            topBottomWall={topBottomWall}
+            hasVerticalWalls={hasVerticalWalls}
+            hasHorizontalWalls={hasHorizontalWalls}
             exposeProgram={program => this.program = program}
-            reactionsEnabled={reactionsEnabledBool}
+            areReactionsEnabled={this.state.areReactionsEnabled}
             reactionRate={this.state.reactionRate}
             overlayType={this.state.overlayType}
           />
@@ -312,7 +309,7 @@ class App extends React.Component {
   renderFluidSettingsCard(alwaysExpanded) {
     const isReducedCard = this.state.viewportWidth < 830;
     const title = isReducedCard ? "FLUID" : "FLUID SETTINGS"
-    const velocityFieldLabel = isReducedCard ? "VELOCITY FIELD" : "VELOCITY FIELD VISUALIZATION";
+    const velocityFieldLabel = isReducedCard ? "FLOW FIELD" : "FLOW FIELD VISUALIZATION";
     const isColumnLayout = this.state.viewportWidth > 1050 || this.state.aspect > 0.9;
     const hasReducedBoundaryLabels = (this.state.viewportWidth < 990 && !isColumnLayout) || (this.state.viewportWidth < 1030 && isColumnLayout);
     const boundaryHorizontalLabel = hasReducedBoundaryLabels ? "|" : "VERTICAL";
@@ -329,7 +326,7 @@ class App extends React.Component {
           <div className="slider-horizontal-container">
             <SliderHorizontal
               value={this.state.viscosity}
-              min={0.05}
+              min={0.03}
               max={1}
               step={0.01}
               decimals={2}
@@ -367,7 +364,7 @@ class App extends React.Component {
             <div className="reset-button">
               <Button 
                 text="RESET WALLS"
-                onClick={this.resetWalls} 
+                onClick={this.resetNodeIds} 
                 color="black"
               />
             </div>
@@ -467,7 +464,7 @@ class App extends React.Component {
           <div className="slider-horizontal-container">
             <SliderHorizontal
               value={this.state.diffusivities[this.state.solute]}
-              min={0.05}
+              min={0.01}
               max={1}
               step={0.01}
               decimals={2}
@@ -502,7 +499,6 @@ class App extends React.Component {
   renderReactionSettingsCard(alwaysExpanded) {
     const isReducedCard = this.state.viewportWidth < 830;
     const title = isReducedCard ? "REACTIONS" : "REACTION SETTINGS"
-    const reactionsEnabledBool = this.state.reactionsEnabled == 1;
     return (
       <SettingsCard
         title={title}
@@ -514,11 +510,11 @@ class App extends React.Component {
           <div className="settings-subtitle">ENABLE REACTION</div>
           <Selector
             values={["OFF", "ON"]}
-            selection={this.state.reactionsEnabled}
+            selection={this.state.areReactionsEnabled}
             setSelection={this.setReactionsEnabled}
           />
         </div>
-        {reactionsEnabledBool &&
+        {this.state.areReactionsEnabled &&
           <div className="settings-subcontainer">
             <div className="settings-subtitle">REACTION RATE</div>
             <div className="slider-horizontal-container">

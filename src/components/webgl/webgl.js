@@ -2,7 +2,6 @@ import React from 'react';
 import WebGLInterface from './helpers/webgl-interface'
 import DefaultProgram from './programs/default/default';
 import LBMProgram from './programs/lbm/lbm';
-import CursorFollowProgram from './programs/cursor-follow/cursor-follow';
 
 export default class WebGL extends React.Component {
   constructor(props) {
@@ -18,9 +17,6 @@ export default class WebGL extends React.Component {
     switch (this.props.program) {
       case "lbm":
         this.program = new LBMProgram(this.wgli, this.props);
-        break;
-      case "cursorFollow":
-        this.program = new CursorFollowProgram(this.wgli, this.props);
         break;
       default:
         this.program = new DefaultProgram(this.wgli, this.props);
@@ -57,25 +53,16 @@ export default class WebGL extends React.Component {
       height: "100.5%",
       left: 0,
       top: 0
-    };
+    };``
     
     return (
       <div style={containerStyle}>
         <canvas 
           id={this.props.id} 
-          width={this.props.resolution} 
-          height={this.props.resolution} 
+          width={this.props.renderWidth}
+          height={this.props.renderHeight}
           style={canvasStyle}
         />
-        {this.props.hasOverlay
-          ? <canvas 
-              id={this.props.id + "-overlay"} 
-              width={this.props.containerWidth * this.props.pixelRatio}
-              height={this.props.containerHeight * this.props.pixelRatio}
-              style={canvasStyle}
-            />
-          : null
-        }
       </div>
     );
   }
