@@ -13,10 +13,12 @@
   <a href="#contributing">Contributing</a> •
   <a href="#building-for-release">Building for Release</a> •
   <a href="#coding-style">Coding Style</a> •
-  <a href="#credits">Credits</a> •
-  <a href="#related">Related</a> •
+  <a href="#related">Related Work</a> •
   <a href="#license">License</a>
 </p>
+<br>
+
+[![Demo](https://raw.githubusercontent.com/rafaelanderka/lattice-boltzmann-simulator/master/doc/demo.jpg)](https://rafaelanderka.com/lattice-boltzmann-simulator/)
 
 ## Contributing
 
