@@ -13,7 +13,7 @@
   <a href="#contributing">Contributing</a> •
   <a href="#building-for-release">Building for Release</a> •
   <a href="#coding-style">Coding Style</a> •
-  <a href="#related">Related Work</a> •
+  <a href="#related-work">Related Work</a> •
   <a href="#license">License</a>
 </p>
 <br>
