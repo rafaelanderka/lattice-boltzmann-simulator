@@ -56,6 +56,7 @@ class App extends React.Component {
     this.setToolSize = this.setToolSize.bind(this);
     this.setIsToolActive = this.setIsToolActive.bind(this);
     this.setSolute = this.setSolute.bind(this);
+    this.toggleStepsPerUpdate = this.toggleStepsPerUpdate.bind(this);
     this.setViscosity = this.setViscosity.bind(this);
     this.setBoundaryWalls = this.setBoundaryWalls.bind(this);
     this.setActiveDiffusivity = this.setActiveDiffusivity.bind(this);
@@ -102,6 +103,20 @@ class App extends React.Component {
 
   setSolute(id) {
     this.setState({solute: id});
+  }
+
+  toggleStepsPerUpdate() {
+    switch (this.state.stepsPerUpdate) {
+      case 4:
+        this.setState({stepsPerUpdate: 8});
+        break;
+      case 8:
+        this.setState({stepsPerUpdate: 0});
+        break;
+      default:
+        this.setState({stepsPerUpdate: 4});
+        break;
+    }
   }
 
   setViscosity(value) {
@@ -187,6 +202,9 @@ class App extends React.Component {
   }
 
   renderHeader() {
+    const playbackSymbol = (this.state.stepsPerUpdate > 4) ? "▶▶"
+                           : (this.state.stepsPerUpdate == 0) ? "■" : "▶";
+
     return (
         <div id="header">
           <div id="header-tools-container">
@@ -220,6 +238,11 @@ class App extends React.Component {
             </div>
           </div>
           <div id="header-buttons-container">
+            <HeaderButton
+              text={playbackSymbol}
+              onClick={this.toggleStepsPerUpdate}
+              isActive={this.state.stepsPerUpdate > 0}
+            />
             <HeaderButton
               image={IconAboutBlack}
               activeImage={IconAboutWhite}
@@ -257,8 +280,8 @@ class App extends React.Component {
   renderWebGL() {
     const isPortrait = this.state.viewportWidth > 1050 || this.state.aspect > 0.9;
     const className = isPortrait ? "webgl-container-portrait" : "webgl-container-landscape";
-    const hasVerticalWalls = (this.state.boundaryWalls == 1 || this.state.boundaryWalls == 3) ? true : false;
-    const hasHorizontalWalls = (this.state.boundaryWalls == 2 || this.state.boundaryWalls == 3) ? true : false;
+    const hasVerticalWalls = (this.state.boundaryWalls == 1 || this.state.boundaryWalls == 3);
+    const hasHorizontalWalls = (this.state.boundaryWalls == 2 || this.state.boundaryWalls == 3);
     return (
       <div id={className}>
         <CursorPositon

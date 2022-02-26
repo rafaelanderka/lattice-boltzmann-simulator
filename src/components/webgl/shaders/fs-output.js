@@ -39,7 +39,7 @@ float getToneMappedConcentration(sampler2D solute) {
 }
 
 float getToneMappedVelocity() {
-    return 0.5 * length(texture(uFluidData, UV).xy);
+    return 0.2 * length(texture(uFluidData, UV).xy);
 }
 
 float signedDistanceSegment(vec2 p, vec2 offset) {

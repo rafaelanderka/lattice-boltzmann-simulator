@@ -4,6 +4,7 @@
   height: 49px;
   border: none;
   background-color: #DDD;
+  color: black;
   transition: all 0.1s ease;
   padding: 0px;
   margin: 0px;
@@ -26,6 +27,7 @@
 
 .header-button-active {
   background-color: black;
+  color: white;
 }
 
 .header-button-active:hover {

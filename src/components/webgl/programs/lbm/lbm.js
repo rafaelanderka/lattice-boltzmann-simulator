@@ -96,6 +96,8 @@ class LBMProgram {
 
   // Resets the fluid
   resetFluid() {
+    this.wgli.clear(this.fluid.fbo.write, 0.0, 0.0, 0.0, 0.0);
+    this.fluid.fbo.swap();
     this._initFluid();
   }
 

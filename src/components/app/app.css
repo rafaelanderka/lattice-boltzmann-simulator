@@ -24,15 +24,26 @@
 
 #header-tools-container {
   display: flex;
-  width: 80vw;
+  width: 75%;
   max-width: 600px;
+  min-width: 510px;
   justify-content: space-between;
+}
+
+#header-buttons-container {
+  display: flex;
+  flex-shrink: 1;
+  justify-content: space-between;
+  width: 17%;
+  max-width: 130px;
+  margin-left: 2.5%;
 }
 
 .logo-container {
   position: relative;
   left: -5px;
   height: 49px;
+  margin-right: 4px;
   justify-content: flex-start;
   font-weight: 500;
   color: white;
@@ -157,7 +168,7 @@
   border: 2px solid white;
   height: 45px;
   padding: 0px 10px;
-  margin-right: 4px;
+  margin-left: 3%;
   box-shadow: rgba(50, 50, 105, 0.45) 0px 2px 5px 0px, rgba(0, 0, 0, 0.05) 0px 1px 1px 0px;
 }
 
